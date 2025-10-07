@@ -1,0 +1,305 @@
+import React from 'react'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { MapPin, Star, Phone, Clock, Heart, Share2, Activity, Users, Award } from 'lucide-react'
+import { createClient } from '@/lib/supabase'
+import SEOSchemaMarkup from '@/components/SEOSchemaMarkup'
+import { getFeaturedPilatesStudios } from '@/lib/pilates-studios'
+
+interface County {
+  id: string;
+  name: string;
+  slug: string;
+  butcher_count: number; // Keep same name for compatibility with existing views
+}
+
+interface CityTown {
+  id: string;
+  name: string;
+  slug: string;
+  full_path: string;
+  county_slug: string;
+  butcher_count: number; // Keep same name for compatibility with existing views
+  type: 'city' | 'town';
+}
+
+interface CountyWithLocations {
+  county: County;
+  locations: CityTown[];
+}
+
+async function getCountiesWithLocations(): Promise<CountyWithLocations[]> {
+  const supabase = createClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  // Get all counties
+  const { data: counties, error: countiesError } = await supabase
+    .from('public_locations')
+    .select('id, name, slug, butcher_count')
+    .eq('type', 'county')
+    .order('name');
+
+  if (countiesError) {
+    console.error('Error fetching counties:', countiesError);
+    return [];
+  }
+
+  // Get all cities and towns
+  const { data: citiesAndTowns, error: locationsError } = await supabase
+    .from('public_locations')
+    .select('id, name, slug, full_path, county_slug, butcher_count, type')
+    .in('type', ['city', 'town'])
+    .order('name');
+
+  if (locationsError) {
+    console.error('Error fetching cities and towns:', locationsError);
+    return [];
+  }
+
+  // Group locations by county
+  return counties.map(county => ({
+    county,
+    locations: citiesAndTowns.filter(location => location.county_slug === county.slug)
+  }));
+}
+
+export default async function Home() {
+  // Get counties with their associated locations and featured studios
+  const [countiesWithLocations, featuredStudios] = await Promise.all([
+    getCountiesWithLocations(),
+    getFeaturedPilatesStudios(6)
+  ]);
+
+  return (
+    <div>
+      <SEOSchemaMarkup page="home" />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+
+      {/* Hero Section with Background Image */}
+      <div className="relative min-h-screen flex items-center justify-center">
+        {/* Background Image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: 'url(/pilates-hero-image.png)',
+          }}
+        />
+
+        {/* Overlay for better text readability */}
+        <div className="absolute inset-0 bg-black/40" />
+
+        {/* Content */}
+        <div className="relative z-10 container mx-auto px-4 py-16">
+          <div className="text-center">
+            <h1 className="text-5xl font-extrabold text-white mb-6 font-jakarta drop-shadow-lg">
+              Find the Perfect Pilates Studio Near You
+            </h1>
+            <p className="text-xl text-white/90 mb-8 max-w-3xl mx-auto drop-shadow-md">
+              Discover the best pilates studios across the UK with detailed class information, instructor profiles, and live booking
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" className="text-lg px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white border-0 shadow-lg" asChild>
+                <Link href="#browse-counties">Browse All Locations</Link>
+              </Button>
+              <Button size="lg" variant="outline" className="text-lg px-8 py-3 bg-white/10 hover:bg-white/20 text-white border-white/30 backdrop-blur-sm" asChild>
+                <Link href="#featured-studios">View Featured Studios</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 py-16">
+
+        {/* Featured Studios */}
+        <div id="featured-studios" className="mb-16">
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-8 text-center font-jakarta">
+            Featured Pilates Studios
+          </h2>
+          {featuredStudios.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredStudios.map((studio) => (
+                <Card key={studio.id} className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle className="text-xl">{studio.name}</CardTitle>
+                        <CardDescription className="flex items-center gap-1 mt-1">
+                          <MapPin className="h-4 w-4" />
+                          {studio.city}, {studio.county}
+                        </CardDescription>
+                      </div>
+                      {studio.google_rating && (
+                        <div className="flex items-center gap-1">
+                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                          <span className="text-sm font-medium">{studio.google_rating.toFixed(1)}</span>
+                        </div>
+                      )}
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {/* Opening Hours */}
+                      {studio.opening_hours && Object.keys(studio.opening_hours).length > 0 && (
+                        <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                          <Clock className="h-4 w-4" />
+                          <span>{Object.values(studio.opening_hours)[0] || 'Opening hours available'}</span>
+                        </div>
+                      )}
+
+                      {/* Phone */}
+                      {studio.phone && (
+                        <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                          <Phone className="h-4 w-4" />
+                          <span>{studio.phone}</span>
+                        </div>
+                      )}
+
+                      {/* Price Range */}
+                      {studio.price_range && (
+                        <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                          <Activity className="h-4 w-4" />
+                          <span>{studio.price_range}</span>
+                        </div>
+                      )}
+
+                      {/* Description */}
+                      <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-3">
+                        {studio.description || `Professional pilates studio in ${studio.city}, ${studio.county} offering expert instruction and quality equipment.`}
+                      </p>
+
+                      {/* Class Types */}
+                      {studio.class_types && studio.class_types.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {studio.class_types.slice(0, 3).map((classType, index) => (
+                            <span key={index} className="px-2 py-1 bg-purple-100 dark:bg-purple-900 text-xs rounded-full">
+                              {classType}
+                            </span>
+                          ))}
+                          {studio.class_types.length > 3 && (
+                            <span className="text-xs text-purple-600 px-2 py-1">
+                              +{studio.class_types.length - 3} more
+                            </span>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Action Buttons */}
+                      <div className="flex items-center gap-2 pt-2">
+                        {studio.website ? (
+                          <Button size="sm" className="flex-1 bg-purple-600 hover:bg-purple-700" asChild>
+                            <a href={studio.website} target="_blank" rel="noopener noreferrer">
+                              Visit Website
+                            </a>
+                          </Button>
+                        ) : studio.phone ? (
+                          <Button size="sm" className="flex-1 bg-purple-600 hover:bg-purple-700" asChild>
+                            <a href={`tel:${studio.phone}`}>
+                              Call Studio
+                            </a>
+                          </Button>
+                        ) : (
+                          <Button size="sm" className="flex-1 bg-purple-600 hover:bg-purple-700" asChild>
+                            <Link href={`/${studio.full_url_path}`}>
+                              View Details
+                            </Link>
+                          </Button>
+                        )}
+
+                        {studio.full_url_path && (
+                          <Button variant="outline" size="sm" asChild>
+                            <Link href={`/${studio.full_url_path}`}>
+                              Details
+                            </Link>
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-slate-600 dark:text-slate-400 text-lg">
+                No featured studios available at the moment.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 py-8">
+        {/* All Locations by County Section */}
+        <div id="browse-counties" className="mb-16">
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-8 text-center font-jakarta">
+            Browse All Locations by County
+          </h2>
+          {countiesWithLocations.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {countiesWithLocations.map(({ county, locations }) => (
+                <div key={county.id} className="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700">
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 border-b border-slate-200 dark:border-slate-700 pb-2">
+                    <Link
+                      href={`/${county.slug}`}
+                      className="hover:text-purple-600 transition-colors"
+                    >
+                      {county.name}
+                    </Link>
+                  </h3>
+
+                  {locations.length > 0 ? (
+                    <div className="space-y-2">
+                      {locations.map((location) => (
+                        <div key={location.id}>
+                          <Link
+                            href={`/${location.full_path}`}
+                            className="text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300 text-sm transition-colors inline-block"
+                          >
+                            {location.name}
+                          </Link>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-slate-500 dark:text-slate-400 text-sm italic">
+                      No cities or towns listed yet
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-slate-600 dark:text-slate-400 text-lg">
+                No locations available at the moment.
+              </p>
+            </div>
+          )}
+        </div>
+
+
+        {/* CTA Section */}
+        <div className="text-center bg-gradient-to-r from-purple-600 to-purple-700 rounded-lg p-12 text-white">
+          <h2 className="text-3xl font-bold mb-4 font-jakarta">Ready to Transform Your Fitness Journey?</h2>
+          <p className="text-xl mb-8 opacity-90">
+            Join thousands of people who trust Pilates Classes Near to find their perfect pilates studio and instructor
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" variant="secondary" className="text-lg px-8 py-3" asChild>
+              <Link href="#browse-counties">Find Studios Near You</Link>
+            </Button>
+            <Button size="lg" variant="outline" className="text-lg px-8 py-3 bg-white text-gray-900 border-white hover:bg-gray-100 hover:text-gray-900" asChild>
+              <Link href="#featured-studios">Explore Featured Studios</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  )
+}
