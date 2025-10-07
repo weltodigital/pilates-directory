@@ -98,7 +98,7 @@ async function getAllCountyStudios(countySlug: string) {
     .select('*')
     .eq('county_slug', countySlug)
     .eq('is_active', true)
-    .order('google_rating', { ascending: false, nullsLast: true })
+    .order('google_rating', { ascending: false, nullsFirst: false })
     .order('name');
 
   if (error) {

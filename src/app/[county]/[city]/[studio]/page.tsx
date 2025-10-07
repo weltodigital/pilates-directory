@@ -247,7 +247,7 @@ function StudioSchema({ studio, county, city }: { studio: PilatesStudio; county:
     ],
     openingHoursSpecification: Object.entries(studio.opening_hours || {}).map(([day, hours]) => {
       // Convert numeric day keys to day names for structured data
-      const dayNames = {
+      const dayNames: Record<string, string> = {
         '0': 'Sunday',
         '1': 'Monday',
         '2': 'Tuesday',
@@ -489,7 +489,7 @@ export default async function StudioPage({ params }: StudioPageProps) {
                           <div className="space-y-2">
                             {Object.entries(studioData.opening_hours).map(([day, hours]) => {
                               // Convert numeric day keys to day names
-                              const dayNames = {
+                              const dayNames: Record<string, string> = {
                                 '0': 'Sunday',
                                 '1': 'Monday',
                                 '2': 'Tuesday',

@@ -156,7 +156,7 @@ async function getCityStudios(countySlug: string, citySlug: string): Promise<Pil
     .eq('county_slug', countySlug)
     .eq('city_slug', citySlug)
     .eq('is_active', true)
-    .order('google_rating', { ascending: false, nullsLast: true })
+    .order('google_rating', { ascending: false, nullsFirst: false })
     .order('name');
 
   // If no exact match, try to match by address containing the city name
@@ -169,7 +169,7 @@ async function getCityStudios(countySlug: string, citySlug: string): Promise<Pil
       .eq('county_slug', countySlug)
       .ilike('address', `%${cityName}%`)
       .eq('is_active', true)
-      .order('google_rating', { ascending: false, nullsLast: true })
+      .order('google_rating', { ascending: false, nullsFirst: false })
       .order('name');
 
     if (!addressError) {

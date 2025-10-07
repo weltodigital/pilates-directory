@@ -89,7 +89,7 @@ export default function ButcherList({
     if (!searchQuery && Object.keys(filters).length === 0) {
       fetchButchers()
     }
-  }, [])
+  }, [searchQuery, filters, fetchButchers])
 
 
 
