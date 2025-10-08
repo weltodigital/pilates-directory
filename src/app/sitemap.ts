@@ -1,150 +1,127 @@
 import { MetadataRoute } from 'next'
-import { createClient } from '@/lib/supabase'
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const supabase = createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-
+export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://pilatesclassesnear.com';
   const currentDate = new Date();
 
-  // Static pages
-  const staticPages: MetadataRoute.Sitemap = [
+  // Static sitemap with core pages to ensure fast loading for Google
+  return [
     {
       url: baseUrl,
       lastModified: currentDate,
       changeFrequency: 'daily',
       priority: 1,
     },
+    // Core county pages
     {
-      url: `${baseUrl}/about`,
+      url: `${baseUrl}/london`,
       lastModified: currentDate,
-      changeFrequency: 'monthly',
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/bedfordshire`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/berkshire`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/greater-manchester`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    // Popular city pages
+    {
+      url: `${baseUrl}/london/camden`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/contact`,
+      url: `${baseUrl}/london/westminster`,
       lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.6,
+      changeFrequency: 'weekly',
+      priority: 0.8,
     },
     {
-      url: `${baseUrl}/privacy`,
+      url: `${baseUrl}/london/islington`,
       lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.3,
+      changeFrequency: 'weekly',
+      priority: 0.8,
     },
     {
-      url: `${baseUrl}/terms`,
+      url: `${baseUrl}/london/hackney`,
       lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.3,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/london/tower-hamlets`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/bedfordshire/bedford`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/berkshire/reading`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/greater-manchester/manchester`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    // Specialty/category pages
+    {
+      url: `${baseUrl}/reformer-pilates`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/mat-pilates`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/clinical-pilates`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/prenatal-pilates`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/barre-pilates`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/beginner-pilates`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.8,
     }
   ];
-
-  try {
-    // Get all counties
-    const { data: counties, error: countiesError } = await supabase
-      .from('public_locations')
-      .select('slug, updated_at')
-      .eq('type', 'county')
-      .order('slug');
-
-    // Get all cities and towns
-    const { data: locations, error: locationsError } = await supabase
-      .from('public_locations')
-      .select('full_path, updated_at')
-      .in('type', ['city', 'town'])
-      .order('full_path');
-
-    // Get all pilates studios
-    const { data: studios, error: studiosError } = await supabase
-      .from('pilates_studios')
-      .select('full_url_path, updated_at')
-      .eq('is_active', true)
-      .order('full_url_path');
-
-    let dynamicPages: MetadataRoute.Sitemap = [];
-
-    // Add county pages
-    if (counties && !countiesError) {
-      const countyPages = counties.map(county => ({
-        url: `${baseUrl}/${county.slug}`,
-        lastModified: new Date(county.updated_at || currentDate),
-        changeFrequency: 'weekly' as const,
-        priority: 0.9,
-      }));
-      dynamicPages = [...dynamicPages, ...countyPages];
-    }
-
-    // Add city/town pages
-    if (locations && !locationsError) {
-      const locationPages = locations.map(location => ({
-        url: `${baseUrl}/${location.full_path}`,
-        lastModified: new Date(location.updated_at || currentDate),
-        changeFrequency: 'weekly' as const,
-        priority: 0.8,
-      }));
-      dynamicPages = [...dynamicPages, ...locationPages];
-    }
-
-    // Add studio pages
-    if (studios && !studiosError) {
-      const studioPages = studios.map(studio => ({
-        url: `${baseUrl}/${studio.full_url_path}`,
-        lastModified: new Date(studio.updated_at || currentDate),
-        changeFrequency: 'weekly' as const,
-        priority: 0.7,
-      }));
-      dynamicPages = [...dynamicPages, ...studioPages];
-    }
-
-    // Add specialty/category pages
-    const specialtyPages: MetadataRoute.Sitemap = [
-      {
-        url: `${baseUrl}/reformer-pilates`,
-        lastModified: currentDate,
-        changeFrequency: 'weekly',
-        priority: 0.8,
-      },
-      {
-        url: `${baseUrl}/mat-pilates`,
-        lastModified: currentDate,
-        changeFrequency: 'weekly',
-        priority: 0.8,
-      },
-      {
-        url: `${baseUrl}/clinical-pilates`,
-        lastModified: currentDate,
-        changeFrequency: 'weekly',
-        priority: 0.8,
-      },
-      {
-        url: `${baseUrl}/prenatal-pilates`,
-        lastModified: currentDate,
-        changeFrequency: 'weekly',
-        priority: 0.7,
-      },
-      {
-        url: `${baseUrl}/barre-pilates`,
-        lastModified: currentDate,
-        changeFrequency: 'weekly',
-        priority: 0.7,
-      },
-      {
-        url: `${baseUrl}/beginner-pilates`,
-        lastModified: currentDate,
-        changeFrequency: 'weekly',
-        priority: 0.8,
-      }
-    ];
-
-    return [...staticPages, ...dynamicPages, ...specialtyPages];
-
-  } catch (error) {
-    console.error('Error generating sitemap:', error);
-    return staticPages;
-  }
 }
