@@ -137,7 +137,7 @@ export async function generateMetadata({ params }: CountyPageProps): Promise<Met
 
   if (!location) {
     return {
-      title: 'County Not Found | PilatesUK - Find Pilates Studios Near You',
+      title: 'County Not Found | Pilates Directory - Find Pilates Studios Near You',
       description: 'The requested county could not be found in our pilates studio directory.',
     };
   }
@@ -153,7 +153,7 @@ export async function generateMetadata({ params }: CountyPageProps): Promise<Met
         description: seoContent.og_description || seoContent.meta_description,
         type: 'website',
         locale: 'en_GB',
-        siteName: 'PilatesUK',
+        siteName: 'Pilates Directory',
         url: seoContent.canonical_url,
       },
       twitter: {
@@ -193,19 +193,19 @@ export async function generateMetadata({ params }: CountyPageProps): Promise<Met
   ];
 
   return {
-    title: location.seo_title || `Pilates Studios in ${location.name} | Find Pilates Classes Near You | PilatesUK`,
+    title: location.seo_title || `Pilates Studios in ${location.name} | Find Pilates Classes Near You | Pilates Directory`,
     description: location.meta_description || `Find the best pilates studios in ${location.name}. Browse reformer, mat & clinical pilates classes. Read reviews, check schedules & book online. ${location.butcher_count}+ studios listed.`,
     keywords: [...pilatesKeywords, ...(location.seo_keywords || [])].join(', '),
     openGraph: {
-      title: `Pilates Studios in ${location.name} | PilatesUK`,
+      title: `Pilates Studios in ${location.name} | Pilates Directory`,
       description: `Discover ${location.butcher_count}+ pilates studios in ${location.name}. Find reformer, mat & clinical pilates classes near you.`,
       type: 'website',
       locale: 'en_GB',
-      siteName: 'PilatesUK',
+      siteName: 'Pilates Directory',
     },
     twitter: {
       card: 'summary_large_image',
-      title: `Pilates Studios in ${location.name} | PilatesUK`,
+      title: `Pilates Studios in ${location.name} | Pilates Directory`,
       description: `Find the best pilates studios in ${location.name}. Browse classes, read reviews & book online.`,
     },
     robots: {
@@ -231,7 +231,7 @@ function StructuredData({ county, citiesAndTowns, featuredStudios }: { county: L
     {
       '@context': 'https://schema.org',
       '@type': 'WebPage',
-      name: `Pilates Studios in ${county.name} | PilatesUK`,
+      name: `Pilates Studios in ${county.name} | Pilates Directory`,
       description: `Find the best pilates studios in ${county.name}. Browse reformer, mat & clinical pilates classes with verified reviews and online booking.`,
       url: `https://pilatesuk.co.uk/${county.slug}`,
       mainEntity: {
@@ -255,7 +255,7 @@ function StructuredData({ county, citiesAndTowns, featuredStudios }: { county: L
           name: `Where can I find pilates studios near me in ${county.name}?`,
           acceptedAnswer: {
             '@type': 'Answer',
-            text: `PilatesUK lists ${county.butcher_count}+ pilates studios across ${county.name}. You can find studios offering reformer pilates, mat classes, clinical pilates, and specialized programs in cities like ${citiesAndTowns.slice(0, 3).map(c => c.name).join(', ')}.`
+            text: `Pilates Directory lists ${county.butcher_count}+ pilates studios across ${county.name}. You can find studios offering reformer pilates, mat classes, clinical pilates, and specialized programs in cities like ${citiesAndTowns.slice(0, 3).map(c => c.name).join(', ')}.`
           }
         },
         {
@@ -592,10 +592,6 @@ export default async function CountyPage({ params }: CountyPageProps) {
                       <div className="flex items-center justify-between">
                         <div className="text-purple-600 font-medium text-sm group-hover:text-purple-700 transition-colors">
                           Find Studios Near Me →
-                        </div>
-                        <div className="flex items-center gap-1 text-xs text-gray-500">
-                          <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                          <span>4.8+ rated</span>
                         </div>
                       </div>
                     </Link>

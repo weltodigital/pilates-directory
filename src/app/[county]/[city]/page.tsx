@@ -192,7 +192,7 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
 
   if (!location) {
     return {
-      title: 'Location Not Found | PilatesUK - Find Pilates Studios Near You',
+      title: 'Location Not Found | Pilates Directory - Find Pilates Studios Near You',
       description: 'The requested location could not be found in our pilates studio directory.',
     };
   }
@@ -208,7 +208,7 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
         description: seoContent.og_description || seoContent.meta_description,
         type: 'website',
         locale: 'en_GB',
-        siteName: 'PilatesUK',
+        siteName: 'Pilates Directory',
         url: seoContent.canonical_url,
       },
       twitter: {
@@ -250,19 +250,19 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
   ];
 
   return {
-    title: location.seo_title || `Pilates Studios in ${location.name} | Pilates Near Me | PilatesUK`,
+    title: location.seo_title || `Pilates Studios in ${location.name} | Pilates Near Me | Pilates Directory`,
     description: location.meta_description || `Find the best pilates studios in ${location.name}. Browse reformer, mat & clinical pilates classes near you. Read reviews, check schedules & book online. ${location.butcher_count}+ local studios.`,
     keywords: [...localKeywords, ...(location.seo_keywords || [])].join(', '),
     openGraph: {
-      title: `Pilates Studios in ${location.name} | PilatesUK`,
+      title: `Pilates Studios in ${location.name} | Pilates Directory`,
       description: `Discover ${location.butcher_count}+ pilates studios in ${location.name}. Find reformer, mat & clinical pilates classes near you with verified reviews.`,
       type: 'website',
       locale: 'en_GB',
-      siteName: 'PilatesUK',
+      siteName: 'Pilates Directory',
     },
     twitter: {
       card: 'summary_large_image',
-      title: `Pilates Near Me in ${location.name} | PilatesUK`,
+      title: `Pilates Near Me in ${location.name} | Pilates Directory`,
       description: `Find the best pilates studios in ${location.name}. Browse classes, read reviews & book online.`,
     },
     robots: {
@@ -403,7 +403,7 @@ function StructuredData({ location, county, studios }: { location: Location; cou
           name: `Where can I find pilates studios near me in ${location.name}?`,
           acceptedAnswer: {
             '@type': 'Answer',
-            text: `PilatesUK lists ${studios.length}+ pilates studios in ${location.name}, ${county.name}. Our directory includes reformer pilates, mat classes, clinical pilates, and specialized programs with verified reviews and online booking options.`
+            text: `Pilates Directory lists ${studios.length}+ pilates studios in ${location.name}, ${county.name}. Our directory includes reformer pilates, mat classes, clinical pilates, and specialized programs with verified reviews and online booking options.`
           }
         },
         {
@@ -564,21 +564,6 @@ export default async function CityPage({ params }: CityPageProps) {
                 </span>
               </div>
 
-              {/* Quick Actions */}
-              <div className="flex flex-wrap gap-4 mb-6">
-                <Button size="lg" className="bg-purple-600 hover:bg-purple-700">
-                  <Search className="h-4 w-4 mr-2" />
-                  Find Studios Near Me
-                </Button>
-                <Button variant="outline" size="lg" className="border-purple-600 text-purple-600 hover:bg-purple-50">
-                  <Clock className="h-4 w-4 mr-2" />
-                  View Class Times
-                </Button>
-                <Button variant="outline" size="lg" className="border-purple-600 text-purple-600 hover:bg-purple-50">
-                  <Star className="h-4 w-4 mr-2" />
-                  Top Rated Studios
-                </Button>
-              </div>
 
               {/* Intro Text */}
               <p className="text-lg text-gray-700 leading-relaxed">
@@ -597,14 +582,6 @@ export default async function CityPage({ params }: CityPageProps) {
                 <h2 className="text-2xl font-bold text-gray-900">
                   Pilates Studios in {location.name} ({studios.length})
                 </h2>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    <MapPin className="h-4 w-4 mr-1" />Map View
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <Star className="h-4 w-4 mr-1" />Sort by Rating
-                  </Button>
-                </div>
               </div>
 
               {studios.length > 0 ? (

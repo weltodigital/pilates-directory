@@ -77,7 +77,7 @@ export default function Dashboard() {
                   <a 
                     href="https://ui.shadcn.com/docs/components" 
                     target="_blank" 
-                    rel="noopener noreferrer"
+                    rel="nofollow noopener noreferrer"
                     className="text-purple-600 hover:underline"
                   >
                     https://ui.shadcn.com/docs/components
@@ -111,7 +111,7 @@ export default function Dashboard() {
                   <a 
                     href="https://ui.shadcn.com/themes" 
                     target="_blank" 
-                    rel="noopener noreferrer"
+                    rel="nofollow noopener noreferrer"
                     className="text-purple-600 hover:underline"
                   >
                     https://ui.shadcn.com/themes
@@ -168,7 +168,7 @@ export default function Dashboard() {
                 📚 <a 
                   href="https://lucide.dev/docs/lucide-react/" 
                   target="_blank" 
-                  rel="noopener noreferrer"
+                  rel="nofollow noopener noreferrer"
                   className="text-purple-600 hover:underline"
                 >
                   Lucide React Docs
@@ -229,7 +229,7 @@ export default function Dashboard() {
                   <a 
                     href="https://ui.shadcn.com/colors" 
                     target="_blank" 
-                    rel="noopener noreferrer"
+                    rel="nofollow noopener noreferrer"
                     className="text-purple-600 hover:underline"
                   >
                     https://ui.shadcn.com/colors

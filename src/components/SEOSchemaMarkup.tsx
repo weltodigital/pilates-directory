@@ -35,7 +35,7 @@ export default function SEOSchemaMarkup({ studios = [], location, page = 'home' 
   const generateOrganizationSchema = () => ({
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'PilatesUK',
+    name: 'Pilates Directory',
     description: 'The UK\'s leading directory for finding pilates studios, classes, and instructors',
     url: 'https://pilatesuk.co.uk',
     logo: 'https://pilatesuk.co.uk/logo.png',
@@ -62,7 +62,7 @@ export default function SEOSchemaMarkup({ studios = [], location, page = 'home' 
   const generateWebsiteSchema = () => ({
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'PilatesUK',
+    name: 'Pilates Directory',
     description: 'Find the best pilates studios across the UK',
     url: 'https://pilatesuk.co.uk',
     potentialAction: {
@@ -75,7 +75,7 @@ export default function SEOSchemaMarkup({ studios = [], location, page = 'home' 
     },
     publisher: {
       '@type': 'Organization',
-      name: 'PilatesUK'
+      name: 'Pilates Directory'
     }
   });
 
@@ -237,7 +237,7 @@ export default function SEOSchemaMarkup({ studios = [], location, page = 'home' 
         name: 'What types of pilates classes are available?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'PilatesUK features studios offering mat pilates, reformer pilates, clinical pilates, prenatal pilates, barre pilates, and many other specialized classes. Each studio listing shows their specific class types and specialties.'
+          text: 'Pilates Directory features studios offering mat pilates, reformer pilates, clinical pilates, prenatal pilates, barre pilates, and many other specialized classes. Each studio listing shows their specific class types and specialties.'
         }
       },
       {

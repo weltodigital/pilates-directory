@@ -228,7 +228,7 @@ export default function LocationStudiosMap({ studios, locationName, locationType
                             <a
                               href={studio.website}
                               target="_blank"
-                              rel="noopener noreferrer"
+                              rel="nofollow noopener noreferrer"
                               className="px-3 py-1.5 border border-purple-600 text-purple-600 text-xs rounded hover:bg-purple-50 transition-colors"
                             >
                               <ExternalLink className="h-3 w-3" />

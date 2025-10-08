@@ -192,7 +192,7 @@ export default async function Home() {
                       <div className="flex items-center gap-2 pt-2">
                         {studio.website ? (
                           <Button size="sm" className="flex-1 bg-purple-600 hover:bg-purple-700" asChild>
-                            <a href={studio.website} target="_blank" rel="noopener noreferrer">
+                            <a href={studio.website} target="_blank" rel="nofollow noopener noreferrer">
                               Visit Website
                             </a>
                           </Button>

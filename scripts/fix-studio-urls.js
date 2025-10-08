@@ -81,10 +81,10 @@ function extractCityCounty(addressComponents) {
 
   // Special handling for UK addresses
   if (country === 'United Kingdom') {
-    // For London addresses, set county to Greater London
-    if (city === 'London' || county === 'Greater London') {
+    // For London addresses, set county to London
+    if (city === 'London' || county === 'London') {
       city = 'London';
-      county = 'Greater London';
+      county = 'London';
     }
     // For Manchester addresses
     else if (city === 'Manchester' || county === 'Greater Manchester') {

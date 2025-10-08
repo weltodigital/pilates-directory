@@ -153,10 +153,6 @@ export default function SEOLocationContent({
                   <div className="text-purple-600 font-medium text-sm group-hover:text-purple-700 transition-colors">
                     Find Studios Near Me →
                   </div>
-                  <div className="flex items-center gap-1 text-xs text-gray-500">
-                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                    <span>4.8+ rated</span>
-                  </div>
                 </div>
               </Link>
             ))}

@@ -123,12 +123,12 @@ export async function generateMetadata({ params }: StudioPageProps): Promise<Met
 
   if (!studioData || !locationData) {
     return {
-      title: 'Studio Not Found | PilatesUK - Find Pilates Studios Near You',
+      title: 'Studio Not Found | Pilates Directory - Find Pilates Studios Near You',
       description: 'The requested pilates studio could not be found.',
     };
   }
 
-  const title = `${studioData.name} | Pilates Studio in ${locationData.city.name} | PilatesUK`;
+  const title = `${studioData.name} | Pilates Studio in ${locationData.city.name} | Pilates Directory`;
   const description = `${studioData.description || `Professional pilates studio in ${locationData.city.name}, ${locationData.county.name}. Offering ${studioData.class_types?.join(', ') || 'reformer, mat and clinical pilates'} classes.`} Book online today!`;
 
   return {
@@ -148,7 +148,7 @@ export async function generateMetadata({ params }: StudioPageProps): Promise<Met
       description,
       type: 'website',
       locale: 'en_GB',
-      siteName: 'PilatesUK',
+      siteName: 'Pilates Directory',
       images: studioData.images?.length ? [studioData.images[0]] : undefined,
     },
     twitter: {
@@ -246,24 +246,35 @@ function StudioSchema({ studio, county, city }: { studio: PilatesStudio; county:
       }] : [])
     ],
     openingHoursSpecification: Object.entries(studio.opening_hours || {}).map(([day, hours]) => {
-      // Convert numeric day keys to day names for structured data
+      // Handle the current format where hours already contain day name and times
       const dayNames: Record<string, string> = {
-        '0': 'Sunday',
-        '1': 'Monday',
-        '2': 'Tuesday',
-        '3': 'Wednesday',
-        '4': 'Thursday',
-        '5': 'Friday',
-        '6': 'Saturday'
+        '0': 'Monday',
+        '1': 'Tuesday',
+        '2': 'Wednesday',
+        '3': 'Thursday',
+        '4': 'Friday',
+        '5': 'Saturday',
+        '6': 'Sunday'
       };
 
-      const dayName = dayNames[day] || day;
+      let dayName, timeRange;
+
+      // Check if hours contains day name (current format: "Monday: 7:30 AM – 8:00 PM")
+      if (hours.includes(':') && (hours.includes('Monday') || hours.includes('Tuesday') || hours.includes('Wednesday') || hours.includes('Thursday') || hours.includes('Friday') || hours.includes('Saturday') || hours.includes('Sunday'))) {
+        const [dayPart, timePart] = hours.split(': ');
+        dayName = dayPart;
+        timeRange = timePart;
+      } else {
+        // Fallback to original format
+        dayName = dayNames[day] || day;
+        timeRange = hours;
+      }
 
       return {
         '@type': 'OpeningHoursSpecification',
         dayOfWeek: dayName,
-        opens: hours.split('-')[0]?.trim(),
-        closes: hours.split('-')[1]?.trim()
+        opens: timeRange.split('–')[0]?.trim() || timeRange.split('-')[0]?.trim(),
+        closes: timeRange.split('–')[1]?.trim() || timeRange.split('-')[1]?.trim()
       };
     }),
     sameAs: [
@@ -488,25 +499,38 @@ export default async function StudioPage({ params }: StudioPageProps) {
                           </h4>
                           <div className="space-y-2">
                             {Object.entries(studioData.opening_hours).map(([day, hours]) => {
-                              // Convert numeric day keys to day names
+                              // Handle the current format where hours already contain day name and times
+                              // e.g., "0": "Monday: 7:30 AM – 8:00 PM"
                               const dayNames: Record<string, string> = {
-                                '0': 'Sunday',
-                                '1': 'Monday',
-                                '2': 'Tuesday',
-                                '3': 'Wednesday',
-                                '4': 'Thursday',
-                                '5': 'Friday',
-                                '6': 'Saturday'
+                                '0': 'Monday',
+                                '1': 'Tuesday',
+                                '2': 'Wednesday',
+                                '3': 'Thursday',
+                                '4': 'Friday',
+                                '5': 'Saturday',
+                                '6': 'Sunday'
                               };
 
-                              const dayName = dayNames[day] || day;
-
-                              return (
-                                <div key={day} className="flex justify-between text-sm">
-                                  <span className="font-medium text-gray-700">{dayName}</span>
-                                  <span className="text-gray-600">{hours}</span>
-                                </div>
-                              );
+                              // Check if hours contains day name (current format)
+                              if (hours.includes(':') && (hours.includes('Monday') || hours.includes('Tuesday') || hours.includes('Wednesday') || hours.includes('Thursday') || hours.includes('Friday') || hours.includes('Saturday') || hours.includes('Sunday'))) {
+                                // Parse "Monday: 7:30 AM – 8:00 PM" format
+                                const [dayPart, timePart] = hours.split(': ');
+                                return (
+                                  <div key={day} className="flex justify-between text-sm">
+                                    <span className="font-medium text-gray-700">{dayPart}</span>
+                                    <span className="text-gray-600">{timePart}</span>
+                                  </div>
+                                );
+                              } else {
+                                // Fallback to original format
+                                const dayName = dayNames[day] || day;
+                                return (
+                                  <div key={day} className="flex justify-between text-sm">
+                                    <span className="font-medium text-gray-700">{dayName}</span>
+                                    <span className="text-gray-600">{hours}</span>
+                                  </div>
+                                );
+                              }
                             })}
                           </div>
                         </div>
