@@ -1,0 +1,436 @@
+import React from 'react'
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Clock, Users, ChefHat, Timer, Utensils, ArrowLeft } from 'lucide-react'
+import { createClient } from '@/lib/supabase'
+import { Metadata } from 'next'
+
+interface Recipe {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  ingredients: any[];
+  instructions: any[];
+  prep_time: number;
+  cook_time: number;
+  total_time: number;
+  servings: number;
+  difficulty: string;
+  calories_per_serving: number;
+  seo_title: string;
+  seo_description: string;
+  featured_image_url: string;
+  featured_image_alt: string;
+  tips: string;
+  variations: string;
+  storage_instructions: string;
+  created_at: string;
+  categories?: Category[];
+}
+
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+interface Nutrition {
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  fiber: number;
+  sugar: number;
+  sodium: number;
+}
+
+async function getRecipe(slug: string): Promise<Recipe | null> {
+  const supabase = createClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  const { data: recipe, error } = await supabase
+    .from('recipes')
+    .select(`
+      *,
+      recipe_categories!inner(
+        categories(
+          id,
+          name,
+          slug
+        )
+      )
+    `)
+    .eq('slug', slug)
+    .eq('status', 'published')
+    .single();
+
+  if (error || !recipe) {
+    return null;
+  }
+
+  // Transform the data to include categories directly on recipe
+  const recipeWithCategories = {
+    ...recipe,
+    categories: recipe.recipe_categories?.map((rc: any) => rc.categories) || []
+  };
+
+  return recipeWithCategories;
+}
+
+async function getRecipeNutrition(recipeId: string): Promise<Nutrition | null> {
+  const supabase = createClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  const { data: nutrition, error } = await supabase
+    .from('recipe_nutrition')
+    .select('*')
+    .eq('recipe_id', recipeId)
+    .single();
+
+  if (error || !nutrition) {
+    return null;
+  }
+
+  return nutrition;
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const resolvedParams = await params;
+  const recipe = await getRecipe(resolvedParams.slug);
+
+  if (!recipe) {
+    return {
+      title: 'Recipe Not Found - Ed\'s Easy Meals',
+      description: 'The recipe you\'re looking for could not be found.'
+    };
+  }
+
+  return {
+    title: recipe.seo_title || recipe.title,
+    description: recipe.seo_description || recipe.description,
+    openGraph: {
+      title: recipe.seo_title || recipe.title,
+      description: recipe.seo_description || recipe.description,
+      images: recipe.featured_image_url ? [recipe.featured_image_url] : []
+    }
+  };
+}
+
+export default async function RecipePage({ params }: { params: Promise<{ slug: string }> }) {
+  const resolvedParams = await params;
+  const recipe = await getRecipe(resolvedParams.slug);
+
+  if (!recipe) {
+    notFound();
+  }
+
+  const nutrition = await getRecipeNutrition(recipe.id);
+
+  // Generate JSON-LD schema for rich snippets
+  const recipeSchema = {
+    "@context": "https://schema.org/",
+    "@type": "Recipe",
+    "name": recipe.title,
+    "description": recipe.description,
+    "image": recipe.featured_image_url ? [recipe.featured_image_url] : [],
+    "author": {
+      "@type": "Person",
+      "name": "Ed's Easy Meals"
+    },
+    "datePublished": recipe.created_at,
+    "prepTime": `PT${recipe.prep_time}M`,
+    "cookTime": `PT${recipe.cook_time}M`,
+    "totalTime": `PT${recipe.total_time}M`,
+    "recipeCategory": recipe.categories?.map(cat => cat.name.replace('Easy ', '').replace(' Recipes', '')) || [],
+    "recipeYield": recipe.servings.toString(),
+    "recipeCuisine": "International",
+    "keywords": recipe.categories?.map(cat => cat.name).join(', ') || '',
+    "recipeIngredient": recipe.ingredients.map((ing: any) => `${ing.amount} ${ing.name}`),
+    "recipeInstructions": recipe.instructions.map((inst: any) => ({
+      "@type": "HowToStep",
+      "text": inst.instruction
+    })),
+    "nutrition": nutrition ? {
+      "@type": "NutritionInformation",
+      "calories": `${nutrition.calories} calories`,
+      "proteinContent": `${nutrition.protein}g`,
+      "carbohydrateContent": `${nutrition.carbs}g`,
+      "fatContent": `${nutrition.fat}g`,
+      "fiberContent": `${nutrition.fiber}g`,
+      "sugarContent": `${nutrition.sugar}g`,
+      "sodiumContent": `${nutrition.sodium}mg`
+    } : undefined,
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.5",
+      "reviewCount": "24"
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+      <div className="container mx-auto px-4 py-8">
+        {/* Back Button */}
+        <div className="mb-6">
+          <Button variant="outline" asChild>
+            <Link href="/" className="flex items-center gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Back to Recipes
+            </Link>
+          </Button>
+        </div>
+
+        {/* Recipe Header */}
+        <div className="mb-8">
+          {/* Recipe Image */}
+          {recipe.featured_image_url && (
+            <div className="mb-6 rounded-lg overflow-hidden shadow-lg">
+              <img
+                src={recipe.featured_image_url}
+                alt={recipe.featured_image_alt || recipe.title}
+                className="w-full h-64 md:h-80 object-cover"
+              />
+            </div>
+          )}
+
+          <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-4 font-jakarta">
+            {recipe.title}
+          </h1>
+          <p className="text-xl text-slate-600 dark:text-slate-400 mb-6">
+            {recipe.description}
+          </p>
+
+          {/* Recipe Stats */}
+          <div className="flex flex-wrap gap-4 text-sm">
+            <div className="flex items-center gap-2 bg-white dark:bg-slate-800 px-4 py-2 rounded-lg shadow-sm">
+              <Timer className="h-5 w-5 text-[#b0512e]" />
+              <span className="font-medium">Prep: {recipe.prep_time} mins</span>
+            </div>
+            <div className="flex items-center gap-2 bg-white dark:bg-slate-800 px-4 py-2 rounded-lg shadow-sm">
+              <Clock className="h-5 w-5 text-[#b0512e]" />
+              <span className="font-medium">Cook: {recipe.cook_time} mins</span>
+            </div>
+            <div className="flex items-center gap-2 bg-white dark:bg-slate-800 px-4 py-2 rounded-lg shadow-sm">
+              <Users className="h-5 w-5 text-[#b0512e]" />
+              <span className="font-medium">Serves: {recipe.servings}</span>
+            </div>
+            <div className="flex items-center gap-2 bg-white dark:bg-slate-800 px-4 py-2 rounded-lg shadow-sm">
+              <ChefHat className="h-5 w-5 text-[#b0512e]" />
+              <span className="font-medium capitalize">Difficulty: {recipe.difficulty}</span>
+            </div>
+            {recipe.calories_per_serving && (
+              <div className="flex items-center gap-2 bg-white dark:bg-slate-800 px-4 py-2 rounded-lg shadow-sm">
+                <Utensils className="h-5 w-5 text-[#b0512e]" />
+                <span className="font-medium">{recipe.calories_per_serving} cal/serving</span>
+              </div>
+            )}
+          </div>
+
+          {/* Category Tags */}
+          {recipe.categories && recipe.categories.length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-3">Categories</h3>
+              <div className="flex flex-wrap gap-2">
+                {recipe.categories.map((category) => (
+                  <Link
+                    key={category.id}
+                    href={`/categories/${category.slug}`}
+                    className="inline-block px-3 py-1 text-sm bg-[#fec52b] text-black rounded-full hover:bg-[#e5b327] transition-colors font-medium"
+                  >
+                    {category.name.replace('Easy ', '').replace(' Recipes', '')}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Ingredients */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-2xl font-jakarta text-[#b0512e]">Ingredients</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3">
+                  {recipe.ingredients.map((ingredient: any, index: number) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <span className="w-2 h-2 bg-[#fec52b] rounded-full mt-2 flex-shrink-0"></span>
+                      <span>
+                        <strong>{ingredient.amount}</strong> {ingredient.name}
+                        {ingredient.notes && <em className="text-slate-600 dark:text-slate-400 ml-2">({ingredient.notes})</em>}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* Instructions */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-2xl font-jakarta text-[#b0512e]">Instructions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ol className="space-y-4">
+                  {recipe.instructions.map((instruction: any, index: number) => (
+                    <li key={index} className="flex gap-4">
+                      <span className="bg-[#fec52b] text-black font-bold rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 text-sm">
+                        {instruction.step}
+                      </span>
+                      <p className="pt-1">{instruction.instruction}</p>
+                    </li>
+                  ))}
+                </ol>
+              </CardContent>
+            </Card>
+
+            {/* Tips & Variations */}
+            {(recipe.tips || recipe.variations) && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {recipe.tips && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg font-jakarta text-[#b0512e]">Tips</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-slate-600 dark:text-slate-400">{recipe.tips}</p>
+                    </CardContent>
+                  </Card>
+                )}
+                {recipe.variations && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg font-jakarta text-[#b0512e]">Variations</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-slate-600 dark:text-slate-400">{recipe.variations}</p>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            )}
+
+            {/* Storage Instructions */}
+            {recipe.storage_instructions && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg font-jakarta text-[#b0512e]">Storage</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">{recipe.storage_instructions}</p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Nutrition Info */}
+            {nutrition && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl font-jakarta text-[#b0512e]">Nutrition Facts</CardTitle>
+                  <CardDescription>Per serving</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span>Calories</span>
+                      <span className="font-medium">{nutrition.calories}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Protein</span>
+                      <span className="font-medium">{nutrition.protein}g</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Carbs</span>
+                      <span className="font-medium">{nutrition.carbs}g</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Fat</span>
+                      <span className="font-medium">{nutrition.fat}g</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Fiber</span>
+                      <span className="font-medium">{nutrition.fiber}g</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Sugar</span>
+                      <span className="font-medium">{nutrition.sugar}g</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Sodium</span>
+                      <span className="font-medium">{nutrition.sodium}mg</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Recipe Actions */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-jakarta text-[#b0512e]">Recipe Actions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button className="w-full bg-[#fec52b] hover:bg-[#e5b327] text-black font-medium">
+                  Print Recipe
+                </Button>
+                <Button variant="outline" className="w-full border-[#b0512e] text-[#b0512e] hover:bg-[#b0512e] hover:text-white">
+                  Save to Favorites
+                </Button>
+                <Button variant="outline" className="w-full">
+                  Share Recipe
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Quick Facts */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-jakarta text-[#b0512e]">Quick Facts</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Total Time</span>
+                  <span className="font-medium">{recipe.total_time} minutes</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Difficulty</span>
+                  <span className="font-medium capitalize">{recipe.difficulty}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Course</span>
+                  <span className="font-medium">Main Dish</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Cuisine</span>
+                  <span className="font-medium">Italian</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Back to Top */}
+        <div className="text-center mt-12">
+          <Button variant="outline" asChild>
+            <Link href="/" className="flex items-center gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Browse More Recipes
+            </Link>
+          </Button>
+        </div>
+      </div>
+  )
+}

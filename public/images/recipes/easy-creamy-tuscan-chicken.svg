@@ -1,0 +1,58 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f8f9fa;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e9ecef;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)" />
+
+  <!-- Plate -->
+  <circle cx="400" cy="320" r="250" fill="#ffffff" stroke="#ddd" stroke-width="2"/>
+
+  <!-- Chicken pieces -->
+  <ellipse cx="350" cy="280" rx="80" ry="50" fill="#d4a574" opacity="0.9"/>
+  <ellipse cx="450" cy="300" rx="75" ry="45" fill="#d4a574" opacity="0.9"/>
+  <ellipse cx="400" cy="350" rx="70" ry="40" fill="#d4a574" opacity="0.9"/>
+
+  <!-- Cream sauce -->
+  <ellipse cx="400" cy="320" rx="180" ry="120" fill="#f5f5dc" opacity="0.7"/>
+
+  <!-- Sun-dried tomatoes -->
+  <circle cx="380" cy="300" r="8" fill="#c44536"/>
+  <circle cx="420" cy="280" r="6" fill="#c44536"/>
+  <circle cx="360" cy="340" r="7" fill="#c44536"/>
+  <circle cx="440" cy="330" r="5" fill="#c44536"/>
+  <circle cx="390" cy="350" r="6" fill="#c44536"/>
+  <circle cx="430" cy="310" r="8" fill="#c44536"/>
+
+  <!-- Spinach leaves -->
+  <ellipse cx="320" cy="290" rx="20" ry="12" fill="#6b8e23" opacity="0.8" transform="rotate(30 320 290)"/>
+  <ellipse cx="480" cy="320" rx="18" ry="10" fill="#6b8e23" opacity="0.8" transform="rotate(-20 480 320)"/>
+  <ellipse cx="340" cy="350" rx="22" ry="14" fill="#6b8e23" opacity="0.8" transform="rotate(60 340 350)"/>
+  <ellipse cx="460" cy="280" rx="16" ry="8" fill="#6b8e23" opacity="0.8" transform="rotate(-45 460 280)"/>
+  <ellipse cx="370" cy="320" rx="19" ry="11" fill="#6b8e23" opacity="0.8" transform="rotate(15 370 320)"/>
+  <ellipse cx="430" cy="350" rx="17" ry="9" fill="#6b8e23" opacity="0.8" transform="rotate(-60 430 350)"/>
+
+  <!-- Parmesan sprinkles -->
+  <circle cx="395" cy="295" r="2" fill="#fff8dc"/>
+  <circle cx="415" cy="315" r="1.5" fill="#fff8dc"/>
+  <circle cx="385" cy="325" r="2" fill="#fff8dc"/>
+  <circle cx="425" cy="295" r="1" fill="#fff8dc"/>
+
+  <!-- Title -->
+  <text x="400" y="80" font-family="Arial, sans-serif" font-size="42" font-weight="bold" text-anchor="middle" fill="#b0512e">
+    Easy Creamy Tuscan Chicken
+  </text>
+
+  <!-- Subtitle -->
+  <text x="400" y="120" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="#666">
+    Restaurant Quality • 30 Minutes
+  </text>
+
+  <!-- Footer text -->
+  <text x="400" y="550" font-family="Arial, sans-serif" font-size="18" text-anchor="middle" fill="#fec52b" font-weight="bold">
+    Ed's Easy Meals
+  </text>
+</svg>
