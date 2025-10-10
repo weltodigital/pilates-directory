@@ -11,20 +11,20 @@ const plusJakarta = Plus_Jakarta_Sans({
 })
 
 export const metadata: Metadata = {
-  title: 'Pilates Classes Near - Find The Best Pilates Studios Near You | #1 UK Directory',
-  description: 'Discover the UK\'s best pilates studios with live class schedules, verified reviews, and instant booking. Find reformer, mat, and clinical pilates classes near you.',
-  keywords: 'pilates, reformer pilates, mat pilates, clinical pilates, fitness, UK, studios, classes, instructors, booking, reviews, London, Manchester, Edinburgh, Birmingham',
+  title: 'Ed\'s Easy Meals - Simple Recipes Anyone Can Make | Easy Cooking Made Simple',
+  description: 'Discover thousands of easy recipes with step-by-step instructions. From easy dinner recipes to simple desserts, find quick meals that anyone can cook.',
+  keywords: 'easy recipes, easy dinner recipes, easy cake recipes, easy cookie recipes, easy pasta recipes, easy chicken recipes, easy dessert recipes, easy baking recipes, simple recipes, quick recipes, beginner recipes',
   openGraph: {
-    title: 'Pilates Classes Near - Find The Best Pilates Studios Near You',
-    description: 'Discover the UK\'s best pilates studios with live class schedules, verified reviews, and instant booking.',
+    title: 'Ed\'s Easy Meals - Simple Recipes Anyone Can Make',
+    description: 'Discover thousands of easy recipes with step-by-step instructions. From easy dinner recipes to simple desserts, find quick meals that anyone can cook.',
     type: 'website',
     locale: 'en_GB',
-    siteName: 'Pilates Classes Near',
+    siteName: 'Ed\'s Easy Meals',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Pilates Classes Near - Find The Best Pilates Studios Near You',
-    description: 'Discover the UK\'s best pilates studios with live class schedules, verified reviews, and instant booking.',
+    title: 'Ed\'s Easy Meals - Simple Recipes Anyone Can Make',
+    description: 'Discover thousands of easy recipes with step-by-step instructions. From easy dinner recipes to simple desserts, find quick meals that anyone can cook.',
   },
   robots: {
     index: true,
