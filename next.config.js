@@ -3,6 +3,31 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // Force CSS compilation and optimization
+  experimental: {
+    forceSwcTransforms: true,
+    optimizeCss: true,
+  },
+  // Force fresh deployment
+  generateBuildId: () => {
+    return 'pilates-css-' + Date.now()
+  },
+  // Ensure CSS is processed correctly
+  webpack: (config, { isServer }) => {
+    config.resolve.fallback = { fs: false, path: false };
+
+    // Force CSS processing
+    if (!isServer) {
+      config.optimization.splitChunks.cacheGroups.styles = {
+        name: 'styles',
+        type: 'css/mini-extract',
+        chunks: 'all',
+        enforce: true,
+      };
+    }
+
+    return config;
+  },
   images: {
     remotePatterns: [
       {

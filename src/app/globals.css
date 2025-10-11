@@ -4,6 +4,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Force Tailwind layer order */
+@layer base, components, utilities;
+
 /* Base styles */
 * {
   box-sizing: border-box;
