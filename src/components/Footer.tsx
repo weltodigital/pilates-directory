@@ -34,25 +34,68 @@ export default async function Footer() {
   const counties = await getFeaturedCounties();
 
   return (
-    <footer className="bg-slate-900 text-white py-12 mt-16">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <footer style={{
+      backgroundColor: '#0f172a',
+      color: '#ffffff',
+      padding: '3rem 0',
+      marginTop: '4rem'
+    }}>
+      <div style={{
+        maxWidth: '1200px',
+        margin: '0 auto',
+        padding: '0 1rem'
+      }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+          gap: '2rem'
+        }}>
           <div>
-            <Link href="/" className="inline-block mb-4">
-              <div className="text-2xl font-bold text-purple-400 font-jakarta">
+            <Link href="/" style={{
+              display: 'inline-block',
+              marginBottom: '1rem',
+              textDecoration: 'none'
+            }}>
+              <div style={{
+                fontSize: '1.5rem',
+                fontWeight: '700',
+                color: '#c4b5fd',
+                fontFamily: 'Plus Jakarta Sans, ui-sans-serif, system-ui, sans-serif'
+              }}>
                 Pilates Classes Near
               </div>
             </Link>
-            <p className="text-slate-400 text-sm">
+            <p style={{
+              color: '#94a3b8',
+              fontSize: '0.875rem',
+              lineHeight: '1.5'
+            }}>
               The UK's most trusted directory for finding the best pilates studios and classes near you.
             </p>
           </div>
           <div>
-            <h4 className="font-semibold mb-4 font-jakarta text-purple-400">Popular Locations</h4>
-            <ul className="space-y-2 text-sm text-slate-400">
+            <h4 style={{
+              fontWeight: '600',
+              marginBottom: '1rem',
+              fontFamily: 'Plus Jakarta Sans, ui-sans-serif, system-ui, sans-serif',
+              color: '#c4b5fd',
+              fontSize: '1rem'
+            }}>Popular Locations</h4>
+            <ul style={{
+              listStyle: 'none',
+              padding: 0,
+              margin: 0
+            }}>
               {counties.slice(0, 6).map((county) => (
-                <li key={county.id}>
-                  <Link href={`/${county.slug}`} className="hover:text-purple-400 transition-colors">
+                <li key={county.id} style={{ marginBottom: '0.5rem' }}>
+                  <Link href={`/${county.slug}`} style={{
+                    color: '#94a3b8',
+                    textDecoration: 'none',
+                    fontSize: '0.875rem',
+                    transition: 'color 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#c4b5fd'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = '#94a3b8'}>
                     Pilates in {county.name}
                   </Link>
                 </li>
@@ -60,16 +103,57 @@ export default async function Footer() {
             </ul>
           </div>
           <div>
-            <h4 className="font-semibold mb-4 font-jakarta text-purple-400">Company</h4>
-            <ul className="space-y-2 text-sm text-slate-400">
-              <li><a href="mailto:hello@pilatesclassesnear.com" className="hover:text-purple-400 transition-colors">Contact</a></li>
-              <li><Link href="/privacy-policy" className="hover:text-purple-400 transition-colors">Privacy Policy</Link></li>
-              <li><Link href="/terms-of-service" className="hover:text-purple-400 transition-colors">Terms of Service</Link></li>
-              <li><Link href="/sitemap.xml" className="hover:text-purple-400 transition-colors">Sitemap</Link></li>
+            <h4 style={{
+              fontWeight: '600',
+              marginBottom: '1rem',
+              fontFamily: 'Plus Jakarta Sans, ui-sans-serif, system-ui, sans-serif',
+              color: '#c4b5fd',
+              fontSize: '1rem'
+            }}>Company</h4>
+            <ul style={{
+              listStyle: 'none',
+              padding: 0,
+              margin: 0
+            }}>
+              <li style={{ marginBottom: '0.5rem' }}>
+                <a href="mailto:hello@pilatesclassesnear.com" style={{
+                  color: '#94a3b8',
+                  textDecoration: 'none',
+                  fontSize: '0.875rem'
+                }}>Contact</a>
+              </li>
+              <li style={{ marginBottom: '0.5rem' }}>
+                <Link href="/privacy-policy" style={{
+                  color: '#94a3b8',
+                  textDecoration: 'none',
+                  fontSize: '0.875rem'
+                }}>Privacy Policy</Link>
+              </li>
+              <li style={{ marginBottom: '0.5rem' }}>
+                <Link href="/terms-of-service" style={{
+                  color: '#94a3b8',
+                  textDecoration: 'none',
+                  fontSize: '0.875rem'
+                }}>Terms of Service</Link>
+              </li>
+              <li style={{ marginBottom: '0.5rem' }}>
+                <Link href="/sitemap.xml" style={{
+                  color: '#94a3b8',
+                  textDecoration: 'none',
+                  fontSize: '0.875rem'
+                }}>Sitemap</Link>
+              </li>
             </ul>
           </div>
         </div>
-        <div className="border-t border-slate-800 mt-8 pt-8 text-center text-sm text-slate-400">
+        <div style={{
+          borderTop: '1px solid #1e293b',
+          marginTop: '2rem',
+          paddingTop: '2rem',
+          textAlign: 'center',
+          fontSize: '0.875rem',
+          color: '#94a3b8'
+        }}>
           <p>&copy; 2025 Pilates Classes Near. All rights reserved. Find the best pilates studios and classes across the UK.</p>
         </div>
       </div>
