@@ -1,0 +1,81 @@
+/* Minimal CSS that should definitely work */
+body {
+  font-family: Arial, sans-serif !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background-color: #f0f0f0 !important;
+  color: #333 !important;
+}
+
+.test-purple {
+  background-color: #9333ea !important;
+  color: white !important;
+  padding: 20px !important;
+  margin: 20px !important;
+  border-radius: 8px !important;
+}
+
+.test-header {
+  background-color: white !important;
+  padding: 16px !important;
+  border-bottom: 1px solid #ddd !important;
+}
+
+.test-container {
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 0 16px !important;
+}
+
+.test-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+  gap: 24px !important;
+  padding: 24px 0 !important;
+}
+
+.test-card {
+  background: white !important;
+  padding: 24px !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+  border: 1px solid #e0e0e0 !important;
+}
+
+.test-button {
+  background-color: #9333ea !important;
+  color: white !important;
+  padding: 12px 24px !important;
+  border: none !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  font-size: 16px !important;
+  text-decoration: none !important;
+  display: inline-block !important;
+}
+
+.test-button:hover {
+  background-color: #7c3aed !important;
+}
+
+.test-footer {
+  background-color: #1a1a1a !important;
+  color: white !important;
+  padding: 48px 0 !important;
+  margin-top: 48px !important;
+}
+
+.test-text-center {
+  text-align: center !important;
+}
+
+.test-text-large {
+  font-size: 48px !important;
+  font-weight: bold !important;
+  margin-bottom: 16px !important;
+}
+
+.test-text-medium {
+  font-size: 24px !important;
+  margin-bottom: 24px !important;
+}
