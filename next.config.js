@@ -3,18 +3,9 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // Force CSS compilation and optimization
-  experimental: {
-    forceSwcTransforms: true,
-  },
-  // Force fresh deployment
+  // Force fresh deployment for CSS
   generateBuildId: () => {
-    return 'pilates-css-' + Date.now()
-  },
-  // Ensure CSS is processed correctly
-  webpack: (config) => {
-    config.resolve.fallback = { fs: false, path: false };
-    return config;
+    return 'pilates-force-css-' + Date.now()
   },
   images: {
     remotePatterns: [
