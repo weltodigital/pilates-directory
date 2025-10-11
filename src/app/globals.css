@@ -4,6 +4,34 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Ensure base styles are always applied */
+html {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+/* Force load critical purple colors */
+.bg-purple-600 {
+  background-color: rgb(147 51 234) !important;
+}
+
+.bg-purple-700 {
+  background-color: rgb(126 34 206) !important;
+}
+
+.text-purple-600 {
+  color: rgb(147 51 234) !important;
+}
+
+.text-purple-400 {
+  color: rgb(196 181 253) !important;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
