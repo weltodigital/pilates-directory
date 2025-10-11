@@ -2,7 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { MapPin, Star, Phone, Clock, Activity, Share2, Users, Award } from 'lucide-react'
+import { MapPin, Star, Phone, Clock, Activity } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 import SEOSchemaMarkup from '@/components/SEOSchemaMarkup'
 
