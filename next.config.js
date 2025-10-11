@@ -6,6 +6,11 @@ const nextConfig = {
   // Force CSS optimization for Vercel
   experimental: {
     forceSwcTransforms: true,
+    turbotrace: {},
+  },
+  // Force fresh deployment - cache buster
+  generateBuildId: () => {
+    return 'pilates-' + Date.now()
   },
   // Ensure CSS is processed correctly
   webpack: (config) => {
