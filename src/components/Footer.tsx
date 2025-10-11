@@ -94,8 +94,7 @@ export default async function Footer() {
                     fontSize: '0.875rem',
                     transition: 'color 0.2s'
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = '#c4b5fd'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = '#94a3b8'}>
+                  className="footer-link">
                     Pilates in {county.name}
                   </Link>
                 </li>

@@ -165,3 +165,8 @@ a:hover {
 .bg-gradient-to-r {
   background: linear-gradient(to right, #faf5ff, #fce7f3) !important;
 }
+
+/* Footer link hover */
+.footer-link:hover {
+  color: #c4b5fd !important;
+}
