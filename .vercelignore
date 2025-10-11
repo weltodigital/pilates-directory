@@ -1,0 +1,12 @@
+# Ignore files for Vercel deployment
+.env.local
+.next
+node_modules
+*.log
+.DS_Store
+
+# Ignore test files
+test-output.css
+src/app/style-test
+src/app/css-test
+src/app/inline-test

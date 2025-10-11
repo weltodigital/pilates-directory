@@ -3,6 +3,15 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // Force CSS optimization for Vercel
+  experimental: {
+    forceSwcTransforms: true,
+  },
+  // Ensure CSS is processed correctly
+  webpack: (config) => {
+    config.resolve.fallback = { fs: false, path: false };
+    return config;
+  },
   images: {
     remotePatterns: [
       {
