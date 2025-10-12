@@ -6,15 +6,13 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  compiler: {
-    removeConsole: false,
+  experimental: {
+    forceSwcTransforms: false,
+    optimizeCss: false,
   },
   // Force fresh deployment for CSS
   generateBuildId: () => {
     return 'pilates-ultra-force-' + Date.now()
-  },
-  experimental: {
-    optimizeCss: false,
   },
   images: {
     remotePatterns: [
