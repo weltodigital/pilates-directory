@@ -1,11 +1,10 @@
 import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase';
 import EnhancedContent from '@/components/EnhancedContent';
 import SEOLocationContent from '@/components/SEOLocationContent';
 import LocationStudiosMap from '@/components/LocationStudiosMap';
 import Link from 'next/link';
-import { MapPin, Star, Users, Activity, Award, Clock, Phone, Heart } from 'lucide-react';
+import { MapPin, Star, Users, Activity, Clock, Phone, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -564,40 +563,41 @@ export default async function CountyPage({ params }: CountyPageProps) {
             )}
 
             {/* Cities and Towns Grid */}
-            <div className="mb-12">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            <div className="content-section">
+              <h2>
                 Pilates Studios by Location in {location.name}
               </h2>
 
               {citiesAndTowns.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="locations-grid">
                   {citiesAndTowns.map((place) => (
                     <Link
                       key={place.id}
                       href={`/${place.full_path}`}
-                      className="block bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-6 border border-gray-200 group"
+                      className="location-card"
                     >
-                      <div className="flex justify-between items-start mb-3">
-                        <h3 className="text-lg font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">{place.name}</h3>
-                        <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-sm capitalize flex items-center gap-1">
-                          <MapPin className="h-3 w-3" />
-                          {place.type}
+                      <div className="studio-header">
+                        <div>
+                          <div className="studio-name">{place.name}</div>
+                          <div className="studio-location">
+                            <MapPin className="h-3 w-3" />
+                            {place.type}
+                          </div>
+                        </div>
+                        <span className="class-type-badge">
+                          {place.butcher_count} Studios
                         </span>
                       </div>
 
-                      <div className="space-y-2 mb-4">
-                        <p className="text-sm text-gray-600 flex items-center gap-1">
-                          <Activity className="h-3 w-3 text-purple-500" />
-                          {place.butcher_count} Pilates Studios
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          Reformer • Mat • Clinical • Prenatal Classes
-                        </p>
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <div className="text-purple-600 font-medium text-sm group-hover:text-purple-700 transition-colors">
-                          Find Studios Near Me →
+                      <div className="studio-details">
+                        <div className="studio-detail-item">
+                          <Activity className="h-3 w-3" />
+                          Reformer • Mat • Clinical Classes
+                        </div>
+                        <div className="studio-actions">
+                          <span className="btn-primary">
+                            Find Studios Near Me →
+                          </span>
                         </div>
                       </div>
                     </Link>
@@ -617,69 +617,65 @@ export default async function CountyPage({ params }: CountyPageProps) {
             </div>
 
             {/* SEO Content Section */}
-            <div className="mb-12">
-              <div className="bg-white rounded-lg p-8 shadow-sm">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                  Why Choose Pilates in {location.name}?
-                </h2>
-                <div className="grid md:grid-cols-2 gap-8">
-                  <div>
-                    <h3 className="text-lg font-semibold mb-3 text-purple-700">🏋️ Diverse Class Options</h3>
-                    <p className="text-gray-600 mb-4">
-                      From reformer pilates to mat classes, {location.name} offers a comprehensive range of pilates styles. Whether you're seeking clinical pilates for injury rehabilitation, prenatal classes for expecting mothers, or high-energy power pilates, you'll find certified instructors and well-equipped studios throughout the region.
-                    </p>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold mb-3 text-purple-700">⭐ Quality & Excellence</h3>
-                    <p className="text-gray-600 mb-4">
-                      The pilates studios in {location.name} maintain high standards with qualified instructors, modern equipment, and welcoming environments. Many studios offer trial classes, flexible membership options, and personalized attention to help you achieve your fitness goals.
-                    </p>
-                  </div>
+            <div className="content-section">
+              <h2>
+                Why Choose Pilates in {location.name}?
+              </h2>
+              <div className="grid">
+                <div>
+                  <h3>🏋️ Diverse Class Options</h3>
+                  <p>
+                    From reformer pilates to mat classes, {location.name} offers a comprehensive range of pilates styles. Whether you're seeking clinical pilates for injury rehabilitation, prenatal classes for expecting mothers, or high-energy power pilates, you'll find certified instructors and well-equipped studios throughout the region.
+                  </p>
+                </div>
+                <div>
+                  <h3>⭐ Quality & Excellence</h3>
+                  <p>
+                    The pilates studios in {location.name} maintain high standards with qualified instructors, modern equipment, and welcoming environments. Many studios offer trial classes, flexible membership options, and personalized attention to help you achieve your fitness goals.
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* FAQ Section */}
-            <div className="mb-12">
-              <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                  Frequently Asked Questions About Pilates in {location.name}
-                </h2>
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">
-                      What pilates studios are near me in {location.name}?
-                    </h3>
-                    <p className="text-gray-600">
-                      Our directory features {location.butcher_count}+ pilates studios across {location.name}, including locations in {citiesAndTowns.slice(0, 4).map(c => c.name).join(', ')}. Use our search filters to find studios by location, class type, or specialty services.
-                    </p>
+            <div className="faq-section">
+              <h2>
+                Frequently Asked Questions About Pilates in {location.name}
+              </h2>
+              <div>
+                <div className="faq-item">
+                  <div className="faq-question">
+                    What pilates studios are near me in {location.name}?
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">
-                      How much do pilates classes cost in {location.name}?
-                    </h3>
-                    <p className="text-gray-600">
-                      Pilates class prices in {location.name} typically range from £15-30 per session, with many studios offering package deals, monthly memberships, and introductory offers. Private sessions usually cost £50-80, while group classes are more affordable.
-                    </p>
+                  <div className="faq-answer">
+                    Our directory features {location.butcher_count}+ pilates studios across {location.name}, including locations in {citiesAndTowns.slice(0, 4).map(c => c.name).join(', ')}. Use our search filters to find studios by location, class type, or specialty services.
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">
-                      What types of pilates are available near me?
-                    </h3>
-                    <p className="text-gray-600">
-                      Studios in {location.name} offer reformer pilates, mat pilates, clinical pilates, prenatal and postnatal classes, barre pilates, and specialized programs. Many locations also provide private sessions and small group training.
-                    </p>
+                </div>
+                <div className="faq-item">
+                  <div className="faq-question">
+                    How much do pilates classes cost in {location.name}?
+                  </div>
+                  <div className="faq-answer">
+                    Pilates class prices in {location.name} typically range from £15-30 per session, with many studios offering package deals, monthly memberships, and introductory offers. Private sessions usually cost £50-80, while group classes are more affordable.
+                  </div>
+                </div>
+                <div className="faq-item">
+                  <div className="faq-question">
+                    What types of pilates are available near me?
+                  </div>
+                  <div className="faq-answer">
+                    Studios in {location.name} offer reformer pilates, mat pilates, clinical pilates, prenatal and postnatal classes, barre pilates, and specialized programs. Many locations also provide private sessions and small group training.
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Content Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid">
               {/* Main Content */}
-              <div className="lg:col-span-2">
-                <div className="bg-white rounded-lg p-8 shadow-sm">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              <div>
+                <div className="content-section">
+                  <h2>
                     Complete Guide to Pilates in {location.name}
                   </h2>
                   <EnhancedContent
@@ -690,35 +686,35 @@ export default async function CountyPage({ params }: CountyPageProps) {
               </div>
 
               {/* Sidebar */}
-              <div className="lg:col-span-1 space-y-6">
+              <div>
                 {/* Quick Stats */}
-                <div className="bg-white p-6 rounded-lg shadow-sm">
-                  <h3 className="text-lg font-semibold mb-4 text-purple-700">Quick Stats</h3>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Total Studios</span>
-                      <span className="font-semibold text-purple-600">{location.butcher_count}+</span>
+                <div className="sidebar">
+                  <h3>Quick Stats</h3>
+                  <div>
+                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem'}}>
+                      <span>Total Studios</span>
+                      <span style={{fontWeight: '600', color: '#9333ea'}}>{location.butcher_count}+</span>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Locations</span>
-                      <span className="font-semibold text-purple-600">{citiesAndTowns.length}</span>
+                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem'}}>
+                      <span>Locations</span>
+                      <span style={{fontWeight: '600', color: '#9333ea'}}>{citiesAndTowns.length}</span>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Avg. Rating</span>
-                      <span className="font-semibold text-purple-600">4.8★</span>
+                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem'}}>
+                      <span>Avg. Rating</span>
+                      <span style={{fontWeight: '600', color: '#9333ea'}}>4.8★</span>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Price Range</span>
-                      <span className="font-semibold text-purple-600">£15-30</span>
+                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                      <span>Price Range</span>
+                      <span style={{fontWeight: '600', color: '#9333ea'}}>£15-30</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Popular Locations */}
                 {citiesAndTowns.length > 0 && (
-                  <div className="bg-white p-6 rounded-lg shadow-sm">
-                    <h3 className="text-lg font-semibold mb-4 text-purple-700">Top Locations</h3>
-                    <ul className="space-y-2">
+                  <div className="sidebar">
+                    <h3>Top Locations</h3>
+                    <ul>
                       {citiesAndTowns
                         .sort((a, b) => (b.butcher_count || 0) - (a.butcher_count || 0))
                         .slice(0, 8)
@@ -726,13 +722,12 @@ export default async function CountyPage({ params }: CountyPageProps) {
                           <li key={place.id}>
                             <Link
                               href={`/${place.full_path}`}
-                              className="text-purple-600 hover:text-purple-800 hover:underline flex justify-between items-center group"
                             >
-                              <span className="flex items-center gap-2">
-                                <MapPin className="h-3 w-3 text-gray-400 group-hover:text-purple-500" />
+                              <span style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+                                <MapPin className="h-3 w-3" />
                                 {place.name}
                               </span>
-                              <span className="text-gray-500 text-sm">
+                              <span>
                                 {place.butcher_count} studios
                               </span>
                             </Link>
@@ -743,11 +738,11 @@ export default async function CountyPage({ params }: CountyPageProps) {
                 )}
 
                 {/* Class Types */}
-                <div className="bg-white p-6 rounded-lg shadow-sm">
-                  <h3 className="text-lg font-semibold mb-4 text-purple-700">Popular Class Types</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {['Reformer Pilates', 'Mat Pilates', 'Clinical Pilates', 'Prenatal', 'Barre Pilates', 'Power Pilates'].map((type) => (
-                      <span key={type} className="px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full">
+                <div className="sidebar">
+                  <h3>Popular Class Types</h3>
+                  <div className="class-types">
+                    {['Reformer Pilates', 'Mat Pilates', 'Clinical Pilates', 'Prenatal', 'Barre Pilates', 'Power Pilates'].map((type: string, index: number) => (
+                      <span key={type} className="class-type-badge">
                         {type}
                       </span>
                     ))}

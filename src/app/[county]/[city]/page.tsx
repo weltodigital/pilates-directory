@@ -6,8 +6,6 @@ import SEOLocationContent from '@/components/SEOLocationContent';
 import LocationStudiosMap from '@/components/LocationStudiosMap';
 import Link from 'next/link';
 import { MapPin, Star, Users, Activity, Award, Clock, Phone, Heart, Navigation, Search } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface CityPageProps {
   params: Promise<{
@@ -471,19 +469,19 @@ function FAQSection({ faqContent, location, county }: { faqContent: Location['fa
   const faqs = faqContent?.questions?.length ? faqContent.questions : defaultFAQs;
 
   return (
-    <section className="bg-gradient-to-r from-purple-50 to-pink-50 p-8 rounded-lg mb-8">
-      <h2 className="text-2xl font-bold mb-6 text-purple-800">
+    <div className="faq-section">
+      <h2>
         Frequently Asked Questions About Pilates in {location.name}
       </h2>
-      <div className="space-y-6">
+      <div>
         {faqs.map((faq, index) => (
-          <div key={index} className="bg-white p-6 rounded-lg shadow-sm border-l-4 border-purple-500">
-            <h3 className="text-lg font-semibold mb-3 text-gray-900">{faq.question}</h3>
-            <p className="text-gray-700 leading-relaxed">{faq.answer}</p>
+          <div key={index} className="faq-item">
+            <div className="faq-question">{faq.question}</div>
+            <div className="faq-answer">{faq.answer}</div>
           </div>
         ))}
       </div>
-    </section>
+    </div>
   );
 }
 
@@ -526,11 +524,10 @@ export default async function CityPage({ params }: CityPageProps) {
     <>
       <StructuredData location={location} county={countyData} studios={studios} />
 
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
+      <div className="page-container">
         {/* Header Section */}
-        <div className="bg-white shadow-sm">
-          <div className="container mx-auto px-4 py-8">
-            <div className="max-w-4xl mx-auto">
+        <div className="page-header">
+          <div className="container">
               {/* Breadcrumbs */}
               <nav className="text-sm text-gray-600 mb-4">
                 <ol className="flex space-x-2">
@@ -553,12 +550,12 @@ export default async function CityPage({ params }: CityPageProps) {
               </p>
 
               {/* Location Meta */}
-              <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-6">
-                <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full flex items-center gap-1">
+              <div className="meta-badges">
+                <span className="meta-badge primary">
                   <MapPin className="h-3 w-3" />
                   {location.name}, {countyData.name}
                 </span>
-                <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full flex items-center gap-1">
+                <span className="meta-badge success">
                   <Activity className="h-3 w-3" />
                   {studios.length} Studios
                 </span>
@@ -569,7 +566,6 @@ export default async function CityPage({ params }: CityPageProps) {
               <p className="text-lg text-gray-700 leading-relaxed">
                 {location.intro_text || `Welcome to your comprehensive guide to pilates studios in ${location.name}. Whether you're looking for reformer pilates, mat classes, clinical rehabilitation, or specialized programs, our directory features ${studios.length} verified studios with certified instructors, modern equipment, and flexible scheduling options.`}
               </p>
-            </div>
           </div>
         </div>
 
@@ -585,108 +581,102 @@ export default async function CityPage({ params }: CityPageProps) {
               </div>
 
               {studios.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="studios-grid">
                   {studios.map((studio) => (
-                    <Card key={studio.id} className="hover:shadow-lg transition-shadow group overflow-hidden">
+                    <div key={studio.id} className="studio-card">
                       {/* Studio Image */}
                       {studio.images && studio.images.length > 0 && (
-                        <div className="w-full h-48 bg-gray-200 relative overflow-hidden">
+                        <div style={{width: '100%', height: '12rem', backgroundColor: '#f3f4f6', position: 'relative', overflow: 'hidden', marginBottom: '1rem', borderRadius: '0.5rem'}}>
                           <img
                             src={studio.images[0]}
                             alt={`${studio.name} - Studio Image`}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            style={{width: '100%', height: '100%', objectFit: 'cover'}}
                           />
                         </div>
                       )}
 
-                      <CardHeader>
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <CardTitle className="text-lg group-hover:text-purple-600 transition-colors">
-                              {studio.name}
-                            </CardTitle>
-                            <CardDescription className="flex items-center gap-1 mt-1">
-                              <MapPin className="h-3 w-3" />
-                              {studio.address}
-                            </CardDescription>
+                      <div className="studio-header">
+                        <div>
+                          <div className="studio-name">
+                            {studio.name}
                           </div>
-                          {studio.google_rating && (
-                            <div className="flex items-center gap-1">
-                              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                              <span className="text-sm font-medium">{studio.google_rating.toFixed(1)}</span>
-                            </div>
-                          )}
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-3">
-                          {studio.phone && (
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                              <Phone className="h-3 w-3" />
-                              <span>{studio.phone}</span>
-                            </div>
-                          )}
-                          {studio.price_range && (
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                              <Activity className="h-3 w-3" />
-                              <span>{studio.price_range}</span>
-                            </div>
-                          )}
-                          <p className="text-sm text-gray-600 line-clamp-2">
-                            {studio.description || `Professional pilates studio offering comprehensive classes for all fitness levels in ${location.name}.`}
-                          </p>
-
-                          {/* Class Types */}
-                          {studio.class_types && studio.class_types.length > 0 && (
-                            <div className="flex flex-wrap gap-1">
-                              {studio.class_types.slice(0, 3).map((type, index) => (
-                                <span key={index} className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
-                                  {type}
-                                </span>
-                              ))}
-                              {studio.class_types.length > 3 && (
-                                <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-                                  +{studio.class_types.length - 3} more
-                                </span>
-                              )}
-                            </div>
-                          )}
-
-                          {/* Features */}
-                          <div className="flex flex-wrap gap-2 text-xs text-gray-500">
-                            {studio.beginner_friendly && (
-                              <span className="flex items-center gap-1">
-                                <Users className="h-3 w-3" />Beginner Friendly
-                              </span>
-                            )}
-                            {studio.online_booking_available && (
-                              <span className="flex items-center gap-1">
-                                <Clock className="h-3 w-3" />Online Booking
-                              </span>
-                            )}
-                            {studio.parking_available && (
-                              <span className="flex items-center gap-1">
-                                <Navigation className="h-3 w-3" />Parking
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="flex gap-2 pt-2">
-                            <Button size="sm" className="flex-1 bg-purple-600 hover:bg-purple-700" asChild>
-                              <Link href={`/${studio.full_url_path}`}>
-                                View Studio
-                              </Link>
-                            </Button>
-                            <Button variant="outline" size="sm">
-                              <Heart className="h-3 w-3" />
-                            </Button>
-                            <Button variant="outline" size="sm">
-                              <Phone className="h-3 w-3" />
-                            </Button>
+                          <div className="studio-location">
+                            <MapPin className="h-3 w-3" />
+                            {studio.address}
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
+                        {studio.google_rating && (
+                          <div className="studio-rating">
+                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                            <span>{studio.google_rating.toFixed(1)}</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="studio-details">
+                        {studio.phone && (
+                          <div className="studio-detail-item">
+                            <Phone className="h-3 w-3" />
+                            <span>{studio.phone}</span>
+                          </div>
+                        )}
+                        {studio.price_range && (
+                          <div className="studio-detail-item">
+                            <Activity className="h-3 w-3" />
+                            <span>{studio.price_range}</span>
+                          </div>
+                        )}
+                        <p style={{fontSize: '0.875rem', color: '#6b7280', marginBottom: '1rem', lineHeight: '1.6'}}>
+                          {studio.description || `Professional pilates studio offering comprehensive classes for all fitness levels in ${location.name}.`}
+                        </p>
+
+                        {/* Class Types */}
+                        {studio.class_types && studio.class_types.length > 0 && (
+                          <div className="class-types">
+                            {studio.class_types.slice(0, 3).map((type: string, index: number) => (
+                              <span key={index} className="class-type-badge">
+                                {type}
+                              </span>
+                            ))}
+                            {studio.class_types.length > 3 && (
+                              <span className="class-type-badge" style={{backgroundColor: '#f1f5f9', color: '#475569'}}>
+                                +{studio.class_types.length - 3} more
+                              </span>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Features */}
+                        <div style={{display: 'flex', flexWrap: 'wrap', gap: '0.5rem', fontSize: '0.75rem', color: '#6b7280', marginBottom: '1rem'}}>
+                          {studio.beginner_friendly && (
+                            <span className="studio-detail-item">
+                              <Users className="h-3 w-3" />Beginner Friendly
+                            </span>
+                          )}
+                          {studio.online_booking_available && (
+                            <span className="studio-detail-item">
+                              <Clock className="h-3 w-3" />Online Booking
+                            </span>
+                          )}
+                          {studio.parking_available && (
+                            <span className="studio-detail-item">
+                              <Navigation className="h-3 w-3" />Parking
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="studio-actions">
+                          <Link href={`/${studio.full_url_path}`} className="btn-primary">
+                            View Studio
+                          </Link>
+                          <button className="btn-secondary">
+                            <Heart className="h-3 w-3" />
+                          </button>
+                          <button className="btn-secondary">
+                            <Phone className="h-3 w-3" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   ))}
                 </div>
               ) : (
@@ -730,12 +720,11 @@ export default async function CityPage({ params }: CityPageProps) {
             )}
 
             {/* Local Pilates Benefits Section */}
-            <div className="mb-12">
-              <div className="bg-white rounded-lg p-8 shadow-sm">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                  Why Choose Pilates in {location.name}?
-                </h2>
-                <div className="grid md:grid-cols-2 gap-8">
+            <div className="content-section">
+              <h2>
+                Why Choose Pilates in {location.name}?
+              </h2>
+              <div className="grid">
                   <div>
                     <h3 className="text-lg font-semibold mb-3 text-purple-700 flex items-center gap-2">
                       <Activity className="h-5 w-5" />
