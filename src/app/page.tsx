@@ -140,39 +140,18 @@ export default async function Home() {
   return (
     <div>
       <SEOSchemaMarkup page="home" />
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+      <div className="hero-gradient">
+        <div className="container" style={{textAlign: 'center', padding: '2rem'}}>
+          <h1 className="hero-title">
+            Find the Perfect Pilates Studio Near You
+          </h1>
+          <p className="hero-subtitle">
+            Discover the best pilates studios across the UK with detailed class information, instructor profiles, and live booking
+          </p>
 
-      {/* Hero Section with Background Image */}
-      <div className="relative min-h-screen flex items-center justify-center">
-        {/* Background Image */}
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: 'url(/pilates-hero-image.png)',
-          }}
-        />
-
-        {/* Overlay for better text readability */}
-        <div className="absolute inset-0 bg-black/40" />
-
-        {/* Content */}
-        <div className="relative z-10 container mx-auto px-4 py-16">
-          <div className="text-center">
-            <h1 className="text-5xl font-extrabold text-white mb-6 font-jakarta drop-shadow-lg">
-              Find the Perfect Pilates Studio Near You
-            </h1>
-            <p className="text-xl text-white/90 mb-8 max-w-3xl mx-auto drop-shadow-md">
-              Discover the best pilates studios across the UK with detailed class information, instructor profiles, and live booking
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="text-lg px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white border-0 shadow-lg" asChild>
-                <Link href="#browse-counties">Browse All Locations</Link>
-              </Button>
-              <Button size="lg" variant="outline" className="text-lg px-8 py-3 bg-white/10 hover:bg-white/20 text-white border-white/30 backdrop-blur-sm" asChild>
-                <Link href="#featured-studios">View Featured Studios</Link>
-              </Button>
-            </div>
+          <div style={{display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap'}}>
+            <Link href="#browse-counties" className="btn">Browse All Locations</Link>
+            <Link href="#featured-studios" className="btn" style={{backgroundColor: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.3)'}}>View Featured Studios</Link>
           </div>
         </div>
       </div>
@@ -363,7 +342,6 @@ export default async function Home() {
           </div>
         </div>
       </div>
-    </div>
     </div>
   )
 }

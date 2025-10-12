@@ -51,6 +51,79 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <style dangerouslySetInnerHTML={{__html: `
+          * { box-sizing: border-box !important; margin: 0 !important; padding: 0 !important; }
+          html, body {
+            font-family: 'Inter', sans-serif !important;
+            line-height: 1.6 !important;
+            color: #1e293b !important;
+            background-color: #f8fafc !important;
+            min-height: 100vh !important;
+          }
+          .hero-gradient {
+            min-height: 100vh !important;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+          }
+          .hero-title {
+            font-size: 3rem !important;
+            font-weight: 800 !important;
+            color: #ffffff !important;
+            text-align: center !important;
+            margin-bottom: 1.5rem !important;
+          }
+          .hero-subtitle {
+            font-size: 1.25rem !important;
+            color: #e2e8f0 !important;
+            text-align: center !important;
+            margin-bottom: 2rem !important;
+          }
+          nav {
+            background-color: #ffffff !important;
+            border-bottom: 1px solid #e5e7eb !important;
+            padding: 1rem !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+          }
+          footer {
+            background-color: #0f172a !important;
+            color: #ffffff !important;
+            padding: 3rem 0 !important;
+            margin-top: 4rem !important;
+          }
+          .container {
+            max-width: 1200px !important;
+            margin: 0 auto !important;
+            padding: 0 1rem !important;
+          }
+          .grid {
+            display: grid !important;
+            gap: 2rem !important;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+          }
+          .card {
+            background: #ffffff !important;
+            border-radius: 0.5rem !important;
+            padding: 2rem !important;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
+          }
+          button, .btn {
+            background-color: #9333ea !important;
+            color: #ffffff !important;
+            padding: 0.75rem 1.5rem !important;
+            border-radius: 0.375rem !important;
+            border: none !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            text-decoration: none !important;
+          }
+          button:hover, .btn:hover {
+            background-color: #7c3aed !important;
+          }
+        `}} />
+      </head>
       <body className={`${inter.className} ${plusJakarta.variable}`}>
         <Header />
         {children}
