@@ -2,8 +2,6 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase';
 import { MapPin, Star, Phone, Clock, Mail, Globe, ArrowLeft, Activity, Users, Award, Heart, Share2, Calendar, Navigation, Instagram, Facebook } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 
 interface StudioPageProps {
@@ -340,11 +338,10 @@ export default async function StudioPage({ params }: StudioPageProps) {
       <StudioSchema studio={studioData} county={locationData.county} city={locationData.city} />
       <BreadcrumbSchema studio={studioData} county={locationData.county} city={locationData.city} />
 
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
+      <div className="page-container">
         {/* Header Section */}
-        <div className="bg-white shadow-sm">
-          <div className="container mx-auto px-4 py-8">
-            <div className="max-w-6xl mx-auto">
+        <div className="page-header">
+          <div className="container">
               {/* Breadcrumbs */}
               <nav className="text-sm text-gray-600 mb-4">
                 <ol className="flex space-x-2">
@@ -391,7 +388,7 @@ export default async function StudioPage({ params }: StudioPageProps) {
                           </div>
                         )}
                         {studioData.is_verified && (
-                          <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm flex items-center gap-1">
+                          <span className="meta-badge success">
                             <Award className="h-3 w-3" />
                             Verified
                           </span>
@@ -430,11 +427,11 @@ export default async function StudioPage({ params }: StudioPageProps) {
 
                   {/* Class Types */}
                   {studioData.class_types && studioData.class_types.length > 0 && (
-                    <div className="mb-6">
-                      <h3 className="text-lg font-semibold mb-3">Class Types</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {studioData.class_types.map((type, index) => (
-                          <span key={index} className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">
+                    <div className="content-section">
+                      <h3>Class Types</h3>
+                      <div className="class-types">
+                        {studioData.class_types.map((type: string, index: number) => (
+                          <span key={index} className="class-type-badge">
                             {type}
                           </span>
                         ))}
@@ -460,17 +457,17 @@ export default async function StudioPage({ params }: StudioPageProps) {
 
                 {/* Contact & Booking Card */}
                 <div className="lg:col-span-1">
-                  <Card className="sticky top-8">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Activity className="h-5 w-5 text-purple-600" />
-                        Book a Class
-                      </CardTitle>
-                      <CardDescription>
-                        {studioData.price_range && `Classes from ${studioData.price_range}`}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
+                  <div className="sidebar" style={{position: 'sticky', top: '2rem'}}>
+                    <h3 style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+                      <Activity className="h-5 w-5" />
+                      Book a Class
+                    </h3>
+                    {studioData.price_range && (
+                      <p style={{color: '#6b7280', fontSize: '0.875rem', marginBottom: '1rem'}}>
+                        Classes from {studioData.price_range}
+                      </p>
+                    )}
+                    <div style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
                       {studioData.website ? (
                         <Button asChild size="lg" className="w-full bg-purple-600 hover:bg-purple-700">
                           <a href={studioData.website} target="_blank" rel="noopener noreferrer">
