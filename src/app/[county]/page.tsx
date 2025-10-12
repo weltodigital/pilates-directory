@@ -2,7 +2,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase';
 import Link from 'next/link';
-import { MapPin, Star, Users, Activity } from 'lucide-react';
+import { MapPin, Star, Users, Activity, Clock, Phone } from 'lucide-react';
 
 interface CountyPageProps {
   params: Promise<{
@@ -15,11 +15,31 @@ interface Location {
   name: string;
   slug: string;
   type: string;
+  full_path: string;
   seo_title: string;
   seo_description: string;
+  meta_description: string;
   h1_title: string;
   intro_text: string;
+  main_content: string;
   butcher_count: number;
+  seo_keywords: string[];
+  parent_id?: string;
+  county_slug?: string;
+}
+
+interface Studio {
+  id: string;
+  name: string;
+  slug: string;
+  address: string;
+  city: string;
+  county: string;
+  phone: string;
+  website: string;
+  google_rating: number;
+  is_featured: boolean;
+  is_active: boolean;
 }
 
 async function getCountyData(countySlug: string): Promise<Location | null> {
@@ -59,6 +79,30 @@ async function getCitiesAndTowns(countyId: string) {
   return data || [];
 }
 
+async function getFeaturedStudios(countySlug: string): Promise<Studio[]> {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://zytpgaraxyhlsvvkrrir.supabase.co',
+    process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp5dHBnYXJheHlobHN2dmtycmlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODc5ODMxMiwiZXhwIjoyMDc0Mzc0MzEyfQ.XLBFI-CGJXMi3yrLsb7FP2DOXRJy-IDDIwSWt7W95Ok'
+  );
+
+  const { data, error } = await supabase
+    .from('pilates_studios')
+    .select('*')
+    .eq('county', countySlug)
+    .eq('is_featured', true)
+    .eq('is_active', true)
+    .order('google_rating', { ascending: false, nullsFirst: false })
+    .order('name')
+    .limit(6);
+
+  if (error) {
+    console.error('Error fetching featured studios:', error);
+    return [];
+  }
+
+  return data || [];
+}
+
 export async function generateMetadata({ params }: CountyPageProps): Promise<Metadata> {
   const resolvedParams = await params;
   const location = await getCountyData(resolvedParams.county);
@@ -70,9 +114,46 @@ export async function generateMetadata({ params }: CountyPageProps): Promise<Met
     };
   }
 
+  const pilatesKeywords = [
+    `pilates ${location.name}`,
+    `pilates studios ${location.name}`,
+    `pilates classes ${location.name}`,
+    `pilates near me ${location.name}`,
+    `reformer pilates ${location.name}`,
+    `mat pilates ${location.name}`,
+    `clinical pilates ${location.name}`,
+    `${location.name} pilates directory`,
+    `${location.name} fitness studios`,
+    `best pilates ${location.name}`
+  ];
+
   return {
-    title: location.seo_title || `Pilates Studios in ${location.name} | Find Classes Near You`,
-    description: location.seo_description || `Discover the best pilates studios in ${location.name}. Find reformer, mat, and clinical pilates classes with verified reviews and online booking.`,
+    title: location.seo_title || `Pilates Studios in ${location.name} | Find Pilates Classes Near You`,
+    description: location.meta_description || `Find the best pilates studios in ${location.name}. Browse reformer, mat & clinical pilates classes. Read reviews, check schedules & book online. ${location.butcher_count}+ studios listed.`,
+    keywords: [...pilatesKeywords, ...(location.seo_keywords || [])].join(', '),
+    openGraph: {
+      title: location.seo_title || `Pilates Studios in ${location.name}`,
+      description: location.meta_description || `Find the best pilates studios in ${location.name}. Browse reformer, mat & clinical pilates classes.`,
+      type: 'website',
+      locale: 'en_GB',
+      siteName: 'Pilates Classes Near',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: location.seo_title || `Pilates Studios in ${location.name}`,
+      description: location.meta_description || `Find the best pilates studios in ${location.name}.`,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
   };
 }
 
@@ -94,13 +175,14 @@ export default async function CountyPage({ params }: CountyPageProps) {
   }
 
   const citiesAndTowns = await getCitiesAndTowns(location.id);
+  const featuredStudios = await getFeaturedStudios(resolvedParams.county);
 
   return (
     <div className="page-container">
       <div className="page-header">
         <div className="container">
           <h1>{location.h1_title || `Pilates Studios in ${location.name} | Find Pilates Classes Near You`}</h1>
-          <p>Discover the best pilates studios in {location.name}. Browse reformer, mat, and clinical pilates classes with verified reviews and online booking.</p>
+          <p>{location.intro_text || `Discover the best pilates studios in ${location.name}. Browse reformer, mat, and clinical pilates classes with verified reviews and online booking.`}</p>
 
           <div className="meta-badges">
             <span className="meta-badge primary">
@@ -115,6 +197,12 @@ export default async function CountyPage({ params }: CountyPageProps) {
               <Activity className="h-3 w-3" />
               {location.butcher_count}+ Studios
             </span>
+            {featuredStudios.length > 0 && (
+              <span className="meta-badge warning">
+                <Star className="h-3 w-3" />
+                Avg Rating: {(featuredStudios.reduce((acc, s) => acc + (s.google_rating || 0), 0) / featuredStudios.length).toFixed(1)}
+              </span>
+            )}
           </div>
 
           <div className="flex flex-wrap gap-4 mb-6">
@@ -123,7 +211,7 @@ export default async function CountyPage({ params }: CountyPageProps) {
               Find Studios Near Me
             </button>
             <button className="btn-secondary">
-              <Star className="h-4 w-4 mr-2" />
+              <Clock className="h-4 w-4 mr-2" />
               View Class Schedules
             </button>
           </div>
@@ -134,6 +222,59 @@ export default async function CountyPage({ params }: CountyPageProps) {
 
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
+          {featuredStudios.length > 0 && (
+            <div className="mb-12">
+              <div className="flex items-center justify-between mb-6">
+                <h2>Featured Pilates Studios in {location.name}</h2>
+                <span className="text-sm text-gray-500">{featuredStudios.length} featured studios</span>
+              </div>
+
+              <div className="studios-grid">
+                {featuredStudios.map((studio) => (
+                  <div key={studio.id} className="studio-card">
+                    <div className="studio-header">
+                      <div>
+                        <h3 className="studio-name">{studio.name}</h3>
+                        <p className="studio-location">
+                          <MapPin className="h-3 w-3" />
+                          {studio.city}
+                        </p>
+                      </div>
+                      {studio.google_rating && (
+                        <div className="studio-rating">
+                          <Star className="h-3 w-3" />
+                          {studio.google_rating}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="studio-details">
+                      <div className="studio-detail-item">
+                        <MapPin className="h-3 w-3" />
+                        <span>{studio.address}</span>
+                      </div>
+                      {studio.phone && (
+                        <div className="studio-detail-item">
+                          <Phone className="h-3 w-3" />
+                          <span>{studio.phone}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="studio-actions">
+                      <Link href={`/${resolvedParams.county}/${studio.city.toLowerCase()}/${studio.slug}`} className="btn-primary flex-1">
+                        View Studio
+                      </Link>
+                      <button className="btn-secondary">
+                        Get Directions
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="mb-12">
             <div className="flex items-center justify-between mb-6">
               <h2>Cities and Towns in {location.name}</h2>
@@ -147,7 +288,7 @@ export default async function CountyPage({ params }: CountyPageProps) {
                     <h3 className="text-lg font-semibold text-gray-900">{city.name}</h3>
                     <span className="text-sm text-gray-500">{city.butcher_count} studios</span>
                   </div>
-                  <p className="text-gray-600 mb-4">Find pilates classes and studios in {city.name}.</p>
+                  <p className="text-gray-600 mb-4">Find pilates classes and studios in {city.name}. Browse reformer, mat, and clinical pilates options.</p>
                   <div className="flex gap-2">
                     <Link href={`/${location.slug}/${city.slug}`} className="btn-primary flex-1">
                       View Studios
@@ -160,6 +301,12 @@ export default async function CountyPage({ params }: CountyPageProps) {
               ))}
             </div>
           </div>
+
+          {location.main_content && (
+            <div className="content-section">
+              <div dangerouslySetInnerHTML={{ __html: location.main_content }} />
+            </div>
+          )}
         </div>
       </div>
     </div>
