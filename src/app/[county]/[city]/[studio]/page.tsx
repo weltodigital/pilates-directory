@@ -468,22 +468,22 @@ export default async function StudioPage({ params }: StudioPageProps) {
                     )}
                     <div style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
                       {studioData.website ? (
-                        <Button asChild size="lg" className="w-full bg-purple-600 hover:bg-purple-700">
+                        <button className="btn-primary w-full">
                           <a href={studioData.website} target="_blank" rel="noopener noreferrer">
                             <Globe className="h-4 w-4 mr-2" />
                             Visit Website
                           </a>
-                        </Button>
+                        </button>
                       ) : studioData.online_booking_available ? (
-                        <Button size="lg" className="w-full bg-purple-600 hover:bg-purple-700">
+                        <button className="btn-primary w-full">
                           <Calendar className="h-4 w-4 mr-2" />
                           Book Online
-                        </Button>
+                        </button>
                       ) : (
-                        <Button variant="outline" size="lg" className="w-full border-purple-600 text-purple-600">
+                        <button className="btn-secondary w-full">
                           <Phone className="h-4 w-4 mr-2" />
                           Call to Book
-                        </Button>
+                        </button>
                       )}
 
                       {/* Opening Hours */}
@@ -638,11 +638,7 @@ export default async function StudioPage({ params }: StudioPageProps) {
                           )}
                         </div>
                         <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            asChild
-                          >
+                          <button className="btn-secondary">
                             <a
                               href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(studioData.address)}`}
                               target="_blank"
@@ -652,7 +648,7 @@ export default async function StudioPage({ params }: StudioPageProps) {
                               <MapPin className="h-3 w-3" />
                               Directions
                             </a>
-                          </Button>
+                          </button>
                         </div>
                       </div>
                     </div>

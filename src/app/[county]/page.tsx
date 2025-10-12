@@ -6,7 +6,7 @@ import SEOLocationContent from '@/components/SEOLocationContent';
 import LocationStudiosMap from '@/components/LocationStudiosMap';
 import Link from 'next/link';
 import { MapPin, Star, Users, Activity, Clock, Phone, Heart } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+// import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface CountyPageProps {
@@ -400,11 +400,11 @@ export default async function CountyPage({ params }: CountyPageProps) {
                         {studio.description || `Professional pilates studio offering a range of classes for all levels.`}
                       </p>
                       <div className="flex gap-2">
-                        <Button size="sm" className="flex-1 bg-purple-600 hover:bg-purple-700" asChild>
+                        <button className="btn-primary flex-1">
                           <Link href={`/${studio.full_url_path}`}>
                             View Studio
                           </Link>
-                        </Button>
+                        </button>
                       </div>
                     </div>
                   </CardContent>
@@ -457,14 +457,14 @@ export default async function CountyPage({ params }: CountyPageProps) {
 
               {/* Quick Actions */}
               <div className="flex flex-wrap gap-4 mb-6">
-                <Button size="lg" className="bg-purple-600 hover:bg-purple-700">
+                <button className="btn-primary">
                   <Activity className="h-4 w-4 mr-2" />
                   Find Studios Near Me
-                </Button>
-                <Button variant="outline" size="lg" className="border-purple-600 text-purple-600 hover:bg-purple-50">
+                </button>
+                <button className="btn-secondary">
                   <Clock className="h-4 w-4 mr-2" />
                   View Class Schedules
-                </Button>
+                </button>
               </div>
 
               {/* Intro Text */}
@@ -485,9 +485,9 @@ export default async function CountyPage({ params }: CountyPageProps) {
                   <h2 className="text-2xl font-bold text-gray-900">
                     Featured Pilates Studios in {location.name}
                   </h2>
-                  <Button variant="outline" className="border-purple-600 text-purple-600">
+                  <button className="btn-secondary">
                     View All Studios
-                  </Button>
+                  </button>
                 </div>
 
                 <div className="studios-grid">
@@ -535,12 +535,12 @@ export default async function CountyPage({ params }: CountyPageProps) {
                             </div>
                           )}
                           <div className="flex gap-2 pt-2">
-                            <Button size="sm" className="flex-1 bg-purple-600 hover:bg-purple-700">
+                            <button className="btn-primary flex-1">
                               View Studio
-                            </Button>
-                            <Button variant="outline" size="sm">
+                            </button>
+                            <button className="btn-secondary">
                               <Heart className="h-3 w-3" />
-                            </Button>
+                            </button>
                           </div>
                         </div>
                       </div>

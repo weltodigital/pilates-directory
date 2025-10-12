@@ -691,11 +691,11 @@ export default async function CityPage({ params }: CityPageProps) {
                     <p className="text-sm text-gray-500">
                       Try searching in nearby areas or contact us to add studios.
                     </p>
-                    <Button variant="outline" className="border-purple-600 text-purple-600" asChild>
+                    <button className="btn-secondary">
                       <Link href={`/${countyData.slug}`}>
                         Browse {countyData.name} Studios
                       </Link>
-                    </Button>
+                    </button>
                   </div>
                 </div>
               )}
