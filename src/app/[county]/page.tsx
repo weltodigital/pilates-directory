@@ -323,10 +323,29 @@ function StructuredData({ county, citiesAndTowns, featuredStudios }: { county: L
 
 export default async function CountyPage({ params }: CountyPageProps) {
   const { county } = await params;
+  console.log('County page accessed with param:', county);
+
+  // Temporary debugging return - to test if routing works at all
+  if (county === 'debug-test') {
+    return (
+      <div style={{padding: '2rem', background: '#f0f0f0'}}>
+        <h1>DEBUG: County page is working!</h1>
+        <p>Parameter: {county}</p>
+        <p>This proves the dynamic routing is functioning.</p>
+      </div>
+    );
+  }
+
   const location = await getCountyData(county);
   const seoContent = await getSEOContent(county);
 
+  console.log('Location found:', !!location);
+  if (location) {
+    console.log('Location name:', location.name);
+  }
+
   if (!location) {
+    console.log('Location not found, calling notFound()');
     notFound();
   }
 
