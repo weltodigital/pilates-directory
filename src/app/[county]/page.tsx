@@ -1,3 +1,4 @@
+import React from 'react';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase';
 import EnhancedContent from '@/components/EnhancedContent';
@@ -417,7 +418,7 @@ export default async function CountyPage({ params }: CountyPageProps) {
   }
 
   return (
-    <>
+    <div>
       <StructuredData county={location} citiesAndTowns={citiesAndTowns} featuredStudios={featuredStudios} />
 
       <div className="page-container">
@@ -741,7 +742,7 @@ export default async function CountyPage({ params }: CountyPageProps) {
                 <div className="sidebar">
                   <h3>Popular Class Types</h3>
                   <div className="class-types">
-                    {['Reformer Pilates', 'Mat Pilates', 'Clinical Pilates', 'Prenatal', 'Barre Pilates', 'Power Pilates'].map((type: string, index: number) => (
+                    {['Reformer Pilates', 'Mat Pilates', 'Clinical Pilates', 'Prenatal', 'Barre Pilates', 'Power Pilates'].map((type: string) => (
                       <span key={type} className="class-type-badge">
                         {type}
                       </span>
@@ -753,7 +754,7 @@ export default async function CountyPage({ params }: CountyPageProps) {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

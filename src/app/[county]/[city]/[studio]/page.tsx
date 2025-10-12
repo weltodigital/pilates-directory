@@ -1,3 +1,4 @@
+import React from 'react';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase';
@@ -334,7 +335,7 @@ export default async function StudioPage({ params }: StudioPageProps) {
   }
 
   return (
-    <>
+    <div>
       <StudioSchema studio={studioData} county={locationData.county} city={locationData.city} />
       <BreadcrumbSchema studio={studioData} county={locationData.county} city={locationData.city} />
 
@@ -664,7 +665,7 @@ export default async function StudioPage({ params }: StudioPageProps) {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

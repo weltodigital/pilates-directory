@@ -1,3 +1,4 @@
+import React from 'react';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase';
@@ -521,7 +522,7 @@ export default async function CityPage({ params }: CityPageProps) {
   }
 
   return (
-    <>
+    <div>
       <StructuredData location={location} county={countyData} studios={studios} />
 
       <div className="page-container">
@@ -895,7 +896,7 @@ export default async function CityPage({ params }: CityPageProps) {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
