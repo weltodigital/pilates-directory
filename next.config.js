@@ -5,7 +5,10 @@ const nextConfig = {
   },
   // Force fresh deployment for CSS
   generateBuildId: () => {
-    return 'pilates-force-css-' + Date.now()
+    return 'pilates-ultra-force-' + Date.now()
+  },
+  experimental: {
+    optimizeCss: false,
   },
   images: {
     remotePatterns: [
