@@ -420,7 +420,6 @@ export default async function CountyPage({ params }: CountyPageProps) {
   return (
     <div>
       <StructuredData county={location} citiesAndTowns={citiesAndTowns} featuredStudios={featuredStudios} />
-
       <div className="page-container">
         {/* Header Section */}
         <div className="page-header">

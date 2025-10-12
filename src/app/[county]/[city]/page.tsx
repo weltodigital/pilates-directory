@@ -524,7 +524,6 @@ export default async function CityPage({ params }: CityPageProps) {
   return (
     <div>
       <StructuredData location={location} county={countyData} studios={studios} />
-
       <div className="page-container">
         {/* Header Section */}
         <div className="page-header">
