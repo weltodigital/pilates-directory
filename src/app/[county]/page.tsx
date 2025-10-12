@@ -345,8 +345,16 @@ export default async function CountyPage({ params }: CountyPageProps) {
   }
 
   if (!location) {
-    console.log('Location not found, calling notFound()');
-    notFound();
+    console.log('Location not found, showing debug info instead of notFound()');
+    return (
+      <div style={{padding: '2rem', background: '#ffe6e6', border: '2px solid red'}}>
+        <h1>🚨 DEBUG: Location not found for county: {county}</h1>
+        <p>This means the database query returned null.</p>
+        <p>The dynamic routing is working (you're seeing this page), but the database lookup failed.</p>
+        <p>County parameter: <strong>{county}</strong></p>
+        <p>This proves the issue is with the database query, not the routing.</p>
+      </div>
+    );
   }
 
   const citiesAndTowns = await getCountyCitiesAndTowns(county);
