@@ -6,6 +6,9 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  compiler: {
+    removeConsole: false,
+  },
   // Force fresh deployment for CSS
   generateBuildId: () => {
     return 'pilates-ultra-force-' + Date.now()

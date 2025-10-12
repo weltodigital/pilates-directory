@@ -522,9 +522,8 @@ export default async function CityPage({ params }: CityPageProps) {
   }
 
   return (
-    <div>
+    <div className="page-container">
       <StructuredData location={location} county={countyData} studios={studios} />
-      <div className="page-container">
         {/* Header Section */}
         <div className="page-header">
           <div className="container">
@@ -894,7 +893,6 @@ export default async function CityPage({ params }: CityPageProps) {
             <FAQSection faqContent={location.faq_content} location={location} county={countyData} />
           </div>
         </div>
-      </div>
     </div>
   );
 }

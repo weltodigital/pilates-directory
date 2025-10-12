@@ -418,9 +418,8 @@ export default async function CountyPage({ params }: CountyPageProps) {
   }
 
   return (
-    <div>
+    <div className="page-container">
       <StructuredData county={location} citiesAndTowns={citiesAndTowns} featuredStudios={featuredStudios} />
-      <div className="page-container">
         {/* Header Section */}
         <div className="page-header">
           <div className="container">
@@ -752,7 +751,6 @@ export default async function CountyPage({ params }: CountyPageProps) {
             </div>
           </div>
         </div>
-      </div>
     </div>
   );
 }

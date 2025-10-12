@@ -335,10 +335,9 @@ export default async function StudioPage({ params }: StudioPageProps) {
   }
 
   return (
-    <div>
+    <div className="page-container">
       <StudioSchema studio={studioData} county={locationData.county} city={locationData.city} />
       <BreadcrumbSchema studio={studioData} county={locationData.county} city={locationData.city} />
-      <div className="page-container">
         {/* Header Section */}
         <div className="page-header">
           <div className="container">
@@ -663,7 +662,6 @@ export default async function StudioPage({ params }: StudioPageProps) {
             )}
           </div>
         </div>
-      </div>
     </div>
   );
 }
