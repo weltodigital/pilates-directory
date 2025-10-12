@@ -122,6 +122,57 @@ export default function RootLayout({
           button:hover, .btn:hover {
             background-color: #7c3aed !important;
           }
+
+          /* County Page Specific Styles */
+          .county-page {
+            background: linear-gradient(to bottom right, #faf5ff, #f3e8ff) !important;
+            min-height: 100vh !important;
+          }
+          .page-header {
+            background: #ffffff !important;
+            padding: 2rem 0 !important;
+            margin-bottom: 2rem !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+          }
+          .content-section {
+            background: #ffffff !important;
+            padding: 2rem !important;
+            margin-bottom: 2rem !important;
+            border-radius: 0.5rem !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+          }
+          .location-card {
+            background: #ffffff !important;
+            border: 1px solid #e5e7eb !important;
+            border-radius: 0.5rem !important;
+            padding: 1.5rem !important;
+            margin-bottom: 1rem !important;
+            transition: box-shadow 0.2s !important;
+          }
+          .location-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+          }
+          h1, h2, h3, h4, h5, h6 {
+            color: #1e293b !important;
+            font-weight: 600 !important;
+            margin-bottom: 1rem !important;
+          }
+          h1 { font-size: 2.5rem !important; }
+          h2 { font-size: 2rem !important; }
+          h3 { font-size: 1.5rem !important; }
+          p {
+            color: #4b5563 !important;
+            line-height: 1.6 !important;
+            margin-bottom: 1rem !important;
+          }
+          .badge {
+            background: #9333ea !important;
+            color: #ffffff !important;
+            padding: 0.25rem 0.75rem !important;
+            border-radius: 1rem !important;
+            font-size: 0.875rem !important;
+            font-weight: 500 !important;
+          }
         `}} />
       </head>
       <body className={`${inter.className} ${plusJakarta.variable}`}>

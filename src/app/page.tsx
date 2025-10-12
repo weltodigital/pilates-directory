@@ -290,10 +290,8 @@ export default async function Home() {
           <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-8 text-center font-jakarta">
             Browse All Locations by County
           </h2>
-          <div style={{background: '#ff0000', color: '#ffffff', padding: '2rem', marginBottom: '1rem', fontSize: '20px', textAlign: 'center', border: '5px solid yellow'}}>
-            <strong>🚨 DEPLOYMENT TEST #{Date.now()} 🚨</strong><br/>
-            Found {countiesWithLocations.length} counties with locations<br/>
-            <strong>If you see this, deployments are working!</strong>
+          <div style={{background: '#f8f9fa', padding: '1rem', marginBottom: '2rem', borderRadius: '0.5rem', border: '1px solid #e9ecef'}}>
+            <strong>Browse Locations:</strong> {countiesWithLocations.length} counties available
           </div>
           {countiesWithLocations.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -306,7 +304,6 @@ export default async function Home() {
                     >
                       {county.name}
                     </Link>
-                    <div style={{fontSize: '10px', color: '#666'}}>Link: /{county.slug}</div>
                   </h3>
 
                   {locations.length > 0 ? (
@@ -319,7 +316,6 @@ export default async function Home() {
                           >
                             {location.name}
                           </Link>
-                          <div style={{fontSize: '8px', color: '#999'}}>→ /{location.full_path}</div>
                         </div>
                       ))}
                     </div>

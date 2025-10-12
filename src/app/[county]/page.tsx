@@ -323,36 +323,18 @@ function StructuredData({ county, citiesAndTowns, featuredStudios }: { county: L
 
 export default async function CountyPage({ params }: CountyPageProps) {
   const { county } = await params;
-  console.log('County page accessed with param:', county);
-
-  // Temporary debugging return - to test if routing works at all
-  if (county === 'debug-test') {
-    return (
-      <div style={{padding: '2rem', background: '#f0f0f0'}}>
-        <h1>DEBUG: County page is working!</h1>
-        <p>Parameter: {county}</p>
-        <p>This proves the dynamic routing is functioning.</p>
-      </div>
-    );
-  }
 
   const location = await getCountyData(county);
   const seoContent = await getSEOContent(county);
 
-  console.log('Location found:', !!location);
-  if (location) {
-    console.log('Location name:', location.name);
-  }
-
   if (!location) {
-    console.log('Location not found, showing debug info instead of notFound()');
     return (
-      <div style={{padding: '2rem', background: '#ffe6e6', border: '2px solid red'}}>
-        <h1>🚨 DEBUG: Location not found for county: {county}</h1>
-        <p>This means the database query returned null.</p>
-        <p>The dynamic routing is working (you're seeing this page), but the database lookup failed.</p>
-        <p>County parameter: <strong>{county}</strong></p>
-        <p>This proves the issue is with the database query, not the routing.</p>
+      <div className="container" style={{padding: '2rem', textAlign: 'center'}}>
+        <h1 style={{color: '#9333ea', marginBottom: '1rem'}}>County Not Found</h1>
+        <p>Sorry, we couldn't find information for this county.</p>
+        <Link href="/" className="btn" style={{marginTop: '1rem', display: 'inline-block'}}>
+          Back to Homepage
+        </Link>
       </div>
     );
   }
