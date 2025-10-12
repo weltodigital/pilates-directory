@@ -290,8 +290,10 @@ export default async function Home() {
           <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-8 text-center font-jakarta">
             Browse All Locations by County
           </h2>
-          <div style={{background: '#f0f0f0', padding: '1rem', marginBottom: '1rem', fontSize: '12px'}}>
-            <strong>Debug Info:</strong> Found {countiesWithLocations.length} counties with locations
+          <div style={{background: '#ff0000', color: '#ffffff', padding: '2rem', marginBottom: '1rem', fontSize: '20px', textAlign: 'center', border: '5px solid yellow'}}>
+            <strong>🚨 DEPLOYMENT TEST #{Date.now()} 🚨</strong><br/>
+            Found {countiesWithLocations.length} counties with locations<br/>
+            <strong>If you see this, deployments are working!</strong>
           </div>
           {countiesWithLocations.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
