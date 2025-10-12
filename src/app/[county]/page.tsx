@@ -421,11 +421,10 @@ export default async function CountyPage({ params }: CountyPageProps) {
     <>
       <StructuredData county={location} citiesAndTowns={citiesAndTowns} featuredStudios={featuredStudios} />
 
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
+      <div className="page-container">
         {/* Header Section */}
-        <div className="bg-white shadow-sm">
-          <div className="container mx-auto px-4 py-8">
-            <div className="max-w-4xl mx-auto">
+        <div className="page-header">
+          <div className="container">
 
               {/* Page Header */}
               <h1 className="text-4xl font-bold text-gray-900 mb-4">
@@ -436,21 +435,21 @@ export default async function CountyPage({ params }: CountyPageProps) {
               </p>
 
               {/* County Meta */}
-              <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-6">
-                <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full flex items-center gap-1">
+              <div className="meta-badges">
+                <span className="meta-badge primary">
                   <MapPin className="h-3 w-3" />
                   {location.name}
                 </span>
-                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full flex items-center gap-1">
+                <span className="meta-badge success">
                   <Users className="h-3 w-3" />
                   {citiesAndTowns.length} Locations
                 </span>
-                <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full flex items-center gap-1">
+                <span className="meta-badge warning">
                   <Activity className="h-3 w-3" />
                   {location.butcher_count}+ Studios
                 </span>
                 {featuredStudios.length > 0 && (
-                  <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full flex items-center gap-1">
+                  <span className="meta-badge warning">
                     <Star className="h-3 w-3" />
                     Avg Rating: {(featuredStudios.reduce((acc, s) => acc + (s.rating || 0), 0) / featuredStudios.length).toFixed(1)}
                   </span>
@@ -493,27 +492,25 @@ export default async function CountyPage({ params }: CountyPageProps) {
                   </Button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                <div className="studios-grid">
                   {featuredStudios.slice(0, 6).map((studio) => (
-                    <Card key={studio.id} className="hover:shadow-lg transition-shadow">
-                      <CardHeader>
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <CardTitle className="text-lg">{studio.name}</CardTitle>
-                            <CardDescription className="flex items-center gap-1 mt-1">
-                              <MapPin className="h-3 w-3" />
-                              {studio.city}
-                            </CardDescription>
+                    <div key={studio.id} className="studio-card">
+                      <div className="studio-header">
+                        <div>
+                          <div className="studio-name">{studio.name}</div>
+                          <div className="studio-location">
+                            <MapPin className="h-3 w-3" />
+                            {studio.city}
                           </div>
-                          {studio.rating && (
-                            <div className="flex items-center gap-1">
-                              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                              <span className="text-sm font-medium">{studio.rating}</span>
-                            </div>
-                          )}
                         </div>
-                      </CardHeader>
-                      <CardContent>
+                        {studio.rating && (
+                          <div className="studio-rating">
+                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                            <span>{studio.rating}</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="studio-details">
                         <div className="space-y-3">
                           {studio.phone && (
                             <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -548,8 +545,8 @@ export default async function CountyPage({ params }: CountyPageProps) {
                             </Button>
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
