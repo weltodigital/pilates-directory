@@ -137,6 +137,14 @@ export default async function Home() {
     getFeaturedPilatesStudios(6)
   ]);
 
+  // Debug logging to see what we're getting
+  console.log('Counties with locations:', countiesWithLocations.length);
+  console.log('Featured studios:', featuredStudios.length);
+  if (countiesWithLocations.length > 0) {
+    console.log('First county:', countiesWithLocations[0].county);
+    console.log('First county locations:', countiesWithLocations[0].locations.length);
+  }
+
   return (
     <div>
       <SEOSchemaMarkup page="home" />
@@ -282,6 +290,9 @@ export default async function Home() {
           <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-8 text-center font-jakarta">
             Browse All Locations by County
           </h2>
+          <div style={{background: '#f0f0f0', padding: '1rem', marginBottom: '1rem', fontSize: '12px'}}>
+            <strong>Debug Info:</strong> Found {countiesWithLocations.length} counties with locations
+          </div>
           {countiesWithLocations.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {countiesWithLocations.map(({ county, locations }) => (
@@ -293,6 +304,7 @@ export default async function Home() {
                     >
                       {county.name}
                     </Link>
+                    <div style={{fontSize: '10px', color: '#666'}}>Link: /{county.slug}</div>
                   </h3>
 
                   {locations.length > 0 ? (
@@ -305,6 +317,7 @@ export default async function Home() {
                           >
                             {location.name}
                           </Link>
+                          <div style={{fontSize: '8px', color: '#999'}}>→ /{location.full_path}</div>
                         </div>
                       ))}
                     </div>
