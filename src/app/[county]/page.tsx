@@ -72,8 +72,7 @@ async function getCitiesAndTowns(countyId: string) {
     .select('*')
     .eq('parent_id', countyId)
     .in('type', ['city', 'town'])
-    .gt('butcher_count', 0)
-    .order('butcher_count', { ascending: false });
+    .order('name');
 
   return data || [];
 }
@@ -284,12 +283,19 @@ export default async function CountyPage({ params }: CountyPageProps) {
                 <div key={city.id} className="location-card">
                   <div className="flex justify-between items-start mb-3">
                     <h3 className="text-lg font-semibold text-gray-900">{city.name}</h3>
-                    <span className="text-sm text-gray-500">{city.butcher_count} studios</span>
+                    <span className="text-sm text-gray-500">
+                      {city.butcher_count > 0 ? `${city.butcher_count} studios` : 'No studios yet'}
+                    </span>
                   </div>
-                  <p className="text-gray-600 mb-4">Find pilates classes and studios in {city.name}. Browse reformer, mat, and clinical pilates options.</p>
+                  <p className="text-gray-600 mb-4">
+                    {city.butcher_count > 0
+                      ? `Find pilates classes and studios in ${city.name}. Browse reformer, mat, and clinical pilates options.`
+                      : `Explore ${city.name} for pilates opportunities. Be the first to discover studios in this area.`
+                    }
+                  </p>
                   <div className="flex gap-2">
                     <Link href={`/${resolvedParams.county}/${city.slug}`} className="btn-primary flex-1">
-                      View Studios
+                      {city.butcher_count > 0 ? 'View Studios' : 'Explore Area'}
                     </Link>
                     <button className="btn-secondary">
                       Get Directions
