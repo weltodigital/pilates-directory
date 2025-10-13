@@ -2,7 +2,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase';
 import Link from 'next/link';
-import { MapPin, Star, Users, Activity, Clock, Phone } from 'lucide-react';
+import { MapPin, Users, Activity } from 'lucide-react';
 
 interface CountyPageProps {
   params: Promise<{
@@ -28,18 +28,6 @@ interface Location {
   county_slug?: string;
 }
 
-interface Studio {
-  id: string;
-  name: string;
-  slug: string;
-  address: string;
-  city: string;
-  county: string;
-  phone: string;
-  website: string;
-  google_rating: number;
-  is_active: boolean;
-}
 
 async function getCountyData(countySlug: string): Promise<Location | null> {
   const supabase = createClient(
@@ -77,28 +65,6 @@ async function getCitiesAndTowns(countyId: string) {
   return data || [];
 }
 
-async function getFeaturedStudios(countySlug: string): Promise<Studio[]> {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://zytpgaraxyhlsvvkrrir.supabase.co',
-    process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp5dHBnYXJheHlobHN2dmtycmlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODc5ODMxMiwiZXhwIjoyMDc0Mzc0MzEyfQ.XLBFI-CGJXMi3yrLsb7FP2DOXRJy-IDDIwSWt7W95Ok'
-  );
-
-  const { data, error } = await supabase
-    .from('pilates_studios')
-    .select('*')
-    .eq('county_slug', countySlug)
-    .eq('is_active', true)
-    .order('google_rating', { ascending: false, nullsFirst: false })
-    .order('name')
-    .limit(6);
-
-  if (error) {
-    console.error('Error fetching featured studios:', error);
-    return [];
-  }
-
-  return data || [];
-}
 
 export async function generateMetadata({ params }: CountyPageProps): Promise<Metadata> {
   const resolvedParams = await params;
@@ -172,7 +138,6 @@ export default async function CountyPage({ params }: CountyPageProps) {
   }
 
   const citiesAndTowns = await getCitiesAndTowns(location.id);
-  const featuredStudios = await getFeaturedStudios(resolvedParams.county);
 
   return (
     <div className="page-container">
@@ -194,24 +159,8 @@ export default async function CountyPage({ params }: CountyPageProps) {
               <Activity className="h-3 w-3" />
               {location.butcher_count}+ Studios
             </span>
-            {featuredStudios.length > 0 && (
-              <span className="meta-badge warning">
-                <Star className="h-3 w-3" />
-                Avg Rating: {(featuredStudios.reduce((acc, s) => acc + (s.google_rating || 0), 0) / featuredStudios.length).toFixed(1)}
-              </span>
-            )}
           </div>
 
-          <div className="flex flex-wrap gap-4 mb-6">
-            <button className="btn-primary">
-              <Activity className="h-4 w-4 mr-2" />
-              Find Studios Near Me
-            </button>
-            <button className="btn-secondary">
-              <Clock className="h-4 w-4 mr-2" />
-              View Class Schedules
-            </button>
-          </div>
 
           <p>{location.intro_text || `Welcome to the comprehensive guide to pilates studios in ${location.name}. Whether you're looking for reformer pilates, mat classes, clinical pilates, or specialized programs, our directory features the best studios across ${location.name} with verified reviews, class schedules, and online booking options.`}</p>
         </div>
@@ -219,58 +168,6 @@ export default async function CountyPage({ params }: CountyPageProps) {
 
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
-          {featuredStudios.length > 0 && (
-            <div className="mb-12">
-              <div className="flex items-center justify-between mb-6">
-                <h2>Featured Pilates Studios in {location.name}</h2>
-                <span className="text-sm text-gray-500">{featuredStudios.length} featured studios</span>
-              </div>
-
-              <div className="studios-grid">
-                {featuredStudios.map((studio) => (
-                  <div key={studio.id} className="studio-card">
-                    <div className="studio-header">
-                      <div>
-                        <h3 className="studio-name">{studio.name}</h3>
-                        <p className="studio-location">
-                          <MapPin className="h-3 w-3" />
-                          {studio.city}
-                        </p>
-                      </div>
-                      {studio.google_rating && (
-                        <div className="studio-rating">
-                          <Star className="h-3 w-3" />
-                          {studio.google_rating}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="studio-details">
-                      <div className="studio-detail-item">
-                        <MapPin className="h-3 w-3" />
-                        <span>{studio.address}</span>
-                      </div>
-                      {studio.phone && (
-                        <div className="studio-detail-item">
-                          <Phone className="h-3 w-3" />
-                          <span>{studio.phone}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="studio-actions">
-                      <Link href={`/${resolvedParams.county}/${studio.city.toLowerCase()}/${studio.slug}`} className="btn-primary flex-1">
-                        View Studio
-                      </Link>
-                      <button className="btn-secondary">
-                        Get Directions
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
 
           <div className="mb-12">
             <div className="flex items-center justify-between mb-6">
