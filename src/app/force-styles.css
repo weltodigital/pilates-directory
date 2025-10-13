@@ -131,7 +131,6 @@ nav, header, [role="banner"] {
   position: sticky !important;
   top: 0 !important;
   z-index: 1000 !important;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
   padding: 1rem !important;
 }
 
@@ -339,8 +338,10 @@ footer div[class*="borderTop"] {
   color: #94a3b8 !important;
 }
 
-/* BUTTONS - UNIVERSAL */
-button, .btn, a[class*="bg-purple"] {
+/* BUTTONS - UNIVERSAL (with proper specificity) */
+button:not(.btn-primary):not(.btn-secondary),
+.btn:not(.btn-primary):not(.btn-secondary),
+a[class*="bg-purple"]:not(.btn-primary):not(.btn-secondary) {
   background-color: #9333ea !important;
   color: #ffffff !important;
   padding: 0.75rem 1.5rem !important;
@@ -354,8 +355,28 @@ button, .btn, a[class*="bg-purple"] {
   font-size: 1rem !important;
 }
 
-button:hover, .btn:hover, a[class*="bg-purple"]:hover {
+button:not(.btn-primary):not(.btn-secondary):hover,
+.btn:not(.btn-primary):not(.btn-secondary):hover,
+a[class*="bg-purple"]:not(.btn-primary):not(.btn-secondary):hover {
   background-color: #7c3aed !important;
+  color: #ffffff !important;
+}
+
+/* Ensure specific button classes take precedence */
+.btn-primary, .btn-secondary {
+  font-size: 1rem !important;
+}
+
+/* Fix any remaining button hover issues */
+.btn-primary:hover {
+  background-color: #7c3aed !important;
+  color: #ffffff !important;
+}
+
+.btn-secondary:hover {
+  background-color: #9333ea !important;
+  color: #ffffff !important;
+  border-color: #9333ea !important;
 }
 
 /* LINKS - UNIVERSAL */

@@ -43,7 +43,7 @@ export default function SEOSchemaMarkup({ studios = [], location, page = 'home' 
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'customer service',
-      email: 'hello@pilatesuk.co.uk',
+      email: 'pilatesclassesnear@weltodigital.com',
       areaServed: 'GB',
       availableLanguage: 'en'
     },

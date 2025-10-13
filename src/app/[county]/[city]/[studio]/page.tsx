@@ -2,7 +2,8 @@ import React from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase';
-import { MapPin, Star, Phone, Mail, Globe, Activity, Users, Award, Heart, Share2, Calendar, Navigation, Instagram, Facebook } from 'lucide-react';
+import { MapPin, Star, Phone, Mail, Globe, Activity, Users, Award, Calendar, Navigation, Instagram, Facebook } from 'lucide-react';
+import StudioImage from '@/components/StudioImage';
 
 interface StudioPageProps {
   params: Promise<{
@@ -202,7 +203,9 @@ export default async function StudioPage({ params }: StudioPageProps) {
           </nav>
 
           <h1>{studioData.name}</h1>
-          <p>Professional pilates studio in {locationData.city.name}, {locationData.county.name}. Offering expert instruction and personalized programs for all fitness levels.</p>
+          <p className="text-gray-700 leading-relaxed">
+            {studioData.description || `${studioData.name} is a professional pilates studio located in ${locationData.city.name}, ${locationData.county.name}. We offer comprehensive pilates instruction with qualified instructors and modern equipment to help you achieve your fitness and wellness goals.`}
+          </p>
 
           <div className="meta-badges">
             <span className="meta-badge primary">
@@ -223,7 +226,7 @@ export default async function StudioPage({ params }: StudioPageProps) {
             )}
           </div>
 
-          <div className="flex flex-wrap gap-4 mb-6">
+          <div className="flex flex-wrap gap-4 mb-8">
             {studioData.phone && (
               <a href={`tel:${studioData.phone}`} className="btn-primary">
                 <Phone className="h-4 w-4 mr-2" />
@@ -237,31 +240,49 @@ export default async function StudioPage({ params }: StudioPageProps) {
               </a>
             )}
           </div>
+
+          {/* Studio Images */}
+          {studioData.images && studioData.images.length > 0 && (
+            <div className="mb-6">
+              {/* Main Image */}
+              <div className="mb-4">
+                <StudioImage
+                  src={studioData.images[0]}
+                  alt={`${studioData.name} - Main Studio Image`}
+                  studioName={studioData.name}
+                  containerClassName="w-full h-64 rounded-lg"
+                  className="hover:opacity-95 transition-opacity"
+                  size="large"
+                />
+              </div>
+
+              {/* Thumbnail Images */}
+              {studioData.images.length > 1 && (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {studioData.images.slice(1).map((image, index) => (
+                    <div key={index + 1} className="aspect-square">
+                      <StudioImage
+                        src={image}
+                        alt={`${studioData.name} - Image ${index + 2}`}
+                        studioName={studioData.name}
+                        containerClassName="w-full h-full rounded-md"
+                        className="hover:opacity-90 transition-opacity"
+                        size="small"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          {studioData.images && studioData.images.length > 0 && (
-            <div className="mb-8">
-              <div style={{width: '100%', height: '20rem', backgroundColor: '#f3f4f6', position: 'relative', overflow: 'hidden', borderRadius: '0.75rem'}}>
-                <img
-                  src={studioData.images[0]}
-                  alt={`${studioData.name} - Studio Interior`}
-                  style={{width: '100%', height: '100%', objectFit: 'cover'}}
-                />
-              </div>
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-lg p-8 shadow-sm">
-                <h2>About {studioData.name}</h2>
-                <p className="text-gray-600 mb-6 leading-relaxed">
-                  {studioData.description || `${studioData.name} is a professional pilates studio located in ${locationData.city.name}, ${locationData.county.name}. We offer comprehensive pilates instruction with qualified instructors and modern equipment to help you achieve your fitness and wellness goals.`}
-                </p>
-
+              <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
                 {studioData.class_types && studioData.class_types.length > 0 && (
                   <div className="mb-6">
                     <h3 className="text-lg font-semibold mb-3 text-purple-700">Classes Offered</h3>
@@ -305,7 +326,7 @@ export default async function StudioPage({ params }: StudioPageProps) {
             </div>
 
             <div className="lg:col-span-1 space-y-6">
-              <div className="bg-white p-6 rounded-lg shadow-sm">
+              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                 <h3 className="text-lg font-semibold mb-4 text-purple-700">Contact Information</h3>
                 <div className="space-y-3">
                   <div className="flex items-start gap-3">
@@ -317,8 +338,8 @@ export default async function StudioPage({ params }: StudioPageProps) {
                     </div>
                   </div>
                   {studioData.phone && (
-                    <div className="flex items-center gap-3">
-                      <Phone className="h-4 w-4 text-purple-500" />
+                    <div className="flex items-start gap-3">
+                      <Phone className="h-4 w-4 text-purple-500 mt-1 flex-shrink-0" />
                       <div>
                         <p className="text-gray-900 font-medium">Phone</p>
                         <a href={`tel:${studioData.phone}`} className="text-purple-600 hover:text-purple-700 text-sm">
@@ -328,8 +349,8 @@ export default async function StudioPage({ params }: StudioPageProps) {
                     </div>
                   )}
                   {studioData.email && (
-                    <div className="flex items-center gap-3">
-                      <Mail className="h-4 w-4 text-purple-500" />
+                    <div className="flex items-start gap-3">
+                      <Mail className="h-4 w-4 text-purple-500 mt-1 flex-shrink-0" />
                       <div>
                         <p className="text-gray-900 font-medium">Email</p>
                         <a href={`mailto:${studioData.email}`} className="text-purple-600 hover:text-purple-700 text-sm">
@@ -339,8 +360,8 @@ export default async function StudioPage({ params }: StudioPageProps) {
                     </div>
                   )}
                   {studioData.website && (
-                    <div className="flex items-center gap-3">
-                      <Globe className="h-4 w-4 text-purple-500" />
+                    <div className="flex items-start gap-3">
+                      <Globe className="h-4 w-4 text-purple-500 mt-1 flex-shrink-0" />
                       <div>
                         <p className="text-gray-900 font-medium">Website</p>
                         <a href={studioData.website} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:text-purple-700 text-sm">
@@ -351,6 +372,7 @@ export default async function StudioPage({ params }: StudioPageProps) {
                   )}
                 </div>
               </div>
+
 
               {(studioData.instagram || studioData.facebook) && (
                 <div className="bg-white p-6 rounded-lg shadow-sm">
@@ -372,55 +394,58 @@ export default async function StudioPage({ params }: StudioPageProps) {
                 </div>
               )}
 
-              <div className="bg-white p-6 rounded-lg shadow-sm">
-                <h3 className="text-lg font-semibold mb-4 text-purple-700">Studio Features</h3>
-                <div className="space-y-2">
-                  {studioData.beginner_friendly && (
-                    <div className="flex items-center gap-2 text-green-600">
-                      <Users className="h-4 w-4" />
-                      <span className="text-sm">Beginner Friendly</span>
-                    </div>
-                  )}
-                  {studioData.online_booking_available && (
-                    <div className="flex items-center gap-2 text-green-600">
-                      <Calendar className="h-4 w-4" />
-                      <span className="text-sm">Online Booking</span>
-                    </div>
-                  )}
-                  {studioData.parking_available && (
-                    <div className="flex items-center gap-2 text-green-600">
-                      <Navigation className="h-4 w-4" />
-                      <span className="text-sm">Parking Available</span>
-                    </div>
-                  )}
-                  {studioData.price_range && (
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Activity className="h-4 w-4" />
-                      <span className="text-sm">Price Range: {studioData.price_range}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
 
-              <div className="bg-white p-6 rounded-lg shadow-sm">
-                <h3 className="text-lg font-semibold mb-4 text-purple-700">Quick Actions</h3>
-                <div className="space-y-3">
-                  <button className="w-full btn-secondary flex items-center justify-center gap-2">
-                    <Heart className="h-4 w-4" />
-                    Save Studio
-                  </button>
-                  <button className="w-full btn-secondary flex items-center justify-center gap-2">
-                    <Share2 className="h-4 w-4" />
-                    Share Studio
-                  </button>
-                  <button className="w-full btn-secondary flex items-center justify-center gap-2">
-                    <Navigation className="h-4 w-4" />
-                    Get Directions
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
+
+          {/* Full-width map section */}
+          {(studioData.latitude && studioData.longitude) || studioData.address ? (
+            <div className="mt-8 bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+              <div className="mb-6 text-center">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Studio Location</h2>
+                <p className="text-gray-600">Find them at {studioData.address}, {studioData.city}</p>
+              </div>
+              <div className="w-full h-96 rounded-lg overflow-hidden border border-gray-200 mb-6">
+                {studioData.latitude && studioData.longitude ? (
+                  <iframe
+                    src={`https://maps.google.com/maps?q=${studioData.latitude},${studioData.longitude}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title={`Map showing location of ${studioData.name}`}
+                  />
+                ) : (
+                  <iframe
+                    src={`https://maps.google.com/maps?q=${encodeURIComponent(studioData.address + ', ' + studioData.city + ', ' + studioData.postcode)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title={`Map showing location of ${studioData.name}`}
+                  />
+                )}
+              </div>
+              <div className="text-center">
+                <a
+                  href={studioData.latitude && studioData.longitude
+                    ? `https://www.google.com/maps/dir/?api=1&destination=${studioData.latitude},${studioData.longitude}`
+                    : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(studioData.address + ', ' + studioData.city + ', ' + studioData.postcode)}`
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-primary inline-flex items-center gap-2"
+                >
+                  <Navigation className="h-4 w-4" />
+                  Get Directions
+                </a>
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

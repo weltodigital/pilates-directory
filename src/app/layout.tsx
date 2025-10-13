@@ -53,12 +53,13 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <style dangerouslySetInnerHTML={{__html: `
-          * { box-sizing: border-box !important; margin: 0 !important; padding: 0 !important; }
+          * { box-sizing: border-box !important; }
+          body, h1, h2, h3, h4, h5, h6, p, ul, ol, li { margin: 0; padding: 0; }
           html, body {
             font-family: 'Inter', sans-serif !important;
             line-height: 1.6 !important;
             color: #1e293b !important;
-            background-color: #f8fafc !important;
+            background-color: #ffffff !important;
             min-height: 100vh !important;
           }
           .hero-gradient {
@@ -85,7 +86,6 @@ export default function RootLayout({
             background-color: #ffffff !important;
             border-bottom: 1px solid #e5e7eb !important;
             padding: 1rem !important;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
           }
           footer {
             background-color: #0f172a !important;
@@ -94,9 +94,9 @@ export default function RootLayout({
             margin-top: 4rem !important;
           }
           .container {
-            max-width: 1200px !important;
+            max-width: 1400px !important;
             margin: 0 auto !important;
-            padding: 0 1rem !important;
+            padding: 0 1.5rem !important;
           }
           .grid {
             display: grid !important;
@@ -125,7 +125,7 @@ export default function RootLayout({
 
           /* All Page Layouts */
           .page-container {
-            background: linear-gradient(to bottom right, #faf5ff, #f3e8ff) !important;
+            background: #ffffff !important;
             min-height: 100vh !important;
           }
 
@@ -150,18 +150,16 @@ export default function RootLayout({
           /* Page Header Section */
           .page-header {
             background: #ffffff !important;
-            padding: 3rem 0 !important;
-            margin-bottom: 2rem !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+            padding: 2rem 0 !important;
+            margin-bottom: 1.5rem !important;
           }
 
           /* Content Sections */
           .content-section {
             background: #ffffff !important;
-            padding: 2rem !important;
-            margin-bottom: 2rem !important;
+            padding: 1.5rem !important;
+            margin-bottom: 1.5rem !important;
             border-radius: 0.75rem !important;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important;
             border: 1px solid #f1f5f9 !important;
           }
 
@@ -170,10 +168,15 @@ export default function RootLayout({
             background: #ffffff !important;
             border: 1px solid #e2e8f0 !important;
             border-radius: 0.75rem !important;
-            padding: 1.5rem !important;
+            padding: 0 !important;
             margin-bottom: 1.5rem !important;
             transition: all 0.2s ease !important;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+            overflow: hidden !important;
+          }
+
+          .studio-card > *:not(:first-child), .location-card > *:not(:first-child) {
+            padding: 1.5rem !important;
           }
 
           .studio-card:hover, .location-card:hover {
@@ -289,6 +292,7 @@ export default function RootLayout({
 
           .btn-primary:hover {
             background: #7c3aed !important;
+            color: #ffffff !important;
           }
 
           .btn-secondary {
@@ -309,6 +313,7 @@ export default function RootLayout({
           .btn-secondary:hover {
             background: #9333ea !important;
             color: #ffffff !important;
+            border-color: #9333ea !important;
           }
 
           /* Meta Information */
@@ -351,7 +356,6 @@ export default function RootLayout({
             background: #ffffff !important;
             padding: 1.5rem !important;
             border-radius: 0.75rem !important;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important;
             border: 1px solid #f1f5f9 !important;
             margin-bottom: 1.5rem !important;
           }

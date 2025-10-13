@@ -6,6 +6,7 @@ import { MapPin, Star, Users, Heart, Phone, Clock, CheckCircle, Activity } from 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import LocationStudiosMap from '@/components/LocationStudiosMap';
+import StudioImage from '@/components/StudioImage';
 
 interface SEOContent {
   meta_title: string;
@@ -79,31 +80,6 @@ export default function SEOLocationContent({
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      {/* Breadcrumbs */}
-      {locationType === 'city' && countyName && countySlug && (
-        <nav className="text-sm text-gray-600 mb-6">
-          <ol className="flex space-x-2">
-            <li>
-              <Link href="/" className="hover:text-purple-600">Home</Link>
-            </li>
-            <li className="before:content-['/'] before:mx-2">
-              <Link href={`/${countySlug}`} className="hover:text-purple-600">{countyName}</Link>
-            </li>
-            <li className="before:content-['/'] before:mx-2 text-gray-900">{locationName}</li>
-          </ol>
-        </nav>
-      )}
-
-      {locationType === 'county' && (
-        <nav className="text-sm text-gray-600 mb-6">
-          <ol className="flex space-x-2">
-            <li>
-              <Link href="/" className="hover:text-purple-600">Home</Link>
-            </li>
-            <li className="before:content-['/'] before:mx-2 text-gray-900">{locationName}</li>
-          </ol>
-        </nav>
-      )}
 
       {/* Hero Section */}
       <div className="text-center mb-12">
@@ -170,15 +146,14 @@ export default function SEOLocationContent({
             {studios.map((studio) => (
               <Card key={studio.id} className="hover:shadow-lg transition-shadow group overflow-hidden">
                 {/* Studio Image */}
-                {studio.images && studio.images.length > 0 && (
-                  <div className="w-full h-48 bg-gray-200 relative overflow-hidden">
-                    <img
-                      src={studio.images[0]}
-                      alt={`${studio.name} - Studio Image`}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                )}
+                <StudioImage
+                  src={studio.images && studio.images.length > 0 ? studio.images[0] : ''}
+                  alt={`${studio.name} - Studio Image`}
+                  studioName={studio.name}
+                  containerClassName="w-full h-48"
+                  className="group-hover:scale-105 transition-all duration-300"
+                  size="medium"
+                />
 
                 <CardHeader>
                   <div className="flex items-start justify-between">

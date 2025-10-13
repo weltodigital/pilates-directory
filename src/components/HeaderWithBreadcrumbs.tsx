@@ -6,11 +6,11 @@ interface Breadcrumb {
   href?: string;
 }
 
-interface HeaderProps {
-  breadcrumbs?: Breadcrumb[];
+interface HeaderWithBreadcrumbsProps {
+  breadcrumbs: Breadcrumb[];
 }
 
-export default function Header({ breadcrumbs }: HeaderProps = {}) {
+export default function HeaderWithBreadcrumbs({ breadcrumbs }: HeaderWithBreadcrumbsProps) {
   return (
     <nav style={{
       backgroundColor: '#ffffff',

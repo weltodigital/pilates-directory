@@ -2,7 +2,10 @@ import React from 'react';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase';
 import Link from 'next/link';
-import { MapPin, Star, Users, Activity, Clock, Phone, Heart, Navigation, Award } from 'lucide-react';
+import { MapPin, Star, Users, Activity, Clock, Phone, Navigation, Award } from 'lucide-react';
+import StudioImage from '@/components/StudioImage';
+import HeaderWithBreadcrumbs from '@/components/HeaderWithBreadcrumbs';
+import Footer from '@/components/Footer';
 
 interface CityPageProps {
   params: Promise<{
@@ -202,22 +205,18 @@ export default async function CityPage({ params }: CityPageProps) {
 
   const studios = await getCityStudios(resolvedParams.county, resolvedParams.city);
 
+  const breadcrumbs = [
+    { label: 'Home', href: '/' },
+    { label: county.name, href: `/${county.slug}` },
+    { label: location.name }
+  ];
+
   return (
-    <div className="page-container">
+    <>
+      <HeaderWithBreadcrumbs breadcrumbs={breadcrumbs} />
+      <div className="page-container">
       <div className="page-header">
         <div className="container">
-          <nav className="text-sm text-gray-600 mb-4">
-            <ol className="flex space-x-2">
-              <li>
-                <Link href="/" className="hover:text-purple-600">Home</Link>
-              </li>
-              <li className="before:content-['/'] before:mx-2">
-                <Link href={`/${county.slug}`} className="hover:text-purple-600">{county.name}</Link>
-              </li>
-              <li className="before:content-['/'] before:mx-2 text-gray-900">{location.name}</li>
-            </ol>
-          </nav>
-
           <h1>{location.h1_title || `Pilates Studios in ${location.name} | Pilates Near Me`}</h1>
           <p>Find the best pilates studios in {location.name}, {county.name}. Browse reformer, mat, and clinical pilates classes with verified reviews and online booking.</p>
 
@@ -237,7 +236,7 @@ export default async function CityPage({ params }: CityPageProps) {
       </div>
 
       <div className="container mx-auto px-4 pb-8">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <div className="mb-8">
             <div className="flex items-center justify-between mb-6">
               <h2>Pilates Studios in {location.name} ({studios.length})</h2>
@@ -247,15 +246,13 @@ export default async function CityPage({ params }: CityPageProps) {
               <div className="studios-grid">
                 {studios.map((studio) => (
                   <div key={studio.id} className="studio-card">
-                    {studio.images && studio.images.length > 0 && (
-                      <div style={{width: '100%', height: '12rem', backgroundColor: '#f3f4f6', position: 'relative', overflow: 'hidden', marginBottom: '1rem', borderRadius: '0.5rem'}}>
-                        <img
-                          src={studio.images[0]}
-                          alt={`${studio.name} - Studio Image`}
-                          style={{width: '100%', height: '100%', objectFit: 'cover'}}
-                        />
-                      </div>
-                    )}
+                    <StudioImage
+                      src={studio.images && studio.images.length > 0 ? studio.images[0] : ''}
+                      alt={`${studio.name} - Studio Image`}
+                      studioName={studio.name}
+                      containerClassName="w-full h-48 rounded-t-lg"
+                      size="medium"
+                    />
 
                     <div className="studio-header">
                       <div>
@@ -286,7 +283,7 @@ export default async function CityPage({ params }: CityPageProps) {
                         </div>
                       )}
                       <p style={{fontSize: '0.875rem', color: '#6b7280', marginBottom: '1rem', lineHeight: '1.6'}}>
-                        {studio.description || `Professional pilates studio offering comprehensive classes for all fitness levels in ${location.name}.`}
+                        {(studio.description || `Professional pilates studio offering comprehensive classes for all fitness levels in ${location.name}.`).split(' ').slice(0, 20).join(' ')}{(studio.description || `Professional pilates studio offering comprehensive classes for all fitness levels in ${location.name}.`).split(' ').length > 20 ? '...' : ''}
                       </p>
 
                       {studio.class_types && studio.class_types.length > 0 && (
@@ -326,12 +323,6 @@ export default async function CityPage({ params }: CityPageProps) {
                         <Link href={`/${studio.full_url_path}`} className="btn-primary">
                           View Studio
                         </Link>
-                        <button className="btn-secondary">
-                          <Heart className="h-3 w-3" />
-                        </button>
-                        <button className="btn-secondary">
-                          <Phone className="h-3 w-3" />
-                        </button>
                       </div>
                     </div>
                   </div>
@@ -363,7 +354,7 @@ export default async function CityPage({ params }: CityPageProps) {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <div className="content-section">
             <h2>Why Choose Pilates in {location.name}?</h2>
             <div className="grid">
@@ -489,7 +480,9 @@ export default async function CityPage({ params }: CityPageProps) {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+      <Footer />
+    </>
   );
 }
 

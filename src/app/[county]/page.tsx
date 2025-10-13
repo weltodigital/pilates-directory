@@ -3,6 +3,8 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase';
 import Link from 'next/link';
 import { MapPin, Users, Activity } from 'lucide-react';
+import HeaderWithBreadcrumbs from '@/components/HeaderWithBreadcrumbs';
+import Footer from '@/components/Footer';
 
 interface CountyPageProps {
   params: Promise<{
@@ -160,8 +162,15 @@ export default async function CountyPage({ params }: CountyPageProps) {
 
   const citiesAndTowns = await getCitiesAndTowns(resolvedParams.county, location.id);
 
+  const breadcrumbs = [
+    { label: 'Home', href: '/' },
+    { label: location.name }
+  ];
+
   return (
-    <div className="page-container">
+    <>
+      <HeaderWithBreadcrumbs breadcrumbs={breadcrumbs} />
+      <div className="page-container">
       <div className="page-header">
         <div className="container">
           <h1>{location.h1_title || `Pilates Studios in ${location.name} | Find Pilates Classes Near You`}</h1>
@@ -188,11 +197,11 @@ export default async function CountyPage({ params }: CountyPageProps) {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
 
           <div className="mb-12">
             <div className="flex items-center justify-between mb-6">
-              <h2>Cities and Towns in {location.name} - Updated Oct 13</h2>
+              <h2>Pilates Locations In {location.name}</h2>
               <span className="text-sm text-gray-500">{citiesAndTowns.length} locations</span>
             </div>
 
@@ -228,7 +237,9 @@ export default async function CountyPage({ params }: CountyPageProps) {
           )}
         </div>
       </div>
-    </div>
+      </div>
+      <Footer />
+    </>
   );
 }
 

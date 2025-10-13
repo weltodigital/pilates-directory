@@ -115,7 +115,7 @@ export default async function Footer() {
               margin: 0
             }}>
               <li style={{ marginBottom: '0.5rem' }}>
-                <a href="mailto:hello@pilatesclassesnear.com" style={{
+                <a href="mailto:pilatesclassesnear@weltodigital.com" style={{
                   color: '#94a3b8',
                   textDecoration: 'none',
                   fontSize: '0.875rem'

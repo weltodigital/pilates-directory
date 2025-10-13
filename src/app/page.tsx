@@ -290,9 +290,6 @@ export default async function Home() {
           <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-8 text-center font-jakarta">
             Browse All Locations by County
           </h2>
-          <div style={{background: '#f8f9fa', padding: '1rem', marginBottom: '2rem', borderRadius: '0.5rem', border: '1px solid #e9ecef'}}>
-            <strong>Browse Locations:</strong> {countiesWithLocations.length} counties available
-          </div>
           {countiesWithLocations.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {countiesWithLocations.map(({ county, locations }) => (
