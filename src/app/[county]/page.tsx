@@ -215,9 +215,6 @@ export default async function CountyPage({ params }: CountyPageProps) {
                     <Link href={`/${resolvedParams.county}/${city.slug}`} className="btn-primary flex-1">
                       {city.butcher_count > 0 ? 'View Studios' : 'Explore Area'}
                     </Link>
-                    <button className="btn-secondary">
-                      Get Directions
-                    </button>
                   </div>
                 </div>
               ))}
