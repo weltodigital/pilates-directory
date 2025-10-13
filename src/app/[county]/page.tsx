@@ -171,7 +171,7 @@ export default async function CountyPage({ params }: CountyPageProps) {
 
           <div className="mb-12">
             <div className="flex items-center justify-between mb-6">
-              <h2>Cities and Towns in {location.name}</h2>
+              <h2>Cities and Towns in {location.name} - Updated Oct 13</h2>
               <span className="text-sm text-gray-500">{citiesAndTowns.length} locations</span>
             </div>
 
