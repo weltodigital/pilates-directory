@@ -10,9 +10,9 @@ const nextConfig = {
     forceSwcTransforms: false,
     optimizeCss: false,
   },
-  // Force fresh deployment for CSS
+  // Force fresh deployment - county pages cleanup
   generateBuildId: () => {
-    return 'pilates-ultra-force-' + Date.now()
+    return 'pilates-county-cleanup-' + Date.now()
   },
   images: {
     remotePatterns: [
