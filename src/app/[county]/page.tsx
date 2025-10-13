@@ -49,18 +49,39 @@ async function getCountyData(countySlug: string): Promise<Location | null> {
   return data;
 }
 
-async function getCitiesAndTowns(countyId: string) {
+async function getCitiesAndTowns(countySlug: string, countyId: string) {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://zytpgaraxyhlsvvkrrir.supabase.co',
     process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp5dHBnYXJheHlobHN2dmtycmlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODc5ODMxMiwiZXhwIjoyMDc0Mzc0MzEyfQ.XLBFI-CGJXMi3yrLsb7FP2DOXRJy-IDDIwSWt7W95Ok'
   );
 
-  const { data, error } = await supabase
+  // Try both approaches - parent_id and county_slug
+  let { data, error } = await supabase
     .from('public_locations')
     .select('*')
     .eq('parent_id', countyId)
     .in('type', ['city', 'town'])
     .order('name');
+
+  // If no results with parent_id, try county_slug
+  if (!data || data.length === 0) {
+    console.log('No results with parent_id, trying county_slug...');
+    const result = await supabase
+      .from('public_locations')
+      .select('*')
+      .eq('county_slug', countySlug)
+      .in('type', ['city', 'town'])
+      .order('name');
+
+    data = result.data;
+    error = result.error;
+  }
+
+  if (error) {
+    console.error('Error fetching cities and towns:', error);
+  }
+
+  console.log(`Cities/towns for county ${countySlug} (${countyId}):`, data?.length || 0);
 
   return data || [];
 }
@@ -137,7 +158,7 @@ export default async function CountyPage({ params }: CountyPageProps) {
     );
   }
 
-  const citiesAndTowns = await getCitiesAndTowns(location.id);
+  const citiesAndTowns = await getCitiesAndTowns(resolvedParams.county, location.id);
 
   return (
     <div className="page-container">
