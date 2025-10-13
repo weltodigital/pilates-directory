@@ -38,7 +38,6 @@ interface Studio {
   phone: string;
   website: string;
   google_rating: number;
-  is_featured: boolean;
   is_active: boolean;
 }
 
@@ -88,8 +87,7 @@ async function getFeaturedStudios(countySlug: string): Promise<Studio[]> {
   const { data, error } = await supabase
     .from('pilates_studios')
     .select('*')
-    .eq('county', countySlug)
-    .eq('is_featured', true)
+    .eq('county_slug', countySlug)
     .eq('is_active', true)
     .order('google_rating', { ascending: false, nullsFirst: false })
     .order('name')
