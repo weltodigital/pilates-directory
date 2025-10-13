@@ -290,7 +290,7 @@ export default async function CountyPage({ params }: CountyPageProps) {
                   </div>
                   <p className="text-gray-600 mb-4">Find pilates classes and studios in {city.name}. Browse reformer, mat, and clinical pilates options.</p>
                   <div className="flex gap-2">
-                    <Link href={`/${location.slug}/${city.slug}`} className="btn-primary flex-1">
+                    <Link href={`/${resolvedParams.county}/${city.slug}`} className="btn-primary flex-1">
                       View Studios
                     </Link>
                     <button className="btn-secondary">
