@@ -1,3 +1,4 @@
+import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -7,7 +8,7 @@ interface Breadcrumb {
 }
 
 interface HeaderWithBreadcrumbsProps {
-  breadcrumbs: Breadcrumb[];
+  breadcrumbs?: Breadcrumb[];
 }
 
 export default function HeaderWithBreadcrumbs({ breadcrumbs }: HeaderWithBreadcrumbsProps) {
@@ -54,15 +55,18 @@ export default function HeaderWithBreadcrumbs({ breadcrumbs }: HeaderWithBreadcr
             alignItems: 'center',
             gap: '1rem'
           }}>
-            <Link href="/#browse-counties" style={{
-              backgroundColor: '#9333ea',
-              color: '#ffffff',
-              padding: '0.5rem 1rem',
-              borderRadius: '0.375rem',
-              textDecoration: 'none',
-              fontSize: '0.875rem',
-              fontWeight: '600'
-            }}>
+            <Link
+              href="/#browse-counties"
+              className="browse-locations-btn"
+              style={{
+                backgroundColor: '#9333ea',
+                color: '#ffffff',
+                padding: '0.5rem 1rem',
+                borderRadius: '0.375rem',
+                textDecoration: 'none',
+                fontSize: '0.875rem',
+                fontWeight: '600'
+              }}>
               Browse Locations
             </Link>
           </div>
@@ -73,46 +77,40 @@ export default function HeaderWithBreadcrumbs({ breadcrumbs }: HeaderWithBreadcr
           <div style={{
             borderTop: '1px solid #f1f5f9',
             paddingTop: '0.75rem',
-            marginTop: '1rem'
+            marginTop: '0.75rem'
           }}>
-            <nav style={{
-              fontSize: '0.875rem',
-              color: '#6b7280'
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              fontSize: '0.875rem'
             }}>
-              <ol style={{
-                display: 'flex',
-                gap: '0.5rem',
-                listStyle: 'none',
-                margin: 0,
-                padding: 0
-              }}>
-                {breadcrumbs.map((breadcrumb, index) => (
-                  <li key={index} style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem'
-                  }}>
-                    {index > 0 && (
-                      <span style={{ color: '#d1d5db' }}>/</span>
-                    )}
-                    {breadcrumb.href ? (
-                      <Link href={breadcrumb.href} style={{
+              {breadcrumbs.map((breadcrumb, index) => (
+                <span key={index} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  {index > 0 && (
+                    <span style={{ color: '#9ca3af' }}>/</span>
+                  )}
+                  {breadcrumb.href ? (
+                    <Link
+                      href={breadcrumb.href}
+                      style={{
                         color: '#9333ea',
                         textDecoration: 'none'
-                      }}>
-                        {breadcrumb.label}
-                      </Link>
-                    ) : (
-                      <span style={{ color: '#1f2937' }}>
-                        {breadcrumb.label}
-                      </span>
-                    )}
-                  </li>
-                ))}
-              </ol>
-            </nav>
+                      }}
+                    >
+                      {breadcrumb.label}
+                    </Link>
+                  ) : (
+                    <span style={{ color: '#6b7280', fontWeight: '500' }}>
+                      {breadcrumb.label}
+                    </span>
+                  )}
+                </span>
+              ))}
+            </div>
           </div>
         )}
+
       </div>
     </nav>
   )

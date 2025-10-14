@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { MapPin, Star, Phone, Clock, Activity } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 import SEOSchemaMarkup from '@/components/SEOSchemaMarkup'
+import Header from '@/components/Header'
+import Footer from '@/components/Footer'
 
 interface County {
   id: string;
@@ -31,6 +33,7 @@ interface CountyWithLocations {
 interface PilatesStudio {
   id: string;
   name: string;
+  slug?: string;
   description: string;
   address: string;
   postcode: string;
@@ -118,16 +121,25 @@ async function getFeaturedPilatesStudios(limit: number = 6): Promise<PilatesStud
     .select('*')
     .eq('is_active', true)
     .not('google_rating', 'is', null)
+    .not('full_url_path', 'is', null)
+    .not('county_slug', 'is', null)
+    .not('city_slug', 'is', null)
     .gte('google_rating', 4.0)
     .order('google_rating', { ascending: false })
-    .limit(limit);
+    .limit(limit * 2);
 
   if (error) {
     console.error('Error fetching featured studios:', error);
     return [];
   }
 
-  return studios || [];
+  // Filter studios to ensure they have complete URL information
+  const validStudios = (studios || []).filter(studio => {
+    return studio.full_url_path ||
+           (studio.county_slug && studio.city_slug && (studio.slug || studio.id));
+  }).slice(0, limit);
+
+  return validStudios;
 }
 
 export default async function Home() {
@@ -147,6 +159,7 @@ export default async function Home() {
 
   return (
     <div>
+      <Header />
       <SEOSchemaMarkup page="home" />
       <div className="hero-gradient">
         <div className="container" style={{textAlign: 'center', padding: '2rem'}}>
@@ -164,11 +177,11 @@ export default async function Home() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto px-4 py-20">
 
         {/* Featured Studios */}
-        <div id="featured-studios" className="mb-16">
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-8 text-center font-jakarta">
+        <div id="featured-studios" className="mb-20">
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-12 text-center font-jakarta mt-8">
             Featured Pilates Studios
           </h2>
           {featuredStudios.length > 0 ? (
@@ -255,15 +268,15 @@ export default async function Home() {
                           </Button>
                         ) : (
                           <Button size="sm" className="flex-1 bg-purple-600 hover:bg-purple-700" asChild>
-                            <Link href={`/${studio.full_url_path}`}>
+                            <Link href={`/${studio.full_url_path || `${studio.county_slug}/${studio.city_slug}/${studio.slug || studio.id}`}`}>
                               View Details
                             </Link>
                           </Button>
                         )}
 
-                        {studio.full_url_path && (
+                        {(studio.full_url_path || studio.county_slug) && (
                           <Button variant="outline" size="sm" asChild>
-                            <Link href={`/${studio.full_url_path}`}>
+                            <Link href={`/${studio.full_url_path || `${studio.county_slug}/${studio.city_slug}/${studio.slug || studio.id}`}`}>
                               Details
                             </Link>
                           </Button>
@@ -350,6 +363,7 @@ export default async function Home() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   )
 }

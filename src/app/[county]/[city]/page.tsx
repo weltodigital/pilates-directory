@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { MapPin, Star, Users, Activity, Clock, Phone, Navigation, Award } from 'lucide-react';
 import StudioImage from '@/components/StudioImage';
 import HeaderWithBreadcrumbs from '@/components/HeaderWithBreadcrumbs';
-import Footer from '@/components/Footer';
 
 interface CityPageProps {
   params: Promise<{
@@ -242,6 +241,30 @@ export default async function CityPage({ params }: CityPageProps) {
               <h2>Pilates Studios in {location.name} ({studios.length})</h2>
             </div>
 
+            {/* Map Section */}
+            {studios.length > 0 && (
+              <div className="mb-8">
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <div className="p-4 border-b border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-900">Studio Locations</h3>
+                    <p className="text-sm text-gray-600 mt-1">{studios.length} studios in this area</p>
+                  </div>
+                  <div className="w-full h-96 rounded-lg overflow-hidden">
+                    <iframe
+                      src={`https://maps.google.com/maps?q=${encodeURIComponent(`pilates studios in ${location.name}`)}&t=&z=12&ie=UTF8&iwloc=&output=embed`}
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title={`Map showing pilates studios in ${location.name}`}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
             {studios.length > 0 ? (
               <div className="studios-grid">
                 {studios.map((studio) => (
@@ -423,65 +446,18 @@ export default async function CityPage({ params }: CityPageProps) {
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Avg. Rating</span>
                       <span className="font-semibold text-purple-600">
-                        {(studios.reduce((acc, s) => acc + (s.rating || 0), 0) / studios.filter(s => s.rating).length || 0).toFixed(1)}★
+                        {(studios.reduce((acc, s) => acc + (s.google_rating || 0), 0) / studios.filter(s => s.google_rating).length || 0).toFixed(1)}★
                       </span>
                     </div>
                   )}
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Price Range</span>
-                    <span className="font-semibold text-purple-600">£15-30</span>
-                  </div>
                 </div>
               </div>
 
-              {studios.length > 0 && (
-                <div className="bg-white p-6 rounded-lg shadow-sm">
-                  <h3 className="text-lg font-semibold mb-4 text-purple-700">Top Rated Studios</h3>
-                  <ul className="space-y-3">
-                    {studios
-                      .filter(s => s.rating)
-                      .sort((a, b) => (b.rating || 0) - (a.rating || 0))
-                      .slice(0, 5)
-                      .map((studio) => (
-                        <li key={studio.id} className="border-b border-gray-100 pb-3 last:border-b-0">
-                          <Link
-                            href={`/${studio.full_url_path}`}
-                            className="block hover:bg-purple-50 p-2 rounded -m-2 group"
-                          >
-                            <div className="flex justify-between items-start gap-3">
-                              {studio.images && studio.images.length > 0 && (
-                                <div className="w-12 h-12 bg-gray-200 rounded overflow-hidden flex-shrink-0">
-                                  <img
-                                    src={studio.images[0]}
-                                    alt={`${studio.name}`}
-                                    className="w-full h-full object-cover"
-                                  />
-                                </div>
-                              )}
-                              <div className="flex-1 min-w-0">
-                                <h4 className="font-medium text-purple-600 group-hover:text-purple-700">{studio.name}</h4>
-                                <p className="text-sm text-gray-500 truncate">{studio.address}</p>
-                                {studio.class_types && studio.class_types.length > 0 && (
-                                  <p className="text-xs text-gray-400">{studio.class_types.slice(0, 2).join(', ')}</p>
-                                )}
-                              </div>
-                              <div className="flex items-center ml-2">
-                                <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                                <span className="text-sm font-medium ml-1">{studio.rating?.toFixed(1)}</span>
-                              </div>
-                            </div>
-                          </Link>
-                        </li>
-                      ))}
-                  </ul>
-                </div>
-              )}
             </div>
           </div>
         </div>
       </div>
       </div>
-      <Footer />
     </>
   );
 }

@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -49,23 +51,23 @@ export default function Header({ breadcrumbs }: HeaderProps = {}) {
               />
             </Link>
           </div>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '1rem'
-          }}>
-            <Link href="/#browse-counties" style={{
+
+          <Link
+            href="/#browse-counties"
+            className="browse-locations-btn"
+            style={{
               backgroundColor: '#9333ea',
               color: '#ffffff',
               padding: '0.5rem 1rem',
               borderRadius: '0.375rem',
               textDecoration: 'none',
               fontSize: '0.875rem',
-              fontWeight: '600'
-            }}>
-              Browse Locations
-            </Link>
-          </div>
+              fontWeight: '600',
+              transition: 'background-color 0.2s ease'
+            }}
+          >
+            Browse Locations
+          </Link>
         </div>
 
         {/* Breadcrumbs */}

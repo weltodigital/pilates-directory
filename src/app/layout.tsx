@@ -63,7 +63,7 @@ export default function RootLayout({
             min-height: 100vh !important;
           }
           .hero-gradient {
-            min-height: 100vh !important;
+            min-height: 60vh !important;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
             display: flex !important;
             align-items: center !important;
@@ -175,7 +175,7 @@ export default function RootLayout({
             overflow: hidden !important;
           }
 
-          .studio-card > *:not(:first-child), .location-card > *:not(:first-child) {
+          .studio-card > *:not(:first-child), .location-card > * {
             padding: 1.5rem !important;
           }
 
@@ -210,7 +210,7 @@ export default function RootLayout({
             display: flex !important;
             justify-content: space-between !important;
             align-items: flex-start !important;
-            margin-bottom: 1rem !important;
+            margin-bottom: 0.5rem !important;
           }
 
           .studio-name {
@@ -239,7 +239,7 @@ export default function RootLayout({
 
           /* Studio Details */
           .studio-details {
-            margin: 1rem 0 !important;
+            margin: 0.5rem 0 !important;
           }
 
           .studio-detail-item {
@@ -412,12 +412,20 @@ export default function RootLayout({
             color: #4b5563 !important;
             line-height: 1.6 !important;
           }
+
+          /* Browse Locations Button */
+          .browse-locations-btn {
+            color: #ffffff !important;
+          }
+
+          .browse-locations-btn:hover {
+            background-color: #7c3aed !important;
+            color: #ffffff !important;
+          }
         `}} />
       </head>
       <body className={`${inter.className} ${plusJakarta.variable}`}>
-        <Header />
         {children}
-        <Footer />
       </body>
     </html>
   )

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase'
 
 interface County {
@@ -56,17 +57,21 @@ export default async function Footer() {
               marginBottom: '1rem',
               textDecoration: 'none'
             }}>
-              <div style={{
-                fontSize: '1.5rem',
-                fontWeight: '700',
-                color: '#c4b5fd',
-                fontFamily: 'Plus Jakarta Sans, ui-sans-serif, system-ui, sans-serif'
-              }}>
-                Pilates Classes Near
-              </div>
+              <Image
+                src="/Pilates Classes Near.png"
+                alt="Pilates Classes Near"
+                width={200}
+                height={60}
+                style={{
+                  height: '3rem',
+                  width: 'auto',
+                  filter: 'brightness(0) invert(1)'
+                }}
+                priority
+              />
             </Link>
             <p style={{
-              color: '#94a3b8',
+              color: '#ffffff',
               fontSize: '0.875rem',
               lineHeight: '1.5'
             }}>

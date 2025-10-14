@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase';
 import { MapPin, Star, Phone, Mail, Globe, Activity, Users, Award, Calendar, Navigation, Instagram, Facebook } from 'lucide-react';
 import StudioImage from '@/components/StudioImage';
+import HeaderWithBreadcrumbs from '@/components/HeaderWithBreadcrumbs';
 
 interface StudioPageProps {
   params: Promise<{
@@ -179,28 +180,19 @@ export default async function StudioPage({ params }: StudioPageProps) {
     );
   }
 
+  const breadcrumbs = [
+    { label: 'Home', href: '/' },
+    { label: locationData.county.name, href: `/${locationData.county.slug}` },
+    { label: locationData.city.name, href: `/${locationData.county.slug}/${locationData.city.slug}` },
+    { label: studioData.name }
+  ];
+
   return (
-    <div className="page-container">
-      <div className="page-header">
-        <div className="container">
-          <nav className="text-sm text-gray-600 mb-4">
-            <ol className="flex space-x-2">
-              <li>
-                <Link href="/" className="hover:text-purple-600">Home</Link>
-              </li>
-              <li className="before:content-['/'] before:mx-2">
-                <Link href={`/${locationData.county.slug}`} className="hover:text-purple-600">
-                  {locationData.county.name}
-                </Link>
-              </li>
-              <li className="before:content-['/'] before:mx-2">
-                <Link href={`/${locationData.county.slug}/${locationData.city.slug}`} className="hover:text-purple-600">
-                  {locationData.city.name}
-                </Link>
-              </li>
-              <li className="before:content-['/'] before:mx-2 text-gray-900">{studioData.name}</li>
-            </ol>
-          </nav>
+    <>
+      <HeaderWithBreadcrumbs breadcrumbs={breadcrumbs} />
+      <div className="page-container">
+        <div className="page-header">
+          <div className="container">
 
           <h1>{studioData.name}</h1>
           <p className="text-gray-700 leading-relaxed">
@@ -403,39 +395,23 @@ export default async function StudioPage({ params }: StudioPageProps) {
             <div className="mt-8 bg-white rounded-lg p-6 shadow-sm border border-gray-100">
               <div className="mb-6 text-center">
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Studio Location</h2>
-                <p className="text-gray-600">Find them at {studioData.address}, {studioData.city}</p>
+                <p className="text-gray-600">Find {studioData.name} at {studioData.address}, {studioData.city}</p>
               </div>
               <div className="w-full h-96 rounded-lg overflow-hidden border border-gray-200 mb-6">
-                {studioData.latitude && studioData.longitude ? (
-                  <iframe
-                    src={`https://maps.google.com/maps?q=${studioData.latitude},${studioData.longitude}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    title={`Map showing location of ${studioData.name}`}
-                  />
-                ) : (
-                  <iframe
-                    src={`https://maps.google.com/maps?q=${encodeURIComponent(studioData.address + ', ' + studioData.city + ', ' + studioData.postcode)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    title={`Map showing location of ${studioData.name}`}
-                  />
-                )}
+                <iframe
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(studioData.address + ', ' + studioData.city + ', ' + studioData.postcode)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title={`Map showing location of ${studioData.name}`}
+                />
               </div>
               <div className="text-center">
                 <a
-                  href={studioData.latitude && studioData.longitude
-                    ? `https://www.google.com/maps/dir/?api=1&destination=${studioData.latitude},${studioData.longitude}`
-                    : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(studioData.address + ', ' + studioData.city + ', ' + studioData.postcode)}`
-                  }
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(studioData.address + ', ' + studioData.city + ', ' + studioData.postcode)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-primary inline-flex items-center gap-2"
@@ -448,6 +424,7 @@ export default async function StudioPage({ params }: StudioPageProps) {
           ) : null}
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
