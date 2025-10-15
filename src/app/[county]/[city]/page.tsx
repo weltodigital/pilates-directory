@@ -102,7 +102,7 @@ async function getCityStudios(countySlug: string, citySlug: string): Promise<Pil
     process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp5dHBnYXJheHlobHN2dmtycmlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODc5ODMxMiwiZXhwIjoyMDc0Mzc0MzEyfQ.XLBFI-CGJXMi3yrLsb7FP2DOXRJy-IDDIwSWt7W95Ok'
   );
 
-  let { data } = await supabase
+  const { data } = await supabase
     .from('pilates_studios')
     .select('*')
     .eq('county_slug', countySlug)
@@ -110,21 +110,6 @@ async function getCityStudios(countySlug: string, citySlug: string): Promise<Pil
     .eq('is_active', true)
     .order('google_rating', { ascending: false, nullsFirst: false })
     .order('name');
-
-  if (!data || data.length === 0) {
-    const cityName = citySlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-
-    const { data: addressData } = await supabase
-      .from('pilates_studios')
-      .select('*')
-      .eq('county_slug', countySlug)
-      .ilike('address', `%${cityName}%`)
-      .eq('is_active', true)
-      .order('google_rating', { ascending: false, nullsFirst: false })
-      .order('name');
-
-    data = addressData;
-  }
 
   return data || [];
 }

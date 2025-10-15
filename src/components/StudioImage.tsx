@@ -3,7 +3,7 @@
 import React from 'react';
 
 interface StudioImageProps {
-  src: string;
+  src: string | { url: string; type?: string; attribution?: string; };
   alt: string;
   studioName: string;
   className?: string;
@@ -19,6 +19,9 @@ export default function StudioImage({
   containerClassName = '',
   size = 'medium'
 }: StudioImageProps) {
+  // Extract URL from src (handle both string and object formats)
+  const imageUrl = typeof src === 'string' ? src : src?.url || '';
+  const imageAttribution = typeof src === 'object' ? src.attribution : undefined;
   const handleError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const target = e.target as HTMLImageElement;
     target.style.display = 'none';
@@ -42,7 +45,7 @@ export default function StudioImage({
   };
 
   // If no src provided, show placeholder immediately
-  if (!src || src.trim() === '') {
+  if (!imageUrl || imageUrl.trim() === '') {
     const iconSize = size === 'large' ? 'w-16 h-16' : size === 'small' ? 'w-8 h-8' : 'w-12 h-12';
     const textSize = size === 'large' ? 'text-lg' : size === 'small' ? 'text-xs' : 'text-sm';
 
@@ -64,7 +67,7 @@ export default function StudioImage({
   return (
     <div className={`relative bg-gray-100 overflow-hidden ${containerClassName}`}>
       <img
-        src={src || undefined}
+        src={imageUrl || undefined}
         alt={alt}
         className={`w-full h-full object-cover transition-opacity duration-200 hover:opacity-90 ${className}`}
         style={{
@@ -75,6 +78,11 @@ export default function StudioImage({
         onError={handleError}
         loading="lazy"
       />
+      {imageAttribution && (
+        <div className="absolute bottom-1 right-1 bg-black bg-opacity-50 text-white text-xs px-1 rounded">
+          {imageAttribution}
+        </div>
+      )}
     </div>
   );
 }

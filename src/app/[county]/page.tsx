@@ -27,6 +27,7 @@ interface Location {
   seo_keywords: string[];
   parent_id?: string;
   county_slug?: string;
+  studio_count?: number;
 }
 
 interface PilatesStudio {
@@ -100,9 +101,31 @@ async function getCitiesAndTowns(countySlug: string, countyId: string) {
     console.error('Error fetching cities and towns:', error);
   }
 
-  console.log(`Cities/towns for county ${countySlug} (${countyId}):`, data?.length || 0);
+  // Get studio counts for each city
+  const citiesWithStudioCounts = await Promise.all(
+    (data || []).map(async (city) => {
+      const { count } = await supabase
+        .from('pilates_studios')
+        .select('*', { count: 'exact', head: true })
+        .eq('county_slug', countySlug)
+        .eq('city_slug', city.slug)
+        .eq('is_active', true);
 
-  return data || [];
+      return {
+        ...city,
+        studio_count: count || 0
+      };
+    })
+  );
+
+  // Filter out cities with 0 studios only for Greater Manchester
+  const citiesWithStudios = countySlug === 'greater-manchester'
+    ? citiesWithStudioCounts.filter(city => (city.studio_count || 0) > 0)
+    : citiesWithStudioCounts;
+
+  console.log(`Cities/towns for county ${countySlug} (${countyId}):`, citiesWithStudios?.length || 0);
+
+  return citiesWithStudios || [];
 }
 
 async function getCountyStudios(countySlug: string): Promise<PilatesStudio[]> {
@@ -116,10 +139,8 @@ async function getCountyStudios(countySlug: string): Promise<PilatesStudio[]> {
     .select('*')
     .eq('county_slug', countySlug)
     .eq('is_active', true)
-    .not('latitude', 'is', null)
-    .not('longitude', 'is', null)
     .order('google_rating', { ascending: false, nullsFirst: false })
-    .limit(50); // Limit to 50 studios to avoid map clutter
+    .order('name'); // Remove coordinate filter and limit to include ALL studios
 
   if (error) {
     console.error('Error fetching county studios:', error);
@@ -203,6 +224,9 @@ export default async function CountyPage({ params }: CountyPageProps) {
   const citiesAndTowns = await getCitiesAndTowns(resolvedParams.county, location.id);
   const studios = await getCountyStudios(resolvedParams.county);
 
+  // Calculate total studio count - use actual studios count for accurate total
+  const totalStudioCount = studios.length;
+
   const breadcrumbs = [
     { label: 'Home', href: '/' },
     { label: location.name }
@@ -228,7 +252,7 @@ export default async function CountyPage({ params }: CountyPageProps) {
             </span>
             <span className="meta-badge warning">
               <Activity className="h-3 w-3" />
-              {location.butcher_count}+ Studios
+              {totalStudioCount} Studios
             </span>
           </div>
 
@@ -252,18 +276,18 @@ export default async function CountyPage({ params }: CountyPageProps) {
                   <div className="flex justify-between items-start mb-3">
                     <h3 className="text-lg font-semibold text-gray-900">{city.name}</h3>
                     <span className="text-sm text-gray-500">
-                      {city.butcher_count > 0 ? `${city.butcher_count} studios` : 'No studios yet'}
+                      {(city.studio_count || 0) > 0 ? `${city.studio_count} studios` : 'No studios yet'}
                     </span>
                   </div>
                   <p className="text-gray-600 mb-4">
-                    {city.butcher_count > 0
+                    {(city.studio_count || 0) > 0
                       ? `Find pilates classes and studios in ${city.name}. Browse reformer, mat, and clinical pilates options.`
                       : `Explore ${city.name} for pilates opportunities. Be the first to discover studios in this area.`
                     }
                   </p>
                   <div className="flex gap-2">
                     <Link href={`/${resolvedParams.county}/${city.slug}`} className="btn-primary flex-1">
-                      {city.butcher_count > 0 ? 'View Studios' : 'Explore Area'}
+                      {(city.studio_count || 0) > 0 ? 'View Studios' : 'Explore Area'}
                     </Link>
                   </div>
                 </div>
@@ -276,8 +300,8 @@ export default async function CountyPage({ params }: CountyPageProps) {
             <div className="mb-12">
               <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
                 <div className="p-4 border-b border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-900">All Studios in {location.name}</h3>
-                  <p className="text-sm text-gray-600 mt-1">{studios.length} studios in this area</p>
+                  <h3 className="text-lg font-semibold text-gray-900">Studios with Locations in {location.name}</h3>
+                  <p className="text-sm text-gray-600 mt-1">{studios.filter(s => s.latitude && s.longitude).length} studios shown on map</p>
                 </div>
                 <div className="w-full h-96 rounded-lg overflow-hidden">
                   <iframe

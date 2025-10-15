@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^2.0.0",
-    "@mendable/firecrawl-js": "^4.3.6",
+    "@mendable/firecrawl-js": "^4.4.0",
     "@radix-ui/react-slot": "^1.2.3",
     "@supabase/supabase-js": "^2.39.0",
     "cheerio": "^1.1.2",
@@ -51,7 +51,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "tailwind-merge": "^2.2.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",

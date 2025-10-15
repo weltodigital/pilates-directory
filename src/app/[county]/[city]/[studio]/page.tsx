@@ -33,7 +33,7 @@ interface PilatesStudio {
   review_count: number;
   specialties: string[];
   opening_hours: Record<string, string>;
-  images: string[];
+  images: (string | { url: string; type?: string; attribution?: string; })[];
   class_types: string[];
   instructor_names: string[];
   price_range?: string;
@@ -302,18 +302,6 @@ export default async function StudioPage({ params }: StudioPageProps) {
                   </div>
                 )}
 
-                {studioData.instructor_names && studioData.instructor_names.length > 0 && (
-                  <div className="mb-6">
-                    <h3 className="text-lg font-semibold mb-3 text-purple-700">Instructors</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {studioData.instructor_names.map((instructor: string, index: number) => (
-                        <span key={index} className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
-                          {instructor}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
 
