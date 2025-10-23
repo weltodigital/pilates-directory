@@ -3,8 +3,8 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase';
 import { MapPin, Star, Phone, Mail, Globe, Activity, Users, Award, Calendar, Navigation, Instagram, Facebook } from 'lucide-react';
-import StudioImage from '@/components/StudioImage';
 import HeaderWithBreadcrumbs from '@/components/HeaderWithBreadcrumbs';
+
 
 interface StudioPageProps {
   params: Promise<{
@@ -141,7 +141,6 @@ export async function generateMetadata({ params }: StudioPageProps): Promise<Met
       type: 'website',
       locale: 'en_GB',
       siteName: 'Pilates Classes Near',
-      images: studioData.images?.length ? [studioData.images[0]] : undefined,
     },
     twitter: {
       card: 'summary_large_image',
@@ -233,40 +232,6 @@ export default async function StudioPage({ params }: StudioPageProps) {
             )}
           </div>
 
-          {/* Studio Images */}
-          {studioData.images && studioData.images.length > 0 && (
-            <div className="mb-6">
-              {/* Main Image */}
-              <div className="mb-4">
-                <StudioImage
-                  src={studioData.images[0]}
-                  alt={`${studioData.name} - Main Studio Image`}
-                  studioName={studioData.name}
-                  containerClassName="w-full h-64 rounded-lg"
-                  className="hover:opacity-95 transition-opacity"
-                  size="large"
-                />
-              </div>
-
-              {/* Thumbnail Images */}
-              {studioData.images.length > 1 && (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                  {studioData.images.slice(1).map((image, index) => (
-                    <div key={index + 1} className="aspect-square">
-                      <StudioImage
-                        src={image}
-                        alt={`${studioData.name} - Image ${index + 2}`}
-                        studioName={studioData.name}
-                        containerClassName="w-full h-full rounded-md"
-                        className="hover:opacity-90 transition-opacity"
-                        size="small"
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </div>
 

@@ -3,7 +3,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { MapPin, Phone, Globe, Star, Clock } from 'lucide-react';
-import StudioImage from '@/components/StudioImage';
 
 interface PilatesStudio {
   id: string;
@@ -61,14 +60,6 @@ export default function PilatesStudioCard({ studio, showLocation = true }: Pilat
 
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
-      {/* Studio Image */}
-      <StudioImage
-        src={studio.images && studio.images.length > 0 ? studio.images[0] : ''}
-        alt={`${studio.name} - Studio Image`}
-        studioName={studio.name}
-        containerClassName="w-full h-48"
-        size="medium"
-      />
 
       <div className="p-6">
         <div className="flex justify-between items-start mb-4">

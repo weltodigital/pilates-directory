@@ -64,41 +64,17 @@ export default function LocationStudiosMap({ studios, locationName, locationType
   if (maxSpread > 0.2) zoom = 10;
   if (maxSpread > 0.5) zoom = 9;
 
-  // Create Google Maps URL that will show studio markers and locations
-  let mapUrl;
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  // Create static map image instead of interactive embed (no API calls)
+  const markers = studiosWithCoords.slice(0, 10).map((studio, index) => {
+    return `markers=color:purple%7Clabel:${index + 1}%7C${studio.latitude},${studio.longitude}`;
+  }).join('&');
 
-  if (apiKey) {
-    // Use the Google Maps Embed API with place search
-    // This searches for pilates studios in the area which should show actual business locations
-    const searchQuery = `pilates+studios+in+${encodeURIComponent(locationName)}`;
-    mapUrl = `https://www.google.com/maps/embed/v1/search?key=${apiKey}&q=${searchQuery}&zoom=${zoom}&center=${centerLat},${centerLng}`;
-  } else {
-    // Fallback: Create a Google Maps URL that shows multiple markers using the waypoints approach
-    // Use the first few studio coordinates as waypoints to force markers to appear
-    const primaryStudio = studiosWithCoords[0];
+  // Static map URL (free for reasonable usage)
+  const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${centerLat},${centerLng}&zoom=${zoom}&size=600x400&maptype=roadmap&${markers}&format=png`;
 
-    if (studiosWithCoords.length === 1) {
-      // Single studio - use place mode
-      mapUrl = `https://maps.google.com/maps?q=${primaryStudio.latitude},${primaryStudio.longitude}&z=${zoom}&output=embed`;
-    } else if (studiosWithCoords.length <= 10) {
-      // Multiple studios but manageable - use directions with waypoints to show markers
-      const origin = `${primaryStudio.latitude},${primaryStudio.longitude}`;
-      const destination = `${studiosWithCoords[studiosWithCoords.length - 1].latitude},${studiosWithCoords[studiosWithCoords.length - 1].longitude}`;
-
-      // Add middle studios as waypoints (Google Maps allows up to 8 waypoints)
-      const waypoints = studiosWithCoords.slice(1, -1).slice(0, 8)
-        .map(studio => `${studio.latitude},${studio.longitude}`)
-        .join('|');
-
-      const waypointsParam = waypoints ? `&waypoints=${waypoints}` : '';
-      mapUrl = `https://maps.google.com/maps?origin=${origin}&destination=${destination}${waypointsParam}&mode=walking&z=${zoom}&output=embed`;
-    } else {
-      // Many studios - use search in the center area
-      const searchQuery = `pilates+studios+near+${centerLat},${centerLng}`;
-      mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(searchQuery)}&z=${zoom}&output=embed`;
-    }
-  }
+  // Fallback Google Maps search URL for "Open in Google Maps" button
+  const searchQuery = `pilates+studios+in+${encodeURIComponent(locationName)}`;
+  const googleMapsUrl = `https://www.google.com/maps/search/${searchQuery}/@${centerLat},${centerLng},${zoom}z`;
 
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -125,17 +101,55 @@ export default function LocationStudiosMap({ studios, locationName, locationType
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
         {/* Map */}
         <div className="lg:col-span-2 h-96 bg-gray-200 relative">
-          <iframe
-            src={mapUrl}
-            width="100%"
-            height="100%"
-            style={{ border: 0 }}
-            loading="lazy"
-            allowFullScreen
-            referrerPolicy="no-referrer-when-downgrade"
-            title={`Map showing pilates studios in ${locationName}`}
-            className="w-full h-full"
-          />
+          <div className="relative w-full h-full">
+            <img
+              src={staticMapUrl}
+              alt={`Map showing ${studiosWithCoords.length} pilates studios in ${locationName}`}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                // If static map fails, show fallback
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                const parent = target.parentElement;
+                if (parent) {
+                  parent.innerHTML = `
+                    <div class="w-full h-full flex items-center justify-center flex-col gap-4 bg-gray-100">
+                      <div class="text-center">
+                        <div class="mb-4">
+                          <svg class="h-16 w-16 text-gray-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                          </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2 text-gray-600">View ${studiosWithCoords.length} Studios on Map</h3>
+                        <p class="text-gray-500 mb-4">Interactive map with all pilates studios in ${locationName}</p>
+                        <a href="${googleMapsUrl}" target="_blank" rel="noopener noreferrer"
+                           class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+                          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                          </svg>
+                          Open Google Maps
+                        </a>
+                      </div>
+                    </div>
+                  `;
+                }
+              }}
+            />
+
+            {/* Overlay for interactive map link */}
+            <div className="absolute top-4 right-4">
+              <a
+                href={googleMapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-3 py-2 bg-white bg-opacity-90 hover:bg-opacity-100 text-gray-800 text-sm rounded shadow hover:shadow-md transition-all"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Open in Google Maps
+              </a>
+            </div>
+          </div>
         </div>
 
         {/* Studio List */}

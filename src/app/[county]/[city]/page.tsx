@@ -3,7 +3,6 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase';
 import Link from 'next/link';
 import { MapPin, Star, Users, Activity, Clock, Phone, Navigation, Award } from 'lucide-react';
-import StudioImage from '@/components/StudioImage';
 import HeaderWithBreadcrumbs from '@/components/HeaderWithBreadcrumbs';
 
 interface CityPageProps {
@@ -254,13 +253,6 @@ export default async function CityPage({ params }: CityPageProps) {
               <div className="studios-grid">
                 {studios.map((studio) => (
                   <div key={studio.id} className="studio-card">
-                    <StudioImage
-                      src={studio.images && studio.images.length > 0 ? studio.images[0] : ''}
-                      alt={`${studio.name} - Studio Image`}
-                      studioName={studio.name}
-                      containerClassName="w-full h-48 rounded-t-lg"
-                      size="medium"
-                    />
 
                     <div className="studio-header">
                       <div>

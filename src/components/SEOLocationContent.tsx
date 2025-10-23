@@ -6,7 +6,6 @@ import { MapPin, Star, Users, Heart, Phone, Clock, CheckCircle, Activity } from 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import LocationStudiosMap from '@/components/LocationStudiosMap';
-import StudioImage from '@/components/StudioImage';
 
 interface SEOContent {
   meta_title: string;
@@ -145,15 +144,6 @@ export default function SEOLocationContent({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {studios.map((studio) => (
               <Card key={studio.id} className="hover:shadow-lg transition-shadow group overflow-hidden">
-                {/* Studio Image */}
-                <StudioImage
-                  src={studio.images && studio.images.length > 0 ? studio.images[0] : ''}
-                  alt={`${studio.name} - Studio Image`}
-                  studioName={studio.name}
-                  containerClassName="w-full h-48"
-                  className="group-hover:scale-105 transition-all duration-300"
-                  size="medium"
-                />
 
                 <CardHeader>
                   <div className="flex items-start justify-between">
