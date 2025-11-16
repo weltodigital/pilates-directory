@@ -264,6 +264,78 @@ export default async function CountyPage({ params }: CountyPageProps) {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
 
+          {/* Pilates Equipment Images Row */}
+          {true && (
+            <div className="mb-8">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4 text-left">Shop for Pilates Equipment</h2>
+              <style dangerouslySetInnerHTML={{
+                __html: `
+                  .large-pilates-img {
+                    width: 160px !important;
+                    height: 160px !important;
+                    min-width: 160px !important;
+                    min-height: 160px !important;
+                    max-width: 160px !important;
+                    max-height: 160px !important;
+                    object-fit: cover !important;
+                    flex-shrink: 0 !important;
+                    flex-grow: 0 !important;
+                    flex-basis: 160px !important;
+                    display: block !important;
+                  }
+                  .large-pilates-img[style] {
+                    width: 160px !important;
+                    height: 160px !important;
+                  }
+                `
+              }} />
+              <div className="flex flex-row gap-4 overflow-x-auto">
+                <a href="https://amzn.to/49t6EJH" target="_blank" rel="noopener noreferrer">
+                  <img
+                    src="/5.png?v=4"
+                    alt="Pilates Equipment"
+                    className="large-pilates-img"
+                  />
+                </a>
+                <a href="https://amzn.to/481BQNA" target="_blank" rel="noopener noreferrer">
+                  <img
+                    src="/6.png?v=4"
+                    alt="Pilates Equipment"
+                    className="large-pilates-img"
+                  />
+                </a>
+                <a href="https://amzn.to/3K6X5FM" target="_blank" rel="noopener noreferrer">
+                  <img
+                    src="/7.png?v=4"
+                    alt="Pilates Equipment"
+                    className="large-pilates-img"
+                  />
+                </a>
+                <a href="https://amzn.to/3WWwiyX" target="_blank" rel="noopener noreferrer">
+                  <img
+                    src="/8.png?v=4"
+                    alt="Pilates Equipment"
+                    className="large-pilates-img"
+                  />
+                </a>
+                <a href="https://amzn.to/481w4vC" target="_blank" rel="noopener noreferrer">
+                  <img
+                    src="/9.png?v=4"
+                    alt="Pilates Equipment"
+                    className="large-pilates-img"
+                  />
+                </a>
+                <a href="https://amzn.to/3K6XckG" target="_blank" rel="noopener noreferrer">
+                  <img
+                    src="/10.png?v=4"
+                    alt="Pilates Equipment"
+                    className="large-pilates-img"
+                  />
+                </a>
+              </div>
+            </div>
+          )}
+
           <div className="mb-12">
             <div className="flex items-center justify-between mb-6">
               <h2>Pilates Locations In {location.name}</h2>
