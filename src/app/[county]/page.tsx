@@ -2,7 +2,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase';
 import Link from 'next/link';
-import { MapPin, Users, Activity } from 'lucide-react';
+import { MapPin, Users, Activity, Star } from 'lucide-react';
 import HeaderWithBreadcrumbs from '@/components/HeaderWithBreadcrumbs';
 
 interface CountyPageProps {
@@ -364,6 +364,29 @@ export default async function CountyPage({ params }: CountyPageProps) {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Grow Your Reviews CTA */}
+          <div className="mb-12 bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 rounded-lg p-6 sm:p-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex-1">
+                <h2 className="text-xl sm:text-2xl font-bold text-purple-900 mb-2">
+                  Own a pilates studio in {location.name}? Grow your studio with more 5-star reviews
+                </h2>
+                <p className="text-purple-800 text-sm sm:text-base">
+                  More reviews mean more bookings. Grow Our Reviews helps pilates studios like yours collect more genuine 5-star Google reviews on autopilot — so new clients find you first.
+                </p>
+              </div>
+              <a
+                href="https://www.growourreviews.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-primary inline-flex items-center gap-2 whitespace-nowrap"
+              >
+                <Star className="h-4 w-4" />
+                Get More Reviews
+              </a>
             </div>
           </div>
 
