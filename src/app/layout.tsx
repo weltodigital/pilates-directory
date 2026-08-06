@@ -52,6 +52,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Impact.com site ownership verification */}
+        <meta
+          name="impact-site-verification"
+          value="3de658f9-c298-4a50-97a3-17ea683a3ac7"
+          content="3de658f9-c298-4a50-97a3-17ea683a3ac7"
+        />
         <style dangerouslySetInnerHTML={{__html: `
           * { box-sizing: border-box !important; }
           body, h1, h2, h3, h4, h5, h6, p, ul, ol, li { margin: 0; padding: 0; }
