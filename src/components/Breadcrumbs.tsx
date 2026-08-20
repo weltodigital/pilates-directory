@@ -13,21 +13,21 @@ export default function Breadcrumbs({ breadcrumbs }: BreadcrumbsProps) {
   if (!breadcrumbs || breadcrumbs.length === 0) return null;
 
   return (
-    <div className="bg-gray-50 border-b">
-      <div className="container mx-auto px-4 py-3">
-        <nav className="text-sm text-gray-600">
-          <ol className="flex space-x-2">
+    <div className="border-b border-line bg-canvas">
+      <div className="shell py-3">
+        <nav aria-label="Breadcrumb">
+          <ol className="flex flex-wrap items-center gap-2 text-sm">
             {breadcrumbs.map((breadcrumb, index) => (
-              <li key={index} className="flex items-center">
+              <li key={index} className="flex items-center gap-2">
                 {index > 0 && (
-                  <span className="mx-2 text-gray-400">/</span>
+                  <span className="text-ink-faint" aria-hidden="true">/</span>
                 )}
                 {breadcrumb.href ? (
-                  <Link href={breadcrumb.href} className="hover:text-purple-600">
+                  <Link href={breadcrumb.href} className="link-quiet">
                     {breadcrumb.label}
                   </Link>
                 ) : (
-                  <span className="text-gray-900">
+                  <span className="font-medium text-ink" aria-current="page">
                     {breadcrumb.label}
                   </span>
                 )}

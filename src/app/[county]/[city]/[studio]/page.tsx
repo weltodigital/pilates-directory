@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase';
 import { MapPin, Star, Phone, Mail, Globe, Activity, Users, Award, Calendar, Navigation, Instagram, Facebook } from 'lucide-react';
 import HeaderWithBreadcrumbs from '@/components/HeaderWithBreadcrumbs';
+import EquipmentStrip from '@/components/EquipmentStrip';
+import ReviewsCta from '@/components/ReviewsCta';
 
 
 interface StudioPageProps {
@@ -168,14 +170,16 @@ export default async function StudioPage({ params }: StudioPageProps) {
 
   if (!studioData || !locationData) {
     return (
-      <div className="page-container">
-        <div className="page-header">
-          <div className="container">
-            <h1>Studio Not Found</h1>
-            <p>The requested pilates studio could not be found.</p>
-          </div>
-        </div>
-      </div>
+      <>
+        <HeaderWithBreadcrumbs breadcrumbs={[{ label: 'Home', href: '/' }]} />
+        <main className="shell band text-center">
+          <h1 className="text-display-sm">Studio not found</h1>
+          <p className="mx-auto mt-5 max-w-md text-lg text-ink-muted">
+            The requested pilates studio could not be found.
+          </p>
+          <Link href="/" className="pill-brand mt-8">Back to all locations</Link>
+        </main>
+      </>
     );
   }
 
@@ -186,294 +190,277 @@ export default async function StudioPage({ params }: StudioPageProps) {
     { label: studioData.name }
   ];
 
+  const fullAddress = `${studioData.address}, ${studioData.city}, ${studioData.postcode}`;
+  const hasMap = Boolean((studioData.latitude && studioData.longitude) || studioData.address);
+
   return (
     <>
       <HeaderWithBreadcrumbs breadcrumbs={breadcrumbs} />
-      <div className="page-container">
-        <div className="page-header">
-          <div className="container">
 
-          <h1>{studioData.name}</h1>
-          <p className="text-gray-700 leading-relaxed">
-            {studioData.description || `${studioData.name} is a professional pilates studio located in ${locationData.city.name}, ${locationData.county.name}. We offer comprehensive pilates instruction with qualified instructors and modern equipment to help you achieve your fitness and wellness goals.`}
-          </p>
-
-          <div className="meta-badges">
-            <span className="meta-badge primary">
-              <MapPin className="h-3 w-3" />
-              {locationData.city.name}
-            </span>
-            {studioData.google_rating && (
-              <span className="meta-badge success">
-                <Star className="h-3 w-3" />
-                {studioData.google_rating} ★
+      <main>
+        {/* ---------------------------------------------------------- Hero */}
+        <section className="relative overflow-hidden border-b border-line">
+          <div
+            className="blob left-[-12%] top-[-40%] h-[30rem] w-[30rem] bg-brand/15"
+            aria-hidden="true"
+          />
+          <div className="shell py-16 sm:py-20">
+            <div className="max-w-3xl">
+              <span className="eyebrow">
+                {locationData.city.name}, {locationData.county.name}
               </span>
-            )}
-            {studioData.is_verified && (
-              <span className="meta-badge warning">
-                <Award className="h-3 w-3" />
-                Verified Studio
-              </span>
-            )}
-          </div>
+              <h1 className="mt-4 text-display-sm sm:text-display">
+                {studioData.name}
+              </h1>
+              <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-muted">
+                {studioData.description ||
+                  `${studioData.name} is a professional pilates studio in ${locationData.city.name}, ${locationData.county.name}, offering expert instruction and modern equipment for every level.`}
+              </p>
 
-          <div className="flex flex-wrap gap-4 mb-8">
-            {studioData.phone && (
-              <a href={`tel:${studioData.phone}`} className="btn-primary">
-                <Phone className="h-4 w-4 mr-2" />
-                Call Studio
-              </a>
-            )}
-            {studioData.website && (
-              <a href={studioData.website} target="_blank" rel="noopener noreferrer" className="btn-secondary">
-                <Globe className="h-4 w-4 mr-2" />
-                Visit Website
-              </a>
-            )}
-          </div>
-
-        </div>
-      </div>
-
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
-                {studioData.class_types && studioData.class_types.length > 0 && (
-                  <div className="mb-6">
-                    <h3 className="text-lg font-semibold mb-3 text-purple-700">Classes Offered</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {studioData.class_types.map((type: string, index: number) => (
-                        <span key={index} className="class-type-badge">
-                          {type}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
+              <div className="mt-8 flex flex-wrap gap-2">
+                <span className="chip chip-brand">
+                  <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
+                  {locationData.city.name}
+                </span>
+                {studioData.google_rating && (
+                  <span className="chip">
+                    <Star className="h-3.5 w-3.5 fill-brand text-brand" aria-hidden="true" />
+                    <span className="font-semibold text-ink">{studioData.google_rating}</span>
+                    {studioData.google_review_count ? ` · ${studioData.google_review_count} reviews` : ''}
+                  </span>
                 )}
-
-                {studioData.equipment_available && studioData.equipment_available.length > 0 && (
-                  <div className="mb-6">
-                    <h3 className="text-lg font-semibold mb-3 text-purple-700">Equipment Available</h3>
-                    <div className="grid grid-cols-2 gap-2">
-                      {studioData.equipment_available.map((equipment: string, index: number) => (
-                        <div key={index} className="flex items-center gap-2 text-gray-600">
-                          <Activity className="h-4 w-4 text-purple-500" />
-                          <span>{equipment}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                {studioData.is_verified && (
+                  <span className="chip">
+                    <Award className="h-3.5 w-3.5" aria-hidden="true" />
+                    Verified studio
+                  </span>
                 )}
-
               </div>
-            </div>
 
-            <div className="lg:col-span-1 space-y-6">
-              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                <h3 className="text-lg font-semibold mb-4 text-purple-700">Contact Information</h3>
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <MapPin className="h-4 w-4 text-purple-500 mt-1 flex-shrink-0" />
-                    <div>
-                      <p className="text-gray-900 font-medium">Address</p>
-                      <p className="text-gray-600 text-sm">{studioData.address}</p>
-                      <p className="text-gray-600 text-sm">{studioData.city}, {studioData.postcode}</p>
-                    </div>
-                  </div>
+              {(studioData.phone || studioData.website) && (
+                <div className="mt-10 flex flex-wrap gap-3">
                   {studioData.phone && (
-                    <div className="flex items-start gap-3">
-                      <Phone className="h-4 w-4 text-purple-500 mt-1 flex-shrink-0" />
-                      <div>
-                        <p className="text-gray-900 font-medium">Phone</p>
-                        <a href={`tel:${studioData.phone}`} className="text-purple-600 hover:text-purple-700 text-sm">
-                          {studioData.phone}
-                        </a>
-                      </div>
-                    </div>
-                  )}
-                  {studioData.email && (
-                    <div className="flex items-start gap-3">
-                      <Mail className="h-4 w-4 text-purple-500 mt-1 flex-shrink-0" />
-                      <div>
-                        <p className="text-gray-900 font-medium">Email</p>
-                        <a href={`mailto:${studioData.email}`} className="text-purple-600 hover:text-purple-700 text-sm">
-                          {studioData.email}
-                        </a>
-                      </div>
-                    </div>
+                    <a href={`tel:${studioData.phone}`} className="pill-brand">
+                      <Phone className="h-4 w-4" aria-hidden="true" />
+                      Call studio
+                    </a>
                   )}
                   {studioData.website && (
+                    <a
+                      href={studioData.website}
+                      target="_blank"
+                      rel="nofollow noopener noreferrer"
+                      className="pill-outline"
+                    >
+                      <Globe className="h-4 w-4" aria-hidden="true" />
+                      Visit website
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        <div className="shell space-y-20 py-20">
+          {/* ------------------------------------------- Details + aside */}
+          <section className="grid gap-6 lg:grid-cols-3">
+            <div className="space-y-6 lg:col-span-2">
+              {studioData.class_types && studioData.class_types.length > 0 && (
+                <div className="card-flat p-7">
+                  <h2 className="font-fraunces text-xl font-semibold">Classes offered</h2>
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {studioData.class_types.map((type: string, index: number) => (
+                      <span key={index} className="chip chip-brand">{type}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {studioData.equipment_available && studioData.equipment_available.length > 0 && (
+                <div className="card-flat p-7">
+                  <h2 className="font-fraunces text-xl font-semibold">Equipment available</h2>
+                  <ul className="mt-5 grid gap-3 sm:grid-cols-2">
+                    {studioData.equipment_available.map((equipment: string, index: number) => (
+                      <li key={index} className="flex items-center gap-2.5 text-sm text-ink-muted">
+                        <Activity className="h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
+                        {equipment}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {studioData.specialties && studioData.specialties.length > 0 && (
+                <div className="card-flat p-7">
+                  <h2 className="font-fraunces text-xl font-semibold">Specialties</h2>
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {studioData.specialties.map((item: string, index: number) => (
+                      <span key={index} className="chip">{item}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Aside */}
+            <aside className="space-y-6 lg:col-span-1">
+              <div className="card-flat p-7">
+                <h2 className="font-fraunces text-xl font-semibold">Contact</h2>
+                <dl className="mt-6 space-y-5 text-sm">
+                  <div className="flex items-start gap-3">
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
+                    <div>
+                      <dt className="font-medium text-ink">Address</dt>
+                      <dd className="mt-1 leading-relaxed text-ink-muted">
+                        {studioData.address}
+                        <br />
+                        {studioData.city}, {studioData.postcode}
+                      </dd>
+                    </div>
+                  </div>
+
+                  {studioData.phone && (
                     <div className="flex items-start gap-3">
-                      <Globe className="h-4 w-4 text-purple-500 mt-1 flex-shrink-0" />
+                      <Phone className="mt-0.5 h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
                       <div>
-                        <p className="text-gray-900 font-medium">Website</p>
-                        <a href={studioData.website} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:text-purple-700 text-sm">
-                          Visit Website
-                        </a>
+                        <dt className="font-medium text-ink">Phone</dt>
+                        <dd className="mt-1">
+                          <a
+                            href={`tel:${studioData.phone}`}
+                            className="text-brand underline-offset-4 hover:underline"
+                          >
+                            {studioData.phone}
+                          </a>
+                        </dd>
                       </div>
                     </div>
                   )}
-                </div>
+
+                  {studioData.email && (
+                    <div className="flex items-start gap-3">
+                      <Mail className="mt-0.5 h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
+                      <div>
+                        <dt className="font-medium text-ink">Email</dt>
+                        <dd className="mt-1">
+                          <a
+                            href={`mailto:${studioData.email}`}
+                            className="break-all text-brand underline-offset-4 hover:underline"
+                          >
+                            {studioData.email}
+                          </a>
+                        </dd>
+                      </div>
+                    </div>
+                  )}
+
+                  {studioData.website && (
+                    <div className="flex items-start gap-3">
+                      <Globe className="mt-0.5 h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
+                      <div>
+                        <dt className="font-medium text-ink">Website</dt>
+                        <dd className="mt-1">
+                          <a
+                            href={studioData.website}
+                            target="_blank"
+                            rel="nofollow noopener noreferrer"
+                            className="text-brand underline-offset-4 hover:underline"
+                          >
+                            Visit website
+                          </a>
+                        </dd>
+                      </div>
+                    </div>
+                  )}
+                </dl>
               </div>
 
-
               {(studioData.instagram || studioData.facebook) && (
-                <div className="bg-white p-6 rounded-lg shadow-sm">
-                  <h3 className="text-lg font-semibold mb-4 text-purple-700">Social Media</h3>
-                  <div className="space-y-3">
+                <div className="card-flat p-7">
+                  <h2 className="font-fraunces text-xl font-semibold">Social</h2>
+                  <div className="mt-5 space-y-3 text-sm">
                     {studioData.instagram && (
-                      <a href={studioData.instagram} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-purple-600 hover:text-purple-700">
-                        <Instagram className="h-4 w-4" />
-                        <span>Follow on Instagram</span>
+                      <a
+                        href={studioData.instagram}
+                        target="_blank"
+                        rel="nofollow noopener noreferrer"
+                        className="flex items-center gap-2.5 text-ink-muted transition-colors hover:text-brand"
+                      >
+                        <Instagram className="h-4 w-4" aria-hidden="true" />
+                        Follow on Instagram
                       </a>
                     )}
                     {studioData.facebook && (
-                      <a href={studioData.facebook} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-purple-600 hover:text-purple-700">
-                        <Facebook className="h-4 w-4" />
-                        <span>Follow on Facebook</span>
+                      <a
+                        href={studioData.facebook}
+                        target="_blank"
+                        rel="nofollow noopener noreferrer"
+                        className="flex items-center gap-2.5 text-ink-muted transition-colors hover:text-brand"
+                      >
+                        <Facebook className="h-4 w-4" aria-hidden="true" />
+                        Follow on Facebook
                       </a>
                     )}
                   </div>
                 </div>
               )}
 
+              {studioData.opening_hours && Object.keys(studioData.opening_hours).length > 0 && (
+                <div className="card-flat p-7">
+                  <h2 className="font-fraunces text-xl font-semibold">Opening hours</h2>
+                  <dl className="mt-5 space-y-2.5 text-sm">
+                    {Object.entries(studioData.opening_hours).map(([day, hours]) => (
+                      <div key={day} className="flex justify-between gap-4">
+                        <dt className="capitalize text-ink-muted">{day}</dt>
+                        <dd className="text-right font-medium text-ink">{String(hours)}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              )}
+            </aside>
+          </section>
 
-            </div>
-          </div>
+          <ReviewsCta locationName={studioData.name} />
 
-          {/* Grow Your Reviews CTA */}
-          <div className="mt-8 bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 rounded-lg p-6 sm:p-8">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="flex-1">
-                <h2 className="text-xl sm:text-2xl font-bold text-purple-900 mb-2">
-                  Own {studioData.name}? Grow your studio with more 5-star reviews
-                </h2>
-                <p className="text-purple-800 text-sm sm:text-base">
-                  More reviews mean more bookings. Grow Our Reviews helps pilates studios like yours collect more genuine 5-star Google reviews on autopilot — so new clients find you first.
-                </p>
-              </div>
-              <a
-                href="https://www.growourreviews.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-primary inline-flex items-center gap-2 whitespace-nowrap"
-              >
-                <Star className="h-4 w-4" />
-                Get More Reviews
-              </a>
-            </div>
-          </div>
-
-          {/* Full-width map section */}
-          {(studioData.latitude && studioData.longitude) || studioData.address ? (
-            <div className="mt-8 mb-8 bg-white rounded-lg p-6 shadow-sm border border-gray-100">
-              <div className="mb-6 text-center">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Studio Location</h2>
-                <p className="text-gray-600">Find {studioData.name} at {studioData.address}, {studioData.city}</p>
-              </div>
-              <div className="w-full h-96 rounded-lg overflow-hidden border border-gray-200 mb-6">
+          {/* ------------------------------------------------------- Map */}
+          {hasMap && (
+            <section>
+              <div className="card-flat overflow-hidden">
+                <div className="border-b border-line p-6">
+                  <h2 className="font-fraunces text-xl font-semibold">Studio location</h2>
+                  <p className="mt-1 text-sm text-ink-muted">
+                    Find {studioData.name} at {fullAddress}
+                  </p>
+                </div>
                 <iframe
-                  src={`https://maps.google.com/maps?q=${encodeURIComponent(studioData.address + ', ' + studioData.city + ', ' + studioData.postcode)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(fullAddress)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
                   width="100%"
                   height="100%"
-                  style={{ border: 0 }}
+                  className="block h-96 w-full border-0"
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                   title={`Map showing location of ${studioData.name}`}
                 />
+                <div className="border-t border-line p-6">
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(fullAddress)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="pill-brand"
+                  >
+                    <Navigation className="h-4 w-4" aria-hidden="true" />
+                    Get directions
+                  </a>
+                </div>
               </div>
-              <div className="text-center">
-                <a
-                  href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(studioData.address + ', ' + studioData.city + ', ' + studioData.postcode)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-primary inline-flex items-center gap-2"
-                >
-                  <Navigation className="h-4 w-4" />
-                  Get Directions
-                </a>
-              </div>
-            </div>
-          ) : null}
-
-          {/* Pilates Equipment Images Row */}
-          {true && (
-            <div className="mb-8">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4 text-left">Shop for Pilates Equipment</h2>
-              <style dangerouslySetInnerHTML={{
-                __html: `
-                  .large-pilates-img {
-                    width: 160px !important;
-                    height: 160px !important;
-                    min-width: 160px !important;
-                    min-height: 160px !important;
-                    max-width: 160px !important;
-                    max-height: 160px !important;
-                    object-fit: cover !important;
-                    flex-shrink: 0 !important;
-                    flex-grow: 0 !important;
-                    flex-basis: 160px !important;
-                    display: block !important;
-                  }
-                  .large-pilates-img[style] {
-                    width: 160px !important;
-                    height: 160px !important;
-                  }
-                `
-              }} />
-              <div className="flex flex-row gap-4 overflow-x-auto">
-                <a href="https://amzn.to/49t6EJH" target="_blank" rel="noopener noreferrer">
-                  <img
-                    src="/5.png?v=4"
-                    alt="Pilates Equipment"
-                    className="large-pilates-img"
-                  />
-                </a>
-                <a href="https://amzn.to/481BQNA" target="_blank" rel="noopener noreferrer">
-                  <img
-                    src="/6.png?v=4"
-                    alt="Pilates Equipment"
-                    className="large-pilates-img"
-                  />
-                </a>
-                <a href="https://amzn.to/3K6X5FM" target="_blank" rel="noopener noreferrer">
-                  <img
-                    src="/7.png?v=4"
-                    alt="Pilates Equipment"
-                    className="large-pilates-img"
-                  />
-                </a>
-                <a href="https://amzn.to/3WWwiyX" target="_blank" rel="noopener noreferrer">
-                  <img
-                    src="/8.png?v=4"
-                    alt="Pilates Equipment"
-                    className="large-pilates-img"
-                  />
-                </a>
-                <a href="https://amzn.to/481w4vC" target="_blank" rel="noopener noreferrer">
-                  <img
-                    src="/9.png?v=4"
-                    alt="Pilates Equipment"
-                    className="large-pilates-img"
-                  />
-                </a>
-                <a href="https://amzn.to/3K6XckG" target="_blank" rel="noopener noreferrer">
-                  <img
-                    src="/10.png?v=4"
-                    alt="Pilates Equipment"
-                    className="large-pilates-img"
-                  />
-                </a>
-              </div>
-            </div>
+            </section>
           )}
 
+          <EquipmentStrip />
         </div>
-      </div>
-      </div>
+      </main>
     </>
   );
 }

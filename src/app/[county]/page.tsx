@@ -2,8 +2,10 @@ import React from 'react';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase';
 import Link from 'next/link';
-import { MapPin, Users, Activity, Star } from 'lucide-react';
+import { MapPin, Users, Activity, Star, ArrowRight } from 'lucide-react';
 import HeaderWithBreadcrumbs from '@/components/HeaderWithBreadcrumbs';
+import EquipmentStrip from '@/components/EquipmentStrip';
+import ReviewsCta from '@/components/ReviewsCta';
 
 interface CountyPageProps {
   params: Promise<{
@@ -210,22 +212,24 @@ export default async function CountyPage({ params }: CountyPageProps) {
 
   if (!location) {
     return (
-      <div className="page-container">
-        <div className="page-header">
-          <div className="container">
-            <h1>County Not Found</h1>
-            <p>The requested county could not be found.</p>
-          </div>
-        </div>
-      </div>
+      <>
+        <HeaderWithBreadcrumbs breadcrumbs={[{ label: 'Home', href: '/' }]} />
+        <main className="shell band text-center">
+          <h1 className="text-display-sm">County not found</h1>
+          <p className="mx-auto mt-5 max-w-md text-lg text-ink-muted">
+            The requested county could not be found.
+          </p>
+          <Link href="/" className="pill-brand mt-8">Back to all locations</Link>
+        </main>
+      </>
     );
   }
 
   const citiesAndTowns = await getCitiesAndTowns(resolvedParams.county, location.id);
   const studios = await getCountyStudios(resolvedParams.county);
 
-  // Calculate total studio count - use actual studios count for accurate total
   const totalStudioCount = studios.length;
+  const mappableStudios = studios.filter(s => s.latitude && s.longitude).length;
 
   const breadcrumbs = [
     { label: 'Home', href: '/' },
@@ -235,234 +239,175 @@ export default async function CountyPage({ params }: CountyPageProps) {
   return (
     <>
       <HeaderWithBreadcrumbs breadcrumbs={breadcrumbs} />
-      <div className="page-container">
-      <div className="page-header">
-        <div className="container">
-          <h1>{location.h1_title || `Pilates Studios in ${location.name} | Find Pilates Classes Near You`}</h1>
-          <p>{location.intro_text || `Discover the best pilates studios in ${location.name}. Browse reformer, mat, and clinical pilates classes with verified reviews and online booking.`}</p>
 
-          <div className="meta-badges">
-            <span className="meta-badge primary">
-              <MapPin className="h-3 w-3" />
-              {location.name}
-            </span>
-            <span className="meta-badge success">
-              <Users className="h-3 w-3" />
-              {citiesAndTowns.length} Locations
-            </span>
-            <span className="meta-badge warning">
-              <Activity className="h-3 w-3" />
-              {totalStudioCount} Studios
-            </span>
-          </div>
+      <main>
+        {/* ---------------------------------------------------------- Hero */}
+        <section className="relative overflow-hidden border-b border-line">
+          <div
+            className="blob left-[-12%] top-[-40%] h-[30rem] w-[30rem] bg-brand/15"
+            aria-hidden="true"
+          />
+          <div className="shell py-16 sm:py-20">
+            <div className="max-w-3xl">
+              <span className="eyebrow">County guide</span>
+              <h1 className="mt-4 text-display-sm sm:text-display">
+                {location.h1_title || `Pilates studios in ${location.name}`}
+              </h1>
+              <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-muted">
+                {location.intro_text ||
+                  `Discover the best pilates studios in ${location.name}. Browse reformer, mat and clinical pilates classes with verified reviews and online booking.`}
+              </p>
 
-
-          <p>{location.intro_text || `Welcome to the comprehensive guide to pilates studios in ${location.name}. Whether you're looking for reformer pilates, mat classes, clinical pilates, or specialized programs, our directory features the best studios across ${location.name} with verified reviews, class schedules, and online booking options.`}</p>
-        </div>
-      </div>
-
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-7xl mx-auto">
-
-          {/* Pilates Equipment Images Row */}
-          {true && (
-            <div className="mb-8">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4 text-left">Shop for Pilates Equipment</h2>
-              <style dangerouslySetInnerHTML={{
-                __html: `
-                  .large-pilates-img {
-                    width: 160px !important;
-                    height: 160px !important;
-                    min-width: 160px !important;
-                    min-height: 160px !important;
-                    max-width: 160px !important;
-                    max-height: 160px !important;
-                    object-fit: cover !important;
-                    flex-shrink: 0 !important;
-                    flex-grow: 0 !important;
-                    flex-basis: 160px !important;
-                    display: block !important;
-                  }
-                  .large-pilates-img[style] {
-                    width: 160px !important;
-                    height: 160px !important;
-                  }
-                `
-              }} />
-              <div className="flex flex-row gap-4 overflow-x-auto">
-                <a href="https://amzn.to/49t6EJH" target="_blank" rel="noopener noreferrer">
-                  <img
-                    src="/5.png?v=4"
-                    alt="Pilates Equipment"
-                    className="large-pilates-img"
-                  />
-                </a>
-                <a href="https://amzn.to/481BQNA" target="_blank" rel="noopener noreferrer">
-                  <img
-                    src="/6.png?v=4"
-                    alt="Pilates Equipment"
-                    className="large-pilates-img"
-                  />
-                </a>
-                <a href="https://amzn.to/3K6X5FM" target="_blank" rel="noopener noreferrer">
-                  <img
-                    src="/7.png?v=4"
-                    alt="Pilates Equipment"
-                    className="large-pilates-img"
-                  />
-                </a>
-                <a href="https://amzn.to/3WWwiyX" target="_blank" rel="noopener noreferrer">
-                  <img
-                    src="/8.png?v=4"
-                    alt="Pilates Equipment"
-                    className="large-pilates-img"
-                  />
-                </a>
-                <a href="https://amzn.to/481w4vC" target="_blank" rel="noopener noreferrer">
-                  <img
-                    src="/9.png?v=4"
-                    alt="Pilates Equipment"
-                    className="large-pilates-img"
-                  />
-                </a>
-                <a href="https://amzn.to/3K6XckG" target="_blank" rel="noopener noreferrer">
-                  <img
-                    src="/10.png?v=4"
-                    alt="Pilates Equipment"
-                    className="large-pilates-img"
-                  />
-                </a>
+              <div className="mt-8 flex flex-wrap gap-2">
+                <span className="chip chip-brand">
+                  <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
+                  {location.name}
+                </span>
+                <span className="chip">
+                  <Users className="h-3.5 w-3.5" aria-hidden="true" />
+                  {citiesAndTowns.length} locations
+                </span>
+                <span className="chip">
+                  <Activity className="h-3.5 w-3.5" aria-hidden="true" />
+                  {totalStudioCount} studios
+                </span>
               </div>
             </div>
-          )}
+          </div>
+        </section>
 
-          <div className="mb-12">
-            <div className="flex items-center justify-between mb-6">
-              <h2>Pilates Locations In {location.name}</h2>
-              <span className="text-sm text-gray-500">{citiesAndTowns.length} locations</span>
+        <div className="shell space-y-20 py-20">
+          <EquipmentStrip />
+
+          {/* ------------------------------------------------- Locations */}
+          <section>
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <span className="eyebrow">Towns &amp; cities</span>
+                <h2 className="mt-3 text-display-sm">
+                  Pilates locations in {location.name}
+                </h2>
+              </div>
+              <span className="text-sm text-ink-faint">
+                {citiesAndTowns.length} locations
+              </span>
             </div>
 
-            <div className="locations-grid">
+            <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {citiesAndTowns.map((city) => (
-                <div key={city.id} className="location-card">
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-lg font-semibold text-gray-900">{city.name}</h3>
-                    <span className="text-sm text-gray-500">
-                      {(city.studio_count || 0) > 0 ? `${city.studio_count} studios` : 'No studios yet'}
+                <article key={city.id} className="card-flat flex flex-col p-7">
+                  <div className="flex items-start justify-between gap-3">
+                    <h3 className="font-fraunces text-xl font-semibold">
+                      {city.name}
+                    </h3>
+                    <span className="chip shrink-0">
+                      {(city.studio_count || 0) > 0
+                        ? `${city.studio_count} studios`
+                        : 'None yet'}
                     </span>
                   </div>
-                  <p className="text-gray-600 mb-4">
+                  <p className="mt-4 flex-1 text-sm leading-relaxed text-ink-muted">
                     {(city.studio_count || 0) > 0
-                      ? `Find pilates classes and studios in ${city.name}. Browse reformer, mat, and clinical pilates options.`
-                      : `Explore ${city.name} for pilates opportunities. Be the first to discover studios in this area.`
-                    }
+                      ? `Find pilates classes and studios in ${city.name}. Browse reformer, mat and clinical pilates options.`
+                      : `Explore ${city.name} for pilates opportunities. Be the first to discover studios in this area.`}
                   </p>
-                  <div className="flex gap-2">
-                    <Link href={`/${resolvedParams.county}/${city.slug}`} className="btn-primary flex-1">
-                      {(city.studio_count || 0) > 0 ? 'View Studios' : 'Explore Area'}
-                    </Link>
-                  </div>
-                </div>
+                  <Link
+                    href={`/${resolvedParams.county}/${city.slug}`}
+                    className="mt-6 inline-flex items-center gap-1.5 border-t border-line pt-5 text-sm font-semibold text-brand transition-colors hover:text-brand-hover"
+                  >
+                    {(city.studio_count || 0) > 0 ? 'View studios' : 'Explore area'}
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </Link>
+                </article>
               ))}
             </div>
-          </div>
+          </section>
 
-          {/* Grow Your Reviews CTA */}
-          <div className="mb-12 bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 rounded-lg p-6 sm:p-8">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="flex-1">
-                <h2 className="text-xl sm:text-2xl font-bold text-purple-900 mb-2">
-                  Own a pilates studio in {location.name}? Grow your studio with more 5-star reviews
-                </h2>
-                <p className="text-purple-800 text-sm sm:text-base">
-                  More reviews mean more bookings. Grow Our Reviews helps pilates studios like yours collect more genuine 5-star Google reviews on autopilot — so new clients find you first.
-                </p>
-              </div>
-              <a
-                href="https://www.growourreviews.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-primary inline-flex items-center gap-2 whitespace-nowrap"
-              >
-                <Star className="h-4 w-4" />
-                Get More Reviews
-              </a>
-            </div>
-          </div>
+          <ReviewsCta locationName={location.name} />
 
-          {/* Map Section */}
+          {/* ------------------------------------------------------- Map */}
           {studios.length > 0 && (
-            <div className="mb-12">
-              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                <div className="p-4 border-b border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-900">Studios with Locations in {location.name}</h3>
-                  <p className="text-sm text-gray-600 mt-1">{studios.filter(s => s.latitude && s.longitude).length} studios shown on map</p>
+            <section>
+              <div className="card-flat overflow-hidden">
+                <div className="border-b border-line p-6">
+                  <h3 className="font-fraunces text-xl font-semibold">
+                    Studios with locations in {location.name}
+                  </h3>
+                  <p className="mt-1 text-sm text-ink-muted">
+                    {mappableStudios} studios shown on map
+                  </p>
                 </div>
-                <div className="w-full h-96 rounded-lg overflow-hidden">
-                  <iframe
-                    src={`https://maps.google.com/maps?q=${encodeURIComponent(`pilates studios in ${location.name}`)}&t=&z=10&ie=UTF8&iwloc=&output=embed`}
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    title={`Map showing pilates studios in ${location.name}`}
-                  />
-                </div>
+                <iframe
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(`pilates studios in ${location.name}`)}&t=&z=10&ie=UTF8&iwloc=&output=embed`}
+                  width="100%"
+                  height="100%"
+                  className="block h-96 w-full border-0"
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title={`Map showing pilates studios in ${location.name}`}
+                />
               </div>
-            </div>
+            </section>
           )}
 
-          {/* Studio List Section */}
+          {/* ---------------------------------------------- Studio index */}
           {studios.length > 0 && (
-            <div className="mb-12">
-              <div className="flex items-center justify-between mb-6">
-                <h2>All Pilates Studios in {location.name}</h2>
-                <span className="text-sm text-gray-500">{studios.length} studios</span>
+            <section>
+              <div className="flex flex-wrap items-end justify-between gap-4">
+                <div>
+                  <span className="eyebrow">Full directory</span>
+                  <h2 className="mt-3 text-display-sm">
+                    All pilates studios in {location.name}
+                  </h2>
+                </div>
+                <span className="text-sm text-ink-faint">
+                  {studios.length} studios
+                </span>
               </div>
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {studios.map((studio) => (
-                    <div key={studio.id} className="border border-gray-100 rounded-lg p-4 hover:border-purple-200 transition-colors">
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-semibold text-gray-900 text-sm">{studio.name}</h3>
-                        {studio.google_rating && (
-                          <span className="text-xs text-yellow-600 font-medium">
-                            ★ {studio.google_rating.toFixed(1)}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs text-gray-600 mb-2">{studio.address}</p>
-                      {studio.phone && (
-                        <p className="text-xs text-gray-500 mb-3">{studio.phone}</p>
+
+              <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {studios.map((studio) => (
+                  <Link
+                    key={studio.id}
+                    href={`/${studio.full_url_path || `${studio.county_slug}/${studio.city_slug}/${studio.slug || studio.id}`}`}
+                    className="card-flat block p-5"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <h3 className="text-sm font-semibold text-ink">
+                        {studio.name}
+                      </h3>
+                      {studio.google_rating && (
+                        <span className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-brand">
+                          <Star className="h-3 w-3 fill-brand" aria-hidden="true" />
+                          {studio.google_rating.toFixed(1)}
+                        </span>
                       )}
-                      <div className="flex gap-2">
-                        <Link
-                          href={`/${studio.full_url_path || `${studio.county_slug}/${studio.city_slug}/${studio.slug || studio.id}`}`}
-                          className="text-xs bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-700 transition-colors"
-                        >
-                          View Details
-                        </Link>
-                      </div>
                     </div>
-                  ))}
-                </div>
+                    <p className="mt-2 text-xs leading-relaxed text-ink-muted">
+                      {studio.address}
+                    </p>
+                    {studio.phone && (
+                      <p className="mt-1 text-xs text-ink-faint">{studio.phone}</p>
+                    )}
+                  </Link>
+                ))}
               </div>
-            </div>
+            </section>
           )}
 
+          {/* --------------------------------------------------- Content */}
           {location.main_content && (
-            <div className="content-section">
+            <section className="prose-editorial">
               <div dangerouslySetInnerHTML={{ __html: location.main_content }} />
-            </div>
+            </section>
           )}
         </div>
-      </div>
-      </div>
+      </main>
     </>
   );
 }
+
 
 export async function generateStaticParams() {
   const supabase = createClient(

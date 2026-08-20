@@ -214,116 +214,66 @@
 }
 
 /* ==========================================================================
-   Legacy compatibility layer
-
-   County / city / studio templates still use these class names, which
-   previously lived in an inline <style> block in layout.tsx. They are
-   re-implemented here on the new design tokens so those pages inherit the
-   new look until each template is rebuilt. Delete each rule as its
-   template is migrated to the `.card-flat` / `.shell` / `.chip` system.
+   Editorial prose
+   For CMS/database HTML injected via dangerouslySetInnerHTML on the
+   location templates. Keeps that content inside the type system.
    ========================================================================== */
 
 @layer components {
-  .page-container {
-    @apply min-h-screen bg-canvas;
+  .prose-editorial {
+    @apply max-w-3xl text-ink-muted;
   }
 
-  .page-header {
-    @apply bg-canvas py-10;
+  .prose-editorial h2 {
+    @apply mb-4 mt-12 font-fraunces text-3xl font-semibold text-ink;
   }
 
-  .content-section {
-    @apply mb-6 rounded-md border border-line bg-surface p-6;
+  .prose-editorial h3 {
+    @apply mb-3 mt-9 font-fraunces text-xl font-semibold text-ink;
   }
 
-  /* Grids */
-  .studios-grid,
-  .locations-grid {
-    @apply mb-8 grid grid-cols-1 gap-6 md:grid-cols-2;
+  .prose-editorial h4 {
+    @apply mb-2 mt-7 font-semibold text-ink;
   }
 
-  .studios-grid {
-    @apply lg:grid-cols-3;
+  .prose-editorial p {
+    @apply mb-5 leading-relaxed;
   }
 
-  /* Cards */
-  .studio-card,
-  .location-card {
-    @apply card-flat mb-6 overflow-hidden;
+  .prose-editorial ul {
+    @apply mb-5 list-disc space-y-2 pl-5;
   }
 
-  .studio-card > *:not(:first-child),
-  .location-card > * {
-    @apply p-6;
+  .prose-editorial ol {
+    @apply mb-5 list-decimal space-y-2 pl-5;
   }
 
-  /* Card content */
-  .studio-header {
-    @apply mb-2 flex items-start justify-between gap-4;
+  .prose-editorial a {
+    @apply font-medium text-brand underline underline-offset-4 hover:text-brand-hover;
   }
 
-  .studio-name {
-    @apply font-fraunces text-xl font-semibold text-ink;
+  .prose-editorial strong {
+    @apply font-semibold text-ink;
   }
 
-  .studio-location {
-    @apply text-sm text-ink-muted;
+  .prose-editorial blockquote {
+    @apply my-6 border-l-2 border-brand pl-5 italic;
   }
 
-  .studio-rating {
-    @apply inline-flex items-center gap-1 text-sm font-semibold text-brand;
+  .prose-editorial table {
+    @apply my-6 w-full border-collapse text-sm;
   }
 
-  .studio-details {
-    @apply my-2;
+  .prose-editorial th,
+  .prose-editorial td {
+    @apply border border-line px-4 py-2 text-left;
   }
 
-  .studio-detail-item {
-    @apply mb-2 flex items-center gap-2 text-sm text-ink-muted;
+  .prose-editorial th {
+    @apply bg-surface-sunken font-semibold text-ink;
   }
 
-  .studio-actions {
-    @apply mt-4 flex flex-wrap gap-3;
-  }
-
-  /* Badges */
-  .class-types,
-  .meta-badges {
-    @apply flex flex-wrap gap-2;
-  }
-
-  .class-type-badge,
-  .meta-badge {
-    @apply chip chip-brand;
-  }
-
-  /* Buttons */
-  .btn-primary {
-    @apply pill-brand;
-  }
-
-  .btn-secondary {
-    @apply pill-outline;
-  }
-
-  .browse-locations-btn {
-    @apply pill-brand px-5 py-2.5;
-  }
-
-  /* FAQ */
-  .faq-section {
-    @apply mt-12;
-  }
-
-  .faq-item {
-    @apply border-b border-line py-5;
-  }
-
-  .faq-question {
-    @apply font-fraunces text-lg font-semibold text-ink;
-  }
-
-  .faq-answer {
-    @apply mt-2 text-sm leading-relaxed text-ink-muted;
+  .prose-editorial > *:first-child {
+    @apply mt-0;
   }
 }
