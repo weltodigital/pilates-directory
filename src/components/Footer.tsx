@@ -10,10 +10,15 @@ interface County {
 }
 
 async function getFeaturedCounties(): Promise<County[]> {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://zytpgaraxyhlsvvkrrir.supabase.co',
-    process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp5dHBnYXJheHlobHN2dmtycmlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODc5ODMxMiwiZXhwIjoyMDc0Mzc0MzEyfQ.XLBFI-CGJXMi3yrLsb7FP2DOXRJy-IDDIwSWt7W95Ok'
-  );
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SECRET_KEY;
+
+  if (!url || !key) {
+    console.error('Supabase env vars missing; skipping footer counties.');
+    return [];
+  }
+
+  const supabase = createClient(url, key);
 
   const { data, error } = await supabase
     .from('public_locations')
@@ -31,134 +36,84 @@ async function getFeaturedCounties(): Promise<County[]> {
   return data || [];
 }
 
+const COMPANY_LINKS = [
+  { label: 'Contact', href: 'mailto:pilatesclassesnear@weltodigital.com' },
+  { label: 'Privacy Policy', href: '/privacy-policy' },
+  { label: 'Terms of Service', href: '/terms-of-service' },
+  { label: 'Sitemap', href: '/sitemap.xml' },
+]
+
 export default async function Footer() {
   const counties = await getFeaturedCounties();
 
   return (
-    <footer style={{
-      backgroundColor: '#0f172a',
-      color: '#ffffff',
-      padding: '3rem 0',
-      marginTop: '4rem'
-    }}>
-      <div style={{
-        maxWidth: '1200px',
-        margin: '0 auto',
-        padding: '0 1rem'
-      }}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-          gap: '2rem'
-        }}>
-          <div>
-            <Link href="/" style={{
-              display: 'inline-block',
-              marginBottom: '1rem',
-              textDecoration: 'none'
-            }}>
+    <footer className="mt-24 border-t border-line bg-surface-sunken">
+      <div className="shell py-16 sm:py-20">
+        <div className="grid gap-12 md:grid-cols-[1.4fr_1fr_1fr]">
+          {/* Brand */}
+          <div className="max-w-sm">
+            <Link href="/" className="inline-block" aria-label="Pilates Classes Near — home">
               <Image
                 src="/Pilates Classes Near.png"
                 alt="Pilates Classes Near"
                 width={200}
                 height={60}
-                style={{
-                  height: '3rem',
-                  width: 'auto',
-                  filter: 'brightness(0) invert(1)'
-                }}
-                priority
+                className="h-11 w-auto"
               />
             </Link>
-            <p style={{
-              color: '#ffffff',
-              fontSize: '0.875rem',
-              lineHeight: '1.5'
-            }}>
-              The UK's most trusted directory for finding the best pilates studios and classes near you.
+            <p className="mt-5 text-sm leading-relaxed text-ink-muted">
+              The UK&apos;s most trusted directory for finding the best pilates
+              studios and classes near you.
+            </p>
+            <p className="mt-6 text-xs uppercase tracking-[0.14em] text-ink-faint">
+              Built in the UK · Updated weekly
             </p>
           </div>
+
+          {/* Locations */}
           <div>
-            <h4 style={{
-              fontWeight: '600',
-              marginBottom: '1rem',
-              fontFamily: 'Plus Jakarta Sans, ui-sans-serif, system-ui, sans-serif',
-              color: '#c4b5fd',
-              fontSize: '1rem'
-            }}>Popular Locations</h4>
-            <ul style={{
-              listStyle: 'none',
-              padding: 0,
-              margin: 0
-            }}>
+            <h4 className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-faint">
+              Popular locations
+            </h4>
+            <ul className="mt-5 space-y-3">
               {counties.slice(0, 6).map((county) => (
-                <li key={county.id} style={{ marginBottom: '0.5rem' }}>
-                  <Link href={`/${county.slug}`} style={{
-                    color: '#94a3b8',
-                    textDecoration: 'none',
-                    fontSize: '0.875rem',
-                    transition: 'color 0.2s'
-                  }}
-                  className="footer-link">
+                <li key={county.id}>
+                  <Link href={`/${county.slug}`} className="link-quiet text-sm">
                     Pilates in {county.name}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
+
+          {/* Company */}
           <div>
-            <h4 style={{
-              fontWeight: '600',
-              marginBottom: '1rem',
-              fontFamily: 'Plus Jakarta Sans, ui-sans-serif, system-ui, sans-serif',
-              color: '#c4b5fd',
-              fontSize: '1rem'
-            }}>Company</h4>
-            <ul style={{
-              listStyle: 'none',
-              padding: 0,
-              margin: 0
-            }}>
-              <li style={{ marginBottom: '0.5rem' }}>
-                <a href="mailto:pilatesclassesnear@weltodigital.com" style={{
-                  color: '#94a3b8',
-                  textDecoration: 'none',
-                  fontSize: '0.875rem'
-                }}>Contact</a>
-              </li>
-              <li style={{ marginBottom: '0.5rem' }}>
-                <Link href="/privacy-policy" style={{
-                  color: '#94a3b8',
-                  textDecoration: 'none',
-                  fontSize: '0.875rem'
-                }}>Privacy Policy</Link>
-              </li>
-              <li style={{ marginBottom: '0.5rem' }}>
-                <Link href="/terms-of-service" style={{
-                  color: '#94a3b8',
-                  textDecoration: 'none',
-                  fontSize: '0.875rem'
-                }}>Terms of Service</Link>
-              </li>
-              <li style={{ marginBottom: '0.5rem' }}>
-                <Link href="/sitemap.xml" style={{
-                  color: '#94a3b8',
-                  textDecoration: 'none',
-                  fontSize: '0.875rem'
-                }}>Sitemap</Link>
-              </li>
+            <h4 className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-faint">
+              Company
+            </h4>
+            <ul className="mt-5 space-y-3">
+              {COMPANY_LINKS.map((link) => (
+                <li key={link.href}>
+                  {link.href.startsWith('mailto:') ? (
+                    <a href={link.href} className="link-quiet text-sm">
+                      {link.label}
+                    </a>
+                  ) : (
+                    <Link href={link.href} className="link-quiet text-sm">
+                      {link.label}
+                    </Link>
+                  )}
+                </li>
+              ))}
             </ul>
           </div>
         </div>
-        <div style={{
-          borderTop: '1px solid #1e293b',
-          marginTop: '2rem',
-          paddingTop: '2rem',
-          textAlign: 'center',
-          fontSize: '0.875rem',
-          color: '#94a3b8'
-        }}>
-          <p>&copy; 2025 Pilates Classes Near. All rights reserved. Find the best pilates studios and classes across the UK.</p>
+
+        <div className="mt-14 border-t border-line pt-8">
+          <p className="text-sm text-ink-faint">
+            &copy; {new Date().getFullYear()} Pilates Classes Near. All rights
+            reserved. Find the best pilates studios and classes across the UK.
+          </p>
         </div>
       </div>
     </footer>

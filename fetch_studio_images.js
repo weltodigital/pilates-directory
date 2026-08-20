@@ -1,8 +1,9 @@
 const { createClient } = require('./src/lib/supabase');
+require('dotenv').config({ path: '.env.local' });
 
 const supabase = createClient(
   'https://zytpgaraxyhlsvvkrrir.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp5dHBnYXJheHlobHN2dmtycmlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODc5ODMxMiwiZXhwIjoyMDc0Mzc0MzEyfQ.XLBFI-CGJXMi3yrLsb7FP2DOXRJy-IDDIwSWt7W95Ok'
+  process.env.SUPABASE_SECRET_KEY
 );
 
 class ImageFetcher {

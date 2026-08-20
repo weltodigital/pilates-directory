@@ -8,11 +8,11 @@ require('dotenv').config({ path: '.env.local' });
 
 // Old butchers database credentials
 const OLD_SUPABASE_URL = 'https://kasctpzogieejraebawc.supabase.co';
-const OLD_SUPABASE_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imthc2N0cHpvZ2llZWpyYWViYXdjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODgxNzI3NywiZXhwIjoyMDc0MzkzMjc3fQ.CSBjcZmQK5sy2Lmp1CPyMdrdS6hAHenfr7i5WontDyQ';
+const OLD_SUPABASE_SERVICE_KEY = process.env.OLD_SUPABASE_SERVICE_ROLE_KEY;
 
 // New pilates database credentials
 const NEW_SUPABASE_URL = process.env.SUPABASE_URL;
-const NEW_SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const NEW_SUPABASE_SERVICE_KEY = process.env.SUPABASE_SECRET_KEY;
 
 const oldSupabase = createClient(OLD_SUPABASE_URL, OLD_SUPABASE_SERVICE_KEY);
 const newSupabase = createClient(NEW_SUPABASE_URL, NEW_SUPABASE_SERVICE_KEY);

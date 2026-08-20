@@ -13,12 +13,12 @@ const path = require('path')
 require('dotenv').config({ path: '.env.local' })
 
 const supabaseUrl = process.env.SUPABASE_URL
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+const supabaseServiceKey = process.env.SUPABASE_SECRET_KEY
 
 if (!supabaseUrl || !supabaseServiceKey) {
   console.error('❌ Missing required environment variables:')
   console.error('   SUPABASE_URL:', supabaseUrl ? '✅' : '❌')
-  console.error('   SUPABASE_SERVICE_ROLE_KEY:', supabaseServiceKey ? '✅' : '❌')
+  console.error('   SUPABASE_SECRET_KEY:', supabaseServiceKey ? '✅' : '❌')
   console.error('\nPlease check your .env.local file')
   process.exit(1)
 }

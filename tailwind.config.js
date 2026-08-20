@@ -20,10 +20,36 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        'cooper': ['Cooper BT', 'serif'],
-        'jakarta': ['var(--font-jakarta)', 'sans-serif'],
+        geist: ['var(--font-geist)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        fraunces: ['var(--font-fraunces)', 'ui-serif', 'Georgia', 'serif'],
+        // Alias kept so existing `font-jakarta` usages inherit the new display face
+        jakarta: ['var(--font-fraunces)', 'ui-serif', 'Georgia', 'serif'],
       },
       colors: {
+        // Design tokens
+        canvas: "hsl(var(--canvas))",
+        surface: {
+          DEFAULT: "hsl(var(--surface))",
+          sunken: "hsl(var(--surface-sunken))",
+        },
+        ink: {
+          DEFAULT: "hsl(var(--ink))",
+          muted: "hsl(var(--ink-muted))",
+          faint: "hsl(var(--ink-faint))",
+        },
+        line: {
+          DEFAULT: "hsl(var(--line))",
+          strong: "hsl(var(--line-strong))",
+        },
+        brand: {
+          DEFAULT: "hsl(var(--brand))",
+          hover: "hsl(var(--brand-hover))",
+          deep: "hsl(var(--brand-deep))",
+          tint: "hsl(var(--brand-tint))",
+          ink: "hsl(var(--brand-ink))",
+        },
+
+        // shadcn primitives
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -58,10 +84,17 @@ module.exports = {
           foreground: "hsl(var(--card-foreground))",
         },
       },
+      fontSize: {
+        // Display scale for Fraunces headlines
+        'display-sm': ['2.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
+        'display': ['3.25rem', { lineHeight: '1.05', letterSpacing: '-0.025em' }],
+        'display-lg': ['4.25rem', { lineHeight: '1.0', letterSpacing: '-0.03em' }],
+      },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
+        lg: "var(--radius-lg)",
+        md: "var(--radius)",
         sm: "calc(var(--radius) - 4px)",
+        xl: "var(--radius-xl)",
       },
       keyframes: {
         "accordion-down": {
@@ -72,10 +105,15 @@ module.exports = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: 0 },
         },
+        "drift": {
+          "0%, 100%": { transform: "translate3d(0, 0, 0) scale(1)" },
+          "50%": { transform: "translate3d(0, -18px, 0) scale(1.06)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "drift": "drift 14s ease-in-out infinite",
       },
     },
   },

@@ -39,7 +39,7 @@ interface Category {
 async function getRecipe(slug: string): Promise<Recipe | null> {
   const supabase = createClient(
     process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    process.env.SUPABASE_SECRET_KEY!
   );
 
   const { data: recipe, error } = await supabase

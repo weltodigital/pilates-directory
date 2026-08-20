@@ -10,7 +10,7 @@ require('dotenv').config({ path: '.env.local' });
 
 // New pilates database credentials
 const NEW_SUPABASE_URL = process.env.SUPABASE_URL;
-const NEW_SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const NEW_SUPABASE_SERVICE_KEY = process.env.SUPABASE_SECRET_KEY;
 
 const newSupabase = createClient(NEW_SUPABASE_URL, NEW_SUPABASE_SERVICE_KEY);
 

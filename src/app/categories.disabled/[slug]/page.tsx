@@ -35,7 +35,7 @@ interface Category {
 async function getCategory(slug: string): Promise<Category | null> {
   const supabase = createClient(
     process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    process.env.SUPABASE_SECRET_KEY!
   );
 
   const { data: category, error } = await supabase
@@ -54,7 +54,7 @@ async function getCategory(slug: string): Promise<Category | null> {
 async function getCategoryRecipes(categoryId: string): Promise<Recipe[]> {
   const supabase = createClient(
     process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    process.env.SUPABASE_SECRET_KEY!
   );
 
   // First get recipes that belong to this category

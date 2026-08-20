@@ -57,8 +57,8 @@ Ensure your `.env.local` file contains:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_anon_key
+SUPABASE_SECRET_KEY=your_service_role_key
 ```
 
 ### 3. Populate Location Data

@@ -68,7 +68,7 @@ function showAutomatedSetup() {
   console.log('This will attempt to create the database schema automatically.')
   console.log('Make sure you have the following environment variables set:')
   console.log('   - SUPABASE_URL')
-  console.log('   - SUPABASE_SERVICE_ROLE_KEY')
+  console.log('   - SUPABASE_SECRET_KEY')
   
   rl.question('\nContinue with automated setup? (y/n): ', (answer) => {
     if (answer.toLowerCase() === 'y') {
@@ -91,7 +91,7 @@ async function runAutomatedSetup() {
     const fs = require('fs')
     
     const supabaseUrl = process.env.SUPABASE_URL
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    const supabaseServiceKey = process.env.SUPABASE_SECRET_KEY
     
     if (!supabaseUrl || !supabaseServiceKey) {
       console.error('❌ Missing environment variables!')

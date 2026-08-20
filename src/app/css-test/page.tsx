@@ -1,5 +1,3 @@
-import '../minimal.css'
-
 export default function CSSTest() {
   return (
     <div>

@@ -24,7 +24,7 @@ Your recipe website is fully ready for deployment with:
 4. **Configure Environment Variables**:
    ```
    SUPABASE_URL=your_supabase_url
-   SUPABASE_SERVICE_ROLE_KEY=your_supabase_key
+   SUPABASE_SECRET_KEY=your_supabase_key
    OPENAI_API_KEY=your_openai_key
    ```
 5. **Deploy**: Click "Deploy" - Done in ~2 minutes!
@@ -50,7 +50,7 @@ npx vercel --prod
 
 # Add environment variables
 npx vercel env add SUPABASE_URL
-npx vercel env add SUPABASE_SERVICE_ROLE_KEY
+npx vercel env add SUPABASE_SECRET_KEY
 npx vercel env add OPENAI_API_KEY
 ```
 
@@ -60,7 +60,7 @@ Make sure to add these in your deployment platform:
 
 ```env
 SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+SUPABASE_SECRET_KEY=your_service_role_key
 OPENAI_API_KEY=sk-your_openai_api_key
 ```
 

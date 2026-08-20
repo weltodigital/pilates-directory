@@ -7,7 +7,7 @@ dotenv.config({ path: '.env.local' });
 const firecrawl = new FirecrawlApp({ apiKey: process.env.FIRECRAWL_API_KEY });
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
+  process.env.SUPABASE_SECRET_KEY
 );
 
 // Comprehensive list of UK cities and towns for pilates studio search

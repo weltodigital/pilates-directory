@@ -10,7 +10,7 @@ require('dotenv').config({ path: '.env.local' });
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 const FIRECRAWL_API_KEY = process.env.FIRECRAWL_API_KEY;
 const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SECRET_KEY;
 
 console.log('🔧 Configuration Check:');
 console.log('Google Maps API Key:', GOOGLE_MAPS_API_KEY ? '✅ Set' : '❌ Missing');

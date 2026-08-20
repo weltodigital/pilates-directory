@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import { ChevronRight } from 'lucide-react'
 
 interface Breadcrumb {
   label: string;
@@ -12,110 +13,68 @@ interface HeaderProps {
   breadcrumbs?: Breadcrumb[];
 }
 
+const NAV_LINKS = [
+  { label: 'Browse locations', href: '/#browse-counties' },
+  { label: 'Featured studios', href: '/#featured-studios' },
+]
+
 export default function Header({ breadcrumbs }: HeaderProps = {}) {
   return (
-    <nav style={{
-      backgroundColor: '#ffffff',
-      borderBottom: '1px solid #e5e7eb',
-      position: 'sticky',
-      top: 0,
-      zIndex: 50
-    }}>
-      <div style={{
-        maxWidth: '1200px',
-        margin: '0 auto',
-        padding: '1rem'
-      }}>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '1rem'
-          }}>
-            <Link href="/" style={{
-              display: 'flex',
-              alignItems: 'center',
-              textDecoration: 'none'
-            }}>
-              <Image
-                src="/Pilates Classes Near.png"
-                alt="Pilates Classes Near"
-                width={200}
-                height={60}
-                style={{ height: '3rem', width: 'auto' }}
-                priority
-              />
-            </Link>
-          </div>
+    <header className="sticky top-0 z-50 border-b border-line/80 bg-canvas/85 backdrop-blur-md">
+      <div className="shell">
+        <div className="flex h-20 items-center justify-between gap-6">
+          <Link href="/" className="shrink-0" aria-label="Pilates Classes Near — home">
+            <Image
+              src="/Pilates Classes Near.png"
+              alt="Pilates Classes Near"
+              width={200}
+              height={60}
+              className="h-10 w-auto sm:h-11"
+              priority
+            />
+          </Link>
 
-          <Link
-            href="/#browse-counties"
-            className="browse-locations-btn"
-            style={{
-              backgroundColor: '#9333ea',
-              color: '#ffffff',
-              padding: '0.5rem 1rem',
-              borderRadius: '0.375rem',
-              textDecoration: 'none',
-              fontSize: '0.875rem',
-              fontWeight: '600',
-              transition: 'background-color 0.2s ease'
-            }}
-          >
-            Browse Locations
+          <nav className="hidden items-center gap-8 md:flex" aria-label="Main">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-sm font-medium text-ink-muted transition-colors hover:text-ink"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
+          <Link href="/#browse-counties" className="pill-brand px-5 py-2.5">
+            Find a studio
+            <ChevronRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         </div>
 
-        {/* Breadcrumbs */}
         {breadcrumbs && breadcrumbs.length > 0 && (
-          <div style={{
-            borderTop: '1px solid #f1f5f9',
-            paddingTop: '0.75rem',
-            marginTop: '1rem'
-          }}>
-            <nav style={{
-              fontSize: '0.875rem',
-              color: '#6b7280'
-            }}>
-              <ol style={{
-                display: 'flex',
-                gap: '0.5rem',
-                listStyle: 'none',
-                margin: 0,
-                padding: 0
-              }}>
-                {breadcrumbs.map((breadcrumb, index) => (
-                  <li key={index} style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem'
-                  }}>
-                    {index > 0 && (
-                      <span style={{ color: '#d1d5db' }}>/</span>
-                    )}
-                    {breadcrumb.href ? (
-                      <Link href={breadcrumb.href} style={{
-                        color: '#9333ea',
-                        textDecoration: 'none'
-                      }}>
-                        {breadcrumb.label}
-                      </Link>
-                    ) : (
-                      <span style={{ color: '#1f2937' }}>
-                        {breadcrumb.label}
-                      </span>
-                    )}
-                  </li>
-                ))}
-              </ol>
-            </nav>
-          </div>
+          <nav aria-label="Breadcrumb" className="border-t border-line py-3">
+            <ol className="flex flex-wrap items-center gap-2 text-sm">
+              {breadcrumbs.map((breadcrumb, index) => (
+                <li key={index} className="flex items-center gap-2">
+                  {index > 0 && (
+                    <span className="text-ink-faint" aria-hidden="true">/</span>
+                  )}
+                  {breadcrumb.href ? (
+                    <Link href={breadcrumb.href} className="link-quiet">
+                      {breadcrumb.label}
+                    </Link>
+                  ) : (
+                    <span className="font-medium text-ink" aria-current="page">
+                      {breadcrumb.label}
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </nav>
         )}
       </div>
-    </nav>
+    </header>
   )
 }

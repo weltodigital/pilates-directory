@@ -6,10 +6,11 @@
 const { createClient } = require('@supabase/supabase-js');
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config({ path: '.env.local' });
 
 // Old butchers database credentials
 const OLD_SUPABASE_URL = 'https://kasctpzogieejraebawc.supabase.co';
-const OLD_SUPABASE_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imthc2N0cHpvZ2llZWpyYWViYXdjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODgxNzI3NywiZXhwIjoyMDc0MzkzMjc3fQ.CSBjcZmQK5sy2Lmp1CPyMdrdS6hAHenfr7i5WontDyQ';
+const OLD_SUPABASE_SERVICE_KEY = process.env.OLD_SUPABASE_SERVICE_ROLE_KEY;
 
 const oldSupabase = createClient(OLD_SUPABASE_URL, OLD_SUPABASE_SERVICE_KEY);
 
