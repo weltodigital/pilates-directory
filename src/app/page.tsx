@@ -118,6 +118,13 @@ async function getCountiesWithLocations(): Promise<CountyWithLocations[]> {
   }));
 }
 
+// A studio needs real review volume before a perfect score means anything.
+const FEATURED_MIN_REVIEWS = 20;
+const FEATURED_MIN_RATING = 4.5;
+// Bayesian prior: how many "average" reviews a studio is credited with before
+// its own reviews dominate. Stops 5.0-from-4-reviews outranking 5.0-from-900.
+const FEATURED_PRIOR_WEIGHT = 50;
+
 async function getFeaturedPilatesStudios(limit: number = 6): Promise<PilatesStudio[]> {
   const supabase = getSupabase();
   if (!supabase) return [];
@@ -126,26 +133,44 @@ async function getFeaturedPilatesStudios(limit: number = 6): Promise<PilatesStud
     .from('pilates_studios')
     .select('*')
     .eq('is_active', true)
+    .eq('business_status', 'OPERATIONAL')
     .not('google_rating', 'is', null)
     .not('full_url_path', 'is', null)
     .not('county_slug', 'is', null)
     .not('city_slug', 'is', null)
-    .gte('google_rating', 4.0)
-    .order('google_rating', { ascending: false })
-    .limit(limit * 2);
+    .gte('google_rating', FEATURED_MIN_RATING)
+    .gte('google_review_count', FEATURED_MIN_REVIEWS)
+    // Most-reviewed first so the 1000-row cap keeps the studios that can
+    // actually win, making the selection deterministic.
+    .order('google_review_count', { ascending: false })
+    .limit(1000);
 
   if (error) {
     console.error('Error fetching featured studios:', error);
     return [];
   }
 
-  // Filter studios to ensure they have complete URL information
-  const validStudios = (studios || []).filter(studio => {
-    return studio.full_url_path ||
-           (studio.county_slug && studio.city_slug && (studio.slug || studio.id));
-  }).slice(0, limit);
+  const candidates = (studios || []).filter(studio => {
+    if (!studio.full_url_path) return false;
+    // Google has no pilates category, so the name is the available signal.
+    // Featuring only six studios means precision matters far more than
+    // recall - this is what kept a doula off the homepage.
+    return /pilates|reformer/i.test(studio.name);
+  });
 
-  return validStudios;
+  if (!candidates.length) return [];
+
+  const meanRating =
+    candidates.reduce((sum, s) => sum + (s.google_rating || 0), 0) / candidates.length;
+
+  const score = (s: PilatesStudio) => {
+    const v = s.google_review_count || 0;
+    const r = s.google_rating || 0;
+    return (v / (v + FEATURED_PRIOR_WEIGHT)) * r +
+           (FEATURED_PRIOR_WEIGHT / (v + FEATURED_PRIOR_WEIGHT)) * meanRating;
+  };
+
+  return candidates.sort((a, b) => score(b) - score(a)).slice(0, limit);
 }
 
 function studioHref(studio: PilatesStudio) {
