@@ -265,44 +265,18 @@ function categories(r) {
     // Town: the CSV's own city is the name people search; the admin district is
     // the administrative area ("Newark and Sherwood") and only a fallback.
     let cityName = (r.city || '').trim();
-    if (!cityName || BAD_CITY.test(cityName) || NOT_A_TOWN.has(cityName.toLowerCase())) {
+    // The extractor sometimes reads the word before the postcode as the town,
+    // which lands the business name in the city field ("Learning4Life").
+    const cityIsBusinessName = cityName && slug(cityName) === slug(r.title || '');
+    if (!cityName || BAD_CITY.test(cityName) || NOT_A_TOWN.has(cityName.toLowerCase()) || cityIsBusinessName) {
       const parish = p.parish && !/unparished/i.test(p.parish) ? p.parish : null;
-      cityName = (r.neighborhood || '').trim() || parish || p.post_town || p.admin_district || '';
+      cityName = ((r.neighborhood || '').split(',')[0].trim()) || parish || p.post_town || p.admin_district || '';
     }
 
-    // A town the postcode data does not corroborate anywhere is probably a
-    // building or estate name ("Castlestead"). The extractor's neighborhood
-    // field is the better answer in that case.
-    const corroborated = [p.admin_district, p.parish, p.post_town, p.admin_county]
-      .filter(Boolean).some(v => v.toLowerCase().includes(cityName.toLowerCase()));
-    if (!corroborated && (r.neighborhood || '').trim()) {
-      const nb = r.neighborhood.trim();
-      const nbOk = [p.admin_district, p.parish, p.post_town].filter(Boolean)
-        .some(v => v.toLowerCase().includes(nb.toLowerCase()));
-      if (nbOk) cityName = nb;
-    }
+    // Take only the leading locality: neighborhoods arrive as "Streetly,
+    // Walsall" and the second half is the wider district.
+    cityName = cityName.split(',')[0].trim();
 
-    // Postal towns cross county lines: DE74 is a Derby postcode but sits in
-    // Leicestershire, so the CSV says "Derby" while the studio is in Castle
-    // Donington. When the CSV town is itself a place that belongs to a
-    // different county, trust the postcode's parish instead.
-    // Three signs the CSV town is wrong for this postcode:
-    //  - it names a county/unitary that maps elsewhere ("Derby" in Leicestershire)
-    //  - it already exists as a town under a different county ("Peterborough")
-    //  - it is not a clean place name at all ("Coombe, St Stephen")
-    const cityAsCounty = UNITARY_TO_COUNTY[cityName] || (haveCounty.has(slug(cityName)) ? slug(cityName) : null);
-    const elsewhere = townCounties.has(slug(cityName)) && !townCounties.get(slug(cityName)).has(countySlug);
-    const messy = cityName.includes(',');
-    if ((cityAsCounty && cityAsCounty !== countySlug) || elsewhere || messy) {
-      // Parish first, but reject administrative placeholders such as
-      // "Erewash, unparished area". The extractor's neighborhood field is
-      // usually the actual town in those cases ("Long Eaton").
-      const parish = p.parish && !/unparished/i.test(p.parish) ? p.parish : null;
-      const better = parish || (r.neighborhood || '').trim() || p.admin_district || cityName;
-      relocated.push({ name: r.title, from: cityName, to: better, county: countySlug, postcode: r.postalCode });
-      cityName = better;
-    }
-    if (!cityName) { skipped.push({ name: r.title, reason: 'no usable town' }); continue; }
     const citySlug = slug(cityName);
     const cityKey = `${countySlug}/${citySlug}`;
     if (!haveCity.has(cityKey)) newCities.set(cityKey, { name: cityName, slug: citySlug, county_slug: countySlug });
