@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase';
-import { MapPin, Star, Phone, Mail, Globe, Activity, Award, Navigation } from 'lucide-react';
+import { MapPin, Star, Phone, Mail, Globe, Activity, Award, Navigation, CalendarCheck, Users } from 'lucide-react';
 import HeaderWithBreadcrumbs from '@/components/HeaderWithBreadcrumbs';
 import EquipmentStrip from '@/components/EquipmentStrip';
 import ReviewsCta from '@/components/ReviewsCta';
@@ -223,18 +223,39 @@ export default async function StudioPage({ params }: StudioPageProps) {
                     {studioData.google_review_count ? ` · ${studioData.google_review_count} reviews` : ''}
                   </span>
                 )}
-                {studioData.is_verified && (
+                {studioData.beginner_friendly && (
                   <span className="chip">
-                    <Award className="h-3.5 w-3.5" aria-hidden="true" />
-                    Verified studio
+                    <Users className="h-3.5 w-3.5" aria-hidden="true" />
+                    Beginner friendly
                   </span>
                 )}
+                {studioData.instructor_qualifications?.map((q: string) => (
+                  <span key={q} className="chip">
+                    <Award className="h-3.5 w-3.5" aria-hidden="true" />
+                    {q}
+                  </span>
+                ))}
               </div>
 
-              {(studioData.phone || studioData.website) && (
+              {(studioData.booking_url || studioData.phone || studioData.website) && (
                 <div className="mt-10 flex flex-wrap gap-3">
+                  {studioData.booking_url && (
+                    <a
+                      href={studioData.booking_url}
+                      target="_blank"
+                      rel="nofollow noopener noreferrer"
+                      className="pill-brand"
+                    >
+                      <CalendarCheck className="h-4 w-4" aria-hidden="true" />
+                      Book a class
+                      {studioData.booking_platform ? ` on ${studioData.booking_platform}` : ''}
+                    </a>
+                  )}
                   {studioData.phone && (
-                    <a href={`tel:${studioData.phone}`} className="pill-brand">
+                    <a
+                      href={`tel:${studioData.phone}`}
+                      className={studioData.booking_url ? 'pill-outline' : 'pill-brand'}
+                    >
                       <Phone className="h-4 w-4" aria-hidden="true" />
                       Call studio
                     </a>
@@ -273,6 +294,46 @@ export default async function StudioPage({ params }: StudioPageProps) {
                     {studioData.class_types.map((type: string, i: number) => (
                       <span key={i} className="chip chip-brand">{type}</span>
                     ))}
+                  </div>
+                )}
+
+                {(studioData.price_drop_in || studioData.price_class_pack ||
+                  studioData.price_membership || studioData.class_size_max) && (
+                  <div className="mt-6 border-t border-line pt-5">
+                    <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-faint">
+                      Prices
+                    </h3>
+                    <dl className="mt-3 space-y-2.5 text-sm">
+                      {studioData.price_drop_in && (
+                        <div className="flex items-baseline justify-between gap-4">
+                          <dt className="text-ink-muted">Drop-in</dt>
+                          <dd className="font-semibold text-ink">
+                            £{Number(studioData.price_drop_in).toFixed(2).replace(/\.00$/, '')}
+                          </dd>
+                        </div>
+                      )}
+                      {studioData.price_class_pack && (
+                        <div className="flex items-baseline justify-between gap-4">
+                          <dt className="shrink-0 text-ink-muted">Class pack</dt>
+                          <dd className="text-right font-medium text-ink">{studioData.price_class_pack}</dd>
+                        </div>
+                      )}
+                      {studioData.price_membership && (
+                        <div className="flex items-baseline justify-between gap-4">
+                          <dt className="shrink-0 text-ink-muted">Membership</dt>
+                          <dd className="text-right font-medium text-ink">{studioData.price_membership}</dd>
+                        </div>
+                      )}
+                      {studioData.class_size_max && (
+                        <div className="flex items-baseline justify-between gap-4">
+                          <dt className="text-ink-muted">Max class size</dt>
+                          <dd className="font-semibold text-ink">{studioData.class_size_max}</dd>
+                        </div>
+                      )}
+                    </dl>
+                    <p className="mt-3 text-xs text-ink-faint">
+                      Prices from the studio&apos;s own website. Confirm before booking.
+                    </p>
                   </div>
                 )}
 
