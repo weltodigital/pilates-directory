@@ -15,7 +15,7 @@ interface HeaderProps {
 
 const NAV_LINKS = [
   { label: 'Browse locations', href: '/#browse-counties' },
-  { label: 'Featured studios', href: '/#featured-studios' },
+  { label: 'Top rated studios', href: '/#top-rated-studios' },
 ]
 
 export default function Header({ breadcrumbs }: HeaderProps = {}) {

@@ -120,13 +120,13 @@ async function getCountiesWithLocations(): Promise<CountyWithLocations[]> {
 }
 
 // A studio needs real review volume before a perfect score means anything.
-const FEATURED_MIN_REVIEWS = 20;
-const FEATURED_MIN_RATING = 4.5;
+const TOP_RATED_MIN_REVIEWS = 20;
+const TOP_RATED_MIN_RATING = 4.5;
 // Bayesian prior: how many "average" reviews a studio is credited with before
 // its own reviews dominate. Stops 5.0-from-4-reviews outranking 5.0-from-900.
-const FEATURED_PRIOR_WEIGHT = 50;
+const TOP_RATED_PRIOR_WEIGHT = 50;
 
-async function getFeaturedPilatesStudios(limit: number = 6): Promise<PilatesStudio[]> {
+async function getTopRatedStudios(limit: number = 6): Promise<PilatesStudio[]> {
   const supabase = getSupabase();
   if (!supabase) return [];
 
@@ -139,15 +139,15 @@ async function getFeaturedPilatesStudios(limit: number = 6): Promise<PilatesStud
     .not('full_url_path', 'is', null)
     .not('county_slug', 'is', null)
     .not('city_slug', 'is', null)
-    .gte('google_rating', FEATURED_MIN_RATING)
-    .gte('google_review_count', FEATURED_MIN_REVIEWS)
+    .gte('google_rating', TOP_RATED_MIN_RATING)
+    .gte('google_review_count', TOP_RATED_MIN_REVIEWS)
     // Most-reviewed first so the 1000-row cap keeps the studios that can
     // actually win, making the selection deterministic.
     .order('google_review_count', { ascending: false })
     .limit(1000);
 
   if (error) {
-    console.error('Error fetching featured studios:', error);
+    console.error('Error fetching top rated studios:', error);
     return [];
   }
 
@@ -167,8 +167,8 @@ async function getFeaturedPilatesStudios(limit: number = 6): Promise<PilatesStud
   const score = (s: PilatesStudio) => {
     const v = s.google_review_count || 0;
     const r = s.google_rating || 0;
-    return (v / (v + FEATURED_PRIOR_WEIGHT)) * r +
-           (FEATURED_PRIOR_WEIGHT / (v + FEATURED_PRIOR_WEIGHT)) * meanRating;
+    return (v / (v + TOP_RATED_PRIOR_WEIGHT)) * r +
+           (TOP_RATED_PRIOR_WEIGHT / (v + TOP_RATED_PRIOR_WEIGHT)) * meanRating;
   };
 
   return candidates.sort((a, b) => score(b) - score(a)).slice(0, limit);
@@ -209,10 +209,10 @@ function studioHref(studio: PilatesStudio) {
 }
 
 export default async function Home() {
-  // Get counties with their associated locations and featured studios
-  const [countiesWithLocations, featuredStudios, averageRating] = await Promise.all([
+  // Get counties with their associated locations and top rated studios
+  const [countiesWithLocations, topRatedStudios, averageRating] = await Promise.all([
     getCountiesWithLocations(),
-    getFeaturedPilatesStudios(6),
+    getTopRatedStudios(6),
     getAverageRating()
   ]);
 
@@ -267,8 +267,8 @@ export default async function Home() {
                     Browse all locations
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </Link>
-                  <Link href="#featured-studios" className="pill-outline">
-                    View featured studios
+                  <Link href="#top-rated-studios" className="pill-outline">
+                    View top rated studios
                   </Link>
                 </div>
               </div>
@@ -343,22 +343,23 @@ export default async function Home() {
         </section>
 
         {/* ============================================================
-            Featured studios
+            Top rated
             ============================================================ */}
-        <section id="featured-studios" className="band">
+        <section id="top-rated-studios" className="band">
           <div className="shell">
             <div className="max-w-2xl">
-              <span className="eyebrow">Handpicked</span>
-              <h2 className="mt-4 text-display-sm">Featured pilates studios</h2>
+              <span className="eyebrow">By rating</span>
+              <h2 className="mt-4 text-display-sm">Top rated pilates studios</h2>
               <p className="mt-5 text-lg leading-relaxed text-ink-muted">
-                Top-rated studios from across the directory, each with a verified
-                Google rating of 4.0 or higher.
+                The highest rated studios in the directory, ranked on verified
+                Google reviews — each with at least {TOP_RATED_MIN_REVIEWS} of
+                them, so a perfect score actually means something.
               </p>
             </div>
 
-            {featuredStudios.length > 0 ? (
+            {topRatedStudios.length > 0 ? (
               <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {featuredStudios.map((studio) => (
+                {topRatedStudios.map((studio) => (
                   <article key={studio.id} className="card-flat flex flex-col p-7">
                     <div className="flex items-start justify-between gap-4">
                       <div className="min-w-0">
@@ -460,7 +461,7 @@ export default async function Home() {
               </div>
             ) : (
               <p className="mt-14 text-ink-muted">
-                No featured studios available at the moment.
+                No top rated studios available at the moment.
               </p>
             )}
           </div>
@@ -547,10 +548,10 @@ export default async function Home() {
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </Link>
                   <Link
-                    href="#featured-studios"
+                    href="#top-rated-studios"
                     className="pill border border-white/25 text-white hover:bg-white/10"
                   >
-                    Explore featured studios
+                    Explore top rated studios
                   </Link>
                 </div>
               </div>
