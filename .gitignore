@@ -46,3 +46,4 @@ Thumbs.db
 # Local record of purged fabricated data (restore source; not for the repo)
 _purge_backup.json
 _purge_backup_specialties.json
+places-refresh-report*.json
