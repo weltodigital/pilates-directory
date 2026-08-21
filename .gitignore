@@ -48,3 +48,5 @@ _purge_backup.json
 _purge_backup_specialties.json
 places-refresh-report*.json
 _removed_studios_backup.json
+_import_preview.json
+dataset_google-maps-extractor_*.csv
