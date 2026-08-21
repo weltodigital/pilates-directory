@@ -32,7 +32,10 @@ const EXECUTE = argv.includes('--execute');
 const ALL = argv.includes('--all');
 const LIMIT = ALL ? Infinity : Number(argv[argv.indexOf('--limit') + 1]) || 100;
 const CONCURRENCY = 8;
-const COORD_TOLERANCE_M = 10;  // ignore sub-10m coordinate drift
+const COORD_TOLERANCE_M = 10;   // ignore sub-10m coordinate drift
+// GetPlaceRequest is capped at 600/minute. Stay comfortably under it so the
+// run never spends itself backing off 429s.
+const MAX_PER_MINUTE = 450;
 
 const FIELD_MASK = [
   'id',
@@ -50,7 +53,18 @@ const FIELD_MASK = [
 
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+/** Spaces calls out to hold the request rate under MAX_PER_MINUTE. */
+const minInterval = 60000 / MAX_PER_MINUTE;
+let nextSlot = 0;
+async function throttle() {
+  const now = Date.now();
+  const slot = Math.max(now, nextSlot);
+  nextSlot = slot + minInterval;
+  if (slot > now) await new Promise(r => setTimeout(r, slot - now));
+}
+
 async function fetchPlace(placeId, attempt = 1) {
+  await throttle();
   const res = await fetch(`https://places.googleapis.com/v1/places/${placeId}`, {
     headers: { 'X-Goog-Api-Key': KEY, 'X-Goog-FieldMask': FIELD_MASK },
   });
@@ -143,6 +157,7 @@ async function run() {
   const errors = [];
   const statusBreakdown = {};
   const notOperational = [];
+  const deactivated = [];
 
   let cursor = 0;
   async function worker() {
@@ -165,6 +180,11 @@ async function run() {
         notOperational.push({ id: s.id, name: s.name, businessStatus: p.businessStatus });
       }
 
+      // Permanently closed businesses come off the directory. Temporarily
+      // closed ones are left active - they reopen.
+      const closePermanently = p.businessStatus === 'CLOSED_PERMANENTLY';
+      if (closePermanently) deactivated.push({ id: s.id, name: s.name });
+
       const incoming = mapToColumns(p, s);
       const diff = {};
       for (const [k, v] of Object.entries(incoming)) {
@@ -178,12 +198,13 @@ async function run() {
         else fieldDiffs[k] = (fieldDiffs[k] || 0) + 1;
       }
 
-      if (!Object.keys(diff).length) { stats.unchanged++; continue; }
+      if (!Object.keys(diff).length && !closePermanently) { stats.unchanged++; continue; }
       changes.push({ id: s.id, name: s.name, businessStatus: p.businessStatus, diff });
 
       if (EXECUTE) {
         const update = Object.fromEntries(Object.entries(diff).map(([k, v]) => [k, v.after]));
         update.last_scraped_at = new Date().toISOString();
+        if (closePermanently) update.is_active = false;
         const { error } = await sb.from('pilates_studios').update(update).eq('id', s.id);
         if (error) errors.push({ id: s.id, name: s.name, error: `write failed: ${error.message}` });
       }
@@ -203,6 +224,8 @@ async function run() {
   console.log(`  would change             : ${changes.length}`);
   console.log(`  NOT operational          : ${stats.closed}  <- closed / temporarily closed`);
 
+  console.log(`\n  permanently closed -> deactivated : ${deactivated.length}`);
+
   console.log('\nBUSINESS STATUS');
   Object.entries(statusBreakdown).sort((a,b)=>b[1]-a[1])
     .forEach(([k,n]) => console.log(`  ${k.padEnd(22)} ${String(n).padStart(5)}`));
@@ -221,7 +244,7 @@ async function run() {
   }
 
   const report = `places-refresh-report${EXECUTE ? '' : '-dryrun'}.json`;
-  fs.writeFileSync(report, JSON.stringify({ generatedAt: new Date().toISOString(), stats, statusBreakdown, notOperational, fieldFills, fieldDiffs, changes, errors }, null, 2));
+  fs.writeFileSync(report, JSON.stringify({ generatedAt: new Date().toISOString(), stats, statusBreakdown, notOperational, deactivated, fieldFills, fieldDiffs, changes, errors }, null, 2));
   console.log(`\nfull report: ${report} (${changes.length} studio diffs)`);
   if (!EXECUTE) console.log('nothing was written. re-run with --execute to apply.');
 }
