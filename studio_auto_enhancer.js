@@ -1,3 +1,8 @@
+// NOTE: instructor_names / specialties / email are no longer generated.
+// They previously held invented data (random names from a fixed pool and
+// unverified info@<name>studio.co.uk addresses) which was published against
+// real businesses. Only sourced, verifiable values may be written here.
+
 const { createClient } = require('./src/lib/supabase');
 require('dotenv').config({ path: '.env.local' });
 
@@ -141,17 +146,17 @@ class StudioAutoEnhancer {
     try {
       // Generate email if missing
       if (!studio.email) {
-        enhancedData.email = this.generateEmail(studio);
+        enhancedData.email = null;
       }
 
       // Generate specialties if missing
       if (!studio.specialties || studio.specialties.length === 0) {
-        enhancedData.specialties = this.generateSpecialties(studio);
+        enhancedData.specialties = null;
       }
 
       // Generate instructor names if missing
       if (!studio.instructor_names || studio.instructor_names.length === 0) {
-        enhancedData.instructor_names = this.generateInstructorNames();
+        enhancedData.instructor_names = null;
       }
 
       return enhancedData;
@@ -165,7 +170,7 @@ class StudioAutoEnhancer {
   /**
    * Generate realistic specialties based on studio name and location
    */
-  generateSpecialties(studio) {
+  null {
     const commonSpecialties = [
       'Reformer Pilates classes',
       'Mat Pilates sessions',
@@ -208,7 +213,7 @@ class StudioAutoEnhancer {
   /**
    * Generate realistic instructor names
    */
-  generateInstructorNames() {
+  null {
     const firstNames = ['Sarah', 'Emma', 'Lisa', 'Kate', 'Rachel', 'Sophie', 'Anna', 'Claire', 'Lucy', 'Helen', 'James', 'Michael', 'David', 'Chris', 'Alex'];
     const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez', 'Wilson', 'Anderson', 'Taylor', 'Thomas', 'Jackson'];
 
@@ -227,7 +232,7 @@ class StudioAutoEnhancer {
   /**
    * Generate email based on studio name
    */
-  generateEmail(studio) {
+  null {
     const studioName = studio.name.toLowerCase()
       .replace(/[^a-z0-9\s]/g, '')
       .replace(/\s+/g, '')

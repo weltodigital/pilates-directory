@@ -1,4 +1,9 @@
 #!/usr/bin/env node
+// NOTE: instructor_names / specialties / email are no longer generated.
+// They previously held invented data (random names from a fixed pool and
+// unverified info@<name>studio.co.uk addresses) which was published against
+// real businesses. Only sourced, verifiable values may be written here.
+
 
 /**
  * Comprehensive fix for all Greater Manchester studio data issues
@@ -188,7 +193,7 @@ async function fixAllStudios() {
 
       // Fix email if missing
       if (!studio.email) {
-        updates.email = generateEmail(studio.name);
+        updates.email = null;
         console.log(`  ✅ Generated email: ${updates.email}`);
       }
 
@@ -221,13 +226,13 @@ async function fixAllStudios() {
 
       // Fix specialties if missing
       if (!studio.specialties || studio.specialties.length === 0) {
-        updates.specialties = generateSpecialties(studio.name);
+        updates.specialties = null;
         console.log(`  ✅ Generated specialties: ${updates.specialties.length} items`);
       }
 
       // Fix instructor names if missing
       if (!studio.instructor_names || studio.instructor_names.length === 0) {
-        updates.instructor_names = generateInstructorNames();
+        updates.instructor_names = null;
         console.log(`  ✅ Generated instructors: ${updates.instructor_names.join(', ')}`);
       }
 

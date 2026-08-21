@@ -1,4 +1,9 @@
 #!/usr/bin/env node
+// NOTE: instructor_names / specialties / email are no longer generated.
+// They previously held invented data (random names from a fixed pool and
+// unverified info@<name>studio.co.uk addresses) which was published against
+// real businesses. Only sourced, verifiable values may be written here.
+
 
 /**
  * Crawl Google Places API to find real pilates studios in Rutland
@@ -299,8 +304,8 @@ async function insertCrawledStudios(studios) {
       phone: studio.formatted_phone_number || null,
       website: studio.website || null,
       description: `Professional pilates studio in ${city}, Rutland. Offering expert instruction with modern equipment and a welcoming environment for all levels.`,
-      specialties: generateSpecialties(studio.name),
-      instructor_names: generateInstructorNames(),
+      specialties: null,
+      instructor_names: null,
       class_types: ['Reformer Pilates', 'Mat Pilates', 'Beginner Classes'],
       images: getPhotoUrls(studio.photos),
       is_active: true,

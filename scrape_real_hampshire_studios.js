@@ -1,4 +1,9 @@
 #!/usr/bin/env node
+// NOTE: instructor_names / specialties / email are no longer generated.
+// They previously held invented data (random names from a fixed pool and
+// unverified info@<name>studio.co.uk addresses) which was published against
+// real businesses. Only sourced, verifiable values may be written here.
+
 
 /**
  * Scrape real Hampshire pilates studios using Firecrawl and Google Maps
@@ -170,8 +175,8 @@ async function insertRealStudios(studios) {
       phone: studio.phone,
       website: studio.website,
       description: `Professional pilates studio in ${studio.city}, Hampshire. Offering expert instruction with modern equipment and a welcoming environment for all levels.`,
-      specialties: generateSpecialties(studio.name),
-      instructor_names: generateInstructorNames(),
+      specialties: null,
+      instructor_names: null,
       class_types: ['Reformer Pilates', 'Mat Pilates', 'Beginner Classes'],
       images: [],
       is_active: true,

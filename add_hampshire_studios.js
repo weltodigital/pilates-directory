@@ -1,4 +1,9 @@
 #!/usr/bin/env node
+// NOTE: instructor_names / specialties / email are no longer generated.
+// They previously held invented data (random names from a fixed pool and
+// unverified info@<name>studio.co.uk addresses) which was published against
+// real businesses. Only sourced, verifiable values may be written here.
+
 
 /**
  * Add real Hampshire pilates studios with live Google Business Profile data
@@ -361,8 +366,8 @@ async function addHampshireStudios() {
         website: googleData?.website || null,
 
         // Generate enhanced data
-        specialties: generateSpecialties(studioData.name),
-        instructor_names: generateInstructorNames(),
+        specialties: null,
+        instructor_names: null,
         class_types: ['Reformer Pilates', 'Mat Pilates', 'Beginner Classes'],
 
         // Use real Google photos if available

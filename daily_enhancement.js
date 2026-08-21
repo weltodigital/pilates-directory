@@ -1,4 +1,9 @@
 #!/usr/bin/env node
+// NOTE: instructor_names / specialties / email are no longer generated.
+// They previously held invented data (random names from a fixed pool and
+// unverified info@<name>studio.co.uk addresses) which was published against
+// real businesses. Only sourced, verifiable values may be written here.
+
 
 /**
  * Daily Studio Enhancement Script
@@ -121,15 +126,15 @@ async function dailyEnhancement() {
 
         // Generate missing data
         if (!studio.email) {
-          enhancedData.email = generateEmail(studio);
+          enhancedData.email = null;
         }
 
         if (!studio.specialties || studio.specialties.length === 0) {
-          enhancedData.specialties = generateSpecialties(studio);
+          enhancedData.specialties = null;
         }
 
         if (!studio.instructor_names || studio.instructor_names.length === 0) {
-          enhancedData.instructor_names = generateInstructorNames();
+          enhancedData.instructor_names = null;
         }
 
         // Update studio
