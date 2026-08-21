@@ -7,6 +7,7 @@ import { MapPin, Users, Activity, Star, ArrowRight } from 'lucide-react';
 import HeaderWithBreadcrumbs from '@/components/HeaderWithBreadcrumbs';
 import EquipmentStrip from '@/components/EquipmentStrip';
 import ReviewsCta from '@/components/ReviewsCta';
+import StudioLocationsMap from '@/components/StudioLocationsMap';
 
 interface CountyPageProps {
   params: Promise<{
@@ -324,19 +325,10 @@ export default async function CountyPage({ params }: CountyPageProps) {
                     Studios with locations in {location.name}
                   </h3>
                   <p className="mt-1 text-sm text-ink-muted">
-                    {mappableStudios} studios shown on map
+                    {mappableStudios} of {studios.length} studios shown on the map
                   </p>
                 </div>
-                <iframe
-                  src={`https://maps.google.com/maps?q=${encodeURIComponent(`pilates studios in ${location.name}`)}&t=&z=10&ie=UTF8&iwloc=&output=embed`}
-                  width="100%"
-                  height="100%"
-                  className="block h-96 w-full border-0"
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title={`Map showing pilates studios in ${location.name}`}
-                />
+                <StudioLocationsMap studios={studios} heightClass="h-[28rem]" />
               </div>
             </section>
           )}

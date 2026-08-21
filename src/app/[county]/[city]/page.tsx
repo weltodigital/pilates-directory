@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import { MapPin, Star, Users, Activity, Clock, Phone, Navigation, Award, ArrowRight } from 'lucide-react';
 import EquipmentStrip from '@/components/EquipmentStrip';
 import ReviewsCta from '@/components/ReviewsCta';
+import StudioLocationsMap from '@/components/StudioLocationsMap';
 import HeaderWithBreadcrumbs from '@/components/HeaderWithBreadcrumbs';
 
 interface CityPageProps {
@@ -274,19 +275,10 @@ export default async function CityPage({ params }: CityPageProps) {
                 <div className="border-b border-line p-6">
                   <h3 className="font-fraunces text-xl font-semibold">Studio locations</h3>
                   <p className="mt-1 text-sm text-ink-muted">
-                    {studios.length} studios in this area
+                    {studios.filter(s => s.latitude && s.longitude).length} of {studios.length} studios shown on the map
                   </p>
                 </div>
-                <iframe
-                  src={`https://maps.google.com/maps?q=${encodeURIComponent(`pilates studios in ${location.name}`)}&t=&z=12&ie=UTF8&iwloc=&output=embed`}
-                  width="100%"
-                  height="100%"
-                  className="block h-96 w-full border-0"
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title={`Map showing pilates studios in ${location.name}`}
-                />
+                <StudioLocationsMap studios={studios} heightClass="h-[28rem]" />
               </div>
             </section>
           )}

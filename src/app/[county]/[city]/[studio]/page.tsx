@@ -7,6 +7,7 @@ import { MapPin, Star, Phone, Mail, Globe, Activity, Users, Award, Calendar, Nav
 import HeaderWithBreadcrumbs from '@/components/HeaderWithBreadcrumbs';
 import EquipmentStrip from '@/components/EquipmentStrip';
 import ReviewsCta from '@/components/ReviewsCta';
+import StudioLocationsMap from '@/components/StudioLocationsMap';
 
 
 interface StudioPageProps {
@@ -181,7 +182,7 @@ export default async function StudioPage({ params }: StudioPageProps) {
   ];
 
   const fullAddress = `${studioData.address}, ${studioData.city}, ${studioData.postcode}`;
-  const hasMap = Boolean((studioData.latitude && studioData.longitude) || studioData.address);
+  const hasMap = Boolean(studioData.latitude && studioData.longitude);
 
   return (
     <>
@@ -423,15 +424,10 @@ export default async function StudioPage({ params }: StudioPageProps) {
                     Find {studioData.name} at {fullAddress}
                   </p>
                 </div>
-                <iframe
-                  src={`https://maps.google.com/maps?q=${encodeURIComponent(fullAddress)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
-                  width="100%"
-                  height="100%"
-                  className="block h-96 w-full border-0"
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title={`Map showing location of ${studioData.name}`}
+                <StudioLocationsMap
+                  studios={[studioData]}
+                  heightClass="h-[26rem]"
+                  singleZoom={16}
                 />
                 <div className="border-t border-line p-6">
                   <a

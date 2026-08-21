@@ -1,3 +1,6 @@
+@import 'leaflet/dist/leaflet.css';
+@import 'leaflet.markercluster/dist/MarkerCluster.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -277,3 +280,37 @@
     @apply mt-0;
   }
 }
+
+
+/* ==========================================================================
+   Leaflet
+   Tile maps are keyless (OpenStreetMap). Only the chrome is restyled so the
+   map reads as part of the design system.
+   ========================================================================== */
+
+.leaflet-container {
+  background: hsl(var(--surface-sunken));
+  font-family: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: var(--radius);
+  box-shadow: 0 8px 30px -8px hsl(var(--ink) / 0.25);
+}
+
+.leaflet-popup-content { margin: 0.875rem 1rem; }
+
+.leaflet-bar a {
+  color: hsl(var(--ink));
+  border-radius: 0;
+}
+
+.leaflet-bar a:hover { background: hsl(var(--brand-tint)); }
+
+.leaflet-control-attribution {
+  background: hsl(var(--surface) / 0.85);
+  font-size: 10px;
+  color: hsl(var(--ink-faint));
+}
+
+.leaflet-control-attribution a { color: hsl(var(--brand)); }
