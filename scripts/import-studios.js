@@ -45,13 +45,61 @@ const slug = s => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '
   .replace(/&/g, 'and').replace(/['’]/g, '').replace(/[^a-z0-9\s-]/g, ' ')
   .trim().replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
 
-/** Unitary authorities mapped onto the ceremonial county already in the site. */
+/**
+ * Metropolitan boroughs and unitary authorities mapped onto the ceremonial
+ * county the site already uses.
+ *
+ * postcodes.io returns admin_county = null for both, falling back to
+ * admin_district - "Leeds", "Birmingham", "Manchester" - none of which are
+ * counties. Without this table those cities cannot be imported at all.
+ */
 const UNITARY_TO_COUNTY = {
+  // West Yorkshire
+  'Leeds': 'west-yorkshire',
+  'Bradford': 'west-yorkshire',
+  'Kirklees': 'west-yorkshire',       // Huddersfield, Dewsbury, Batley
+  'Calderdale': 'west-yorkshire',     // Halifax
+  'Wakefield': 'west-yorkshire',
+  // West Midlands
+  'Birmingham': 'west-midlands',
+  'Coventry': 'west-midlands',
+  'Solihull': 'west-midlands',
+  'Walsall': 'west-midlands',
+  'Sandwell': 'west-midlands',        // West Bromwich
+  'Dudley': 'west-midlands',
+  'Wolverhampton': 'west-midlands',
+  // Greater Manchester
+  'Manchester': 'greater-manchester',
+  'Salford': 'greater-manchester',
+  'Bolton': 'greater-manchester',
+  'Bury': 'greater-manchester',
+  'Oldham': 'greater-manchester',
+  'Rochdale': 'greater-manchester',
+  'Stockport': 'greater-manchester',
+  'Tameside': 'greater-manchester',
+  'Trafford': 'greater-manchester',
+  'Wigan': 'greater-manchester',
+  // Merseyside
+  'Liverpool': 'merseyside',
+  'Knowsley': 'merseyside',
+  'Sefton': 'merseyside',
+  'St. Helens': 'merseyside',
+  'Wirral': 'merseyside',
+  // South Yorkshire
+  'Sheffield': 'south-yorkshire',
+  'Barnsley': 'south-yorkshire',
+  'Doncaster': 'south-yorkshire',
+  'Rotherham': 'south-yorkshire',
+  // Tyne and Wear
+  'Newcastle upon Tyne': 'tyne-and-wear',
+  'Gateshead': 'tyne-and-wear',
+  'North Tyneside': 'tyne-and-wear',
+  'South Tyneside': 'tyne-and-wear',
+  'Sunderland': 'tyne-and-wear',
+  // Other unitary authorities
   'Cheshire West and Chester': 'cheshire',
   'Cheshire East': 'cheshire',
   'South Gloucestershire': 'gloucestershire',
-  'Dudley': 'west-midlands',
-  'Wolverhampton': 'west-midlands',
   'Nottingham': 'nottinghamshire',
   'Derby': 'derbyshire',
   'Stoke-on-Trent': 'staffordshire',
@@ -71,6 +119,12 @@ const COUNTRY_SLUG = { Scotland: 'scotland', Wales: 'wales', 'Northern Ireland':
 
 /** CSV city values that are not place names. */
 const BAD_CITY = /^(business park|village|villlage|unit|the )/i;
+/** Regions and countries the extractor sometimes puts in the city field. */
+// 'near' comes from addresses like "High St, Broom, Near B50 4HJ", where the
+// extractor reads the word before the postcode as the town.
+const NOT_A_TOWN = new Set(['yorkshire','england','scotland','wales','northern ireland',
+  'united kingdom','uk','great britain','midlands','east midlands','west midlands',
+  'near','nr','uk.','n/a','unknown']);
 
 function openingHours(r) {
   const out = {};
@@ -156,7 +210,35 @@ function categories(r) {
     const j = await res.json();
     (j.result || []).forEach(x => { if (x.result) pc.set(x.query.toUpperCase().replace(/\s+/g, ''), x.result); });
   }
-  console.log(`postcodes resolved: ${pc.size}/${pcs.length}\n`);
+  console.log(`postcodes resolved: ${pc.size}/${pcs.length}`);
+
+  // Postcodes get retired. postcodes.io returns nothing for them on the live
+  // endpoint, but the studio still exists and the export carries coordinates,
+  // so fall back to a reverse lookup on lat/lng.
+  // Rows whose postcode is missing entirely, or retired and so absent from the
+  // live lookup. Both still have coordinates, so reverse-geocode instead and
+  // adopt the nearest real postcode.
+  const unresolved = fresh.filter(r => {
+    const k = (r.postalCode || '').toUpperCase().replace(/\s+/g, '');
+    return !k || !pc.has(k);
+  });
+  let recovered = 0;
+  for (const r of unresolved) {
+    const lat = parseFloat(r['location/lat']), lon = parseFloat(r['location/lng']);
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) continue;
+    // Default search radius is 100m, which misses rural and edge-of-town
+    // addresses. 2km is the maximum the API allows.
+    const res = await fetch(`https://api.postcodes.io/postcodes?lon=${lon}&lat=${lat}&limit=1&radius=2000`);
+    const j = await res.json();
+    const hit = j.result && j.result[0];
+    if (!hit) continue;
+    // Adopt the resolved postcode when the export had none.
+    if (!(r.postalCode || '').trim()) r.postalCode = hit.postcode;
+    pc.set((r.postalCode || '').toUpperCase().replace(/\s+/g, ''), hit);
+    recovered++;
+  }
+  if (unresolved.length) console.log(`recovered by coordinates: ${recovered}/${unresolved.length} (missing or retired postcodes)`);
+  console.log();
 
   // --- build ----------------------------------------------------------------
   const studios = [], newCountries = new Map(), newCities = new Map(), skipped = [], relocated = [];
@@ -183,7 +265,22 @@ function categories(r) {
     // Town: the CSV's own city is the name people search; the admin district is
     // the administrative area ("Newark and Sherwood") and only a fallback.
     let cityName = (r.city || '').trim();
-    if (!cityName || BAD_CITY.test(cityName)) cityName = p.post_town || p.admin_district || '';
+    if (!cityName || BAD_CITY.test(cityName) || NOT_A_TOWN.has(cityName.toLowerCase())) {
+      const parish = p.parish && !/unparished/i.test(p.parish) ? p.parish : null;
+      cityName = (r.neighborhood || '').trim() || parish || p.post_town || p.admin_district || '';
+    }
+
+    // A town the postcode data does not corroborate anywhere is probably a
+    // building or estate name ("Castlestead"). The extractor's neighborhood
+    // field is the better answer in that case.
+    const corroborated = [p.admin_district, p.parish, p.post_town, p.admin_county]
+      .filter(Boolean).some(v => v.toLowerCase().includes(cityName.toLowerCase()));
+    if (!corroborated && (r.neighborhood || '').trim()) {
+      const nb = r.neighborhood.trim();
+      const nbOk = [p.admin_district, p.parish, p.post_town].filter(Boolean)
+        .some(v => v.toLowerCase().includes(nb.toLowerCase()));
+      if (nbOk) cityName = nb;
+    }
 
     // Postal towns cross county lines: DE74 is a Derby postcode but sits in
     // Leicestershire, so the CSV says "Derby" while the studio is in Castle
