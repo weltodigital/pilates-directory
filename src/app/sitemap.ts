@@ -1,103 +1,97 @@
 import { MetadataRoute } from 'next'
+import { createClient } from '@supabase/supabase-js'
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://pilatesclassesnear.com';
-  const currentDate = new Date();
+/**
+ * Generated from the database rather than hand-maintained.
+ *
+ * The previous version was a hardcoded list: it advertised eleven
+ * "specialty" URLs that returned 404, carried 150 entries against a site of
+ * 1,400+ pages, and contained no studio pages at all.
+ */
 
-  const sitemapEntries = [
-    // Homepage
-    {
-      url: baseUrl,
-      lastModified: currentDate,
-      changeFrequency: 'daily' as const,
-      priority: 1,
-    },
+const BASE_URL = 'https://www.pilatesclassesnear.com';
+
+/** Every row of a table, past PostgREST's 1000-row ceiling. */
+async function selectAll(supabase: any, table: string, columns: string, apply: (q: any) => any) {
+  const rows: any[] = [];
+  for (let from = 0; ; from += 1000) {
+    const { data, error } = await apply(supabase.from(table).select(columns)).range(from, from + 999);
+    if (error) {
+      console.error(`Sitemap: ${table} query failed:`, error.message);
+      break;
+    }
+    if (!data?.length) break;
+    rows.push(...data);
+    if (data.length < 1000) break;
+  }
+  return rows;
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const lastModified = new Date();
+
+  const entries: MetadataRoute.Sitemap = [
+    { url: BASE_URL, lastModified, changeFrequency: 'daily', priority: 1 },
+    { url: `${BASE_URL}/near`, lastModified, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${BASE_URL}/privacy-policy`, lastModified, changeFrequency: 'yearly', priority: 0.3 },
+    { url: `${BASE_URL}/terms-of-service`, lastModified, changeFrequency: 'yearly', priority: 0.3 },
   ];
 
-  // All English counties
-  const counties = [
-    'bedfordshire', 'berkshire', 'buckinghamshire', 'cambridgeshire', 'cheshire',
-    'cornwall', 'cumbria', 'derbyshire', 'devon', 'dorset', 'durham',
-    'east-sussex', 'essex', 'gloucestershire', 'london', 'greater-manchester',
-    'hampshire', 'herefordshire', 'hertfordshire', 'isle-of-wight', 'kent',
-    'lancashire', 'leicestershire', 'lincolnshire', 'merseyside', 'norfolk',
-    'northamptonshire', 'northumberland', 'north-yorkshire', 'nottinghamshire',
-    'oxfordshire', 'rutland', 'shropshire', 'somerset', 'south-yorkshire',
-    'staffordshire', 'suffolk', 'surrey', 'tyne-and-wear', 'warwickshire',
-    'west-midlands', 'west-sussex', 'west-yorkshire', 'wiltshire', 'worcestershire'
-  ];
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SECRET_KEY;
+  if (!url || !key) {
+    console.error('Sitemap: Supabase env vars missing; returning static entries only.');
+    return entries;
+  }
+  const supabase = createClient(url, key);
 
-  // Add county pages
-  counties.forEach(county => {
-    sitemapEntries.push({
-      url: `${baseUrl}/${county}`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly' as const,
-      priority: 0.9,
+  // Counties, countries and towns that actually have studios. A location with
+  // none is a thin page and does not belong in a sitemap.
+  const locations = await selectAll(
+    supabase, 'public_locations', 'slug,type,county_slug,butcher_count',
+    (q: any) => q.gt('butcher_count', 0)
+  );
+
+  for (const loc of locations) {
+    const path = loc.type === 'county' ? loc.slug : `${loc.county_slug}/${loc.slug}`;
+    entries.push({
+      url: `${BASE_URL}/${path}`,
+      lastModified,
+      changeFrequency: 'weekly',
+      priority: loc.type === 'county' ? 0.9 : 0.8,
     });
-  });
+  }
 
-  // Major city pages for top counties
-  const majorCities = [
-    // London boroughs
-    { county: 'london', cities: ['camden', 'westminster', 'islington', 'hackney', 'tower-hamlets', 'kensington-and-chelsea', 'lambeth', 'greenwich', 'hammersmith-and-fulham', 'lewisham'] },
-    // Other major counties
-    { county: 'greater-manchester', cities: ['manchester', 'bolton', 'bury', 'oldham', 'rochdale', 'salford', 'stockport', 'tameside', 'trafford', 'wigan'] },
-    { county: 'west-midlands', cities: ['birmingham', 'wolverhampton', 'coventry', 'dudley', 'walsall', 'west-bromwich', 'solihull', 'sutton-coldfield'] },
-    { county: 'west-yorkshire', cities: ['leeds', 'bradford', 'huddersfield', 'halifax', 'wakefield', 'dewsbury', 'batley', 'keighley'] },
-    { county: 'merseyside', cities: ['liverpool', 'birkenhead', 'st-helens', 'southport', 'bootle', 'crosby'] },
-    { county: 'south-yorkshire', cities: ['sheffield', 'doncaster', 'rotherham', 'barnsley'] },
-    { county: 'tyne-and-wear', cities: ['newcastle-upon-tyne', 'sunderland', 'south-shields', 'north-shields', 'gateshead'] },
-    { county: 'essex', cities: ['colchester', 'southend-on-sea', 'chelmsford', 'basildon', 'harlow', 'brentwood'] },
-    { county: 'kent', cities: ['maidstone', 'canterbury', 'dartford', 'dover', 'rochester', 'margate', 'folkestone', 'ashford'] },
-    { county: 'surrey', cities: ['guildford', 'woking', 'epsom', 'kingston-upon-thames', 'sutton', 'croydon', 'camberley', 'farnham'] },
-    { county: 'hampshire', cities: ['southampton', 'portsmouth', 'basingstoke', 'winchester', 'eastleigh', 'fareham'] },
-    { county: 'berkshire', cities: ['reading', 'slough', 'windsor', 'maidenhead', 'bracknell', 'newbury', 'wokingham'] },
-    { county: 'bedfordshire', cities: ['bedford', 'luton', 'dunstable', 'leighton-buzzard', 'biggleswade'] }
-  ];
+  // Studios and postcode districts come from the same scan.
+  const studios = await selectAll(
+    supabase, 'pilates_studios', 'full_url_path,outward_code,updated_at',
+    (q: any) => q.eq('is_active', true).not('full_url_path', 'is', null)
+  );
 
-  // Add major city pages
-  majorCities.forEach(({ county, cities }) => {
-    cities.forEach(city => {
-      sitemapEntries.push({
-        url: `${baseUrl}/${county}/${city}`,
-        lastModified: currentDate,
-        changeFrequency: 'weekly' as const,
-        priority: 0.8,
-      });
+  const districtCounts: Record<string, number> = {};
+
+  for (const studio of studios) {
+    entries.push({
+      url: `${BASE_URL}/${studio.full_url_path}`,
+      lastModified: studio.updated_at ? new Date(studio.updated_at) : lastModified,
+      changeFrequency: 'monthly',
+      priority: 0.7,
     });
-  });
+    const code = (studio.outward_code || '').toLowerCase();
+    if (code) districtCounts[code] = (districtCounts[code] || 0) + 1;
+  }
 
-  // Specialty/category pages
-  const specialtyPages = [
-    'reformer-pilates', 'mat-pilates', 'clinical-pilates', 'prenatal-pilates',
-    'barre-pilates', 'beginner-pilates', 'advanced-pilates', 'pilates-classes',
-    'private-pilates', 'group-pilates', 'online-pilates'
-  ];
-
-  specialtyPages.forEach(page => {
-    sitemapEntries.push({
-      url: `${baseUrl}/${page}`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly' as const,
-      priority: page.includes('reformer') || page.includes('mat') || page.includes('beginner') ? 0.8 : 0.7,
+  // Matches the prerender threshold in the [county] route: districts with
+  // fewer than three studios render on demand and are too thin to submit.
+  for (const [code, count] of Object.entries(districtCounts)) {
+    if (count < 3) continue;
+    entries.push({
+      url: `${BASE_URL}/${code}`,
+      lastModified,
+      changeFrequency: 'weekly',
+      priority: 0.8,
     });
-  });
+  }
 
-  // Static pages
-  const staticPages = [
-    { path: 'privacy-policy', priority: 0.3 },
-    { path: 'terms-of-service', priority: 0.3 }
-  ];
-
-  staticPages.forEach(({ path, priority }) => {
-    sitemapEntries.push({
-      url: `${baseUrl}/${path}`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly' as const,
-      priority,
-    });
-  });
-
-  return sitemapEntries;
+  return entries;
 }

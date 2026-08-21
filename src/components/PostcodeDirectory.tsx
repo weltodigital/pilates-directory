@@ -44,8 +44,59 @@ export default function PostcodeDirectory({
   }, {});
   const towns = Object.entries(townCounts).sort((a, b) => b[1] - a[1]);
 
+  const BASE = 'https://www.pilatesclassesnear.com';
+
+  const schema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: BASE },
+          { '@type': 'ListItem', position: 2, name: `Pilates studios in ${code}`, item: `${BASE}/${code.toLowerCase()}` },
+        ],
+      },
+      {
+        '@type': 'ItemList',
+        name: `Pilates studios in ${code}`,
+        numberOfItems: studios.length,
+        itemListElement: studios.slice(0, 30).map((s, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          item: {
+            '@type': 'HealthAndBeautyBusiness',
+            name: s.name,
+            ...(s.full_url_path ? { url: `${BASE}/${s.full_url_path}` } : {}),
+            address: {
+              '@type': 'PostalAddress',
+              streetAddress: s.address || undefined,
+              addressLocality: s.city || undefined,
+              postalCode: s.postcode || undefined,
+              addressCountry: 'GB',
+            },
+            ...(s.latitude && s.longitude ? {
+              geo: { '@type': 'GeoCoordinates', latitude: s.latitude, longitude: s.longitude },
+            } : {}),
+            ...(s.google_rating && s.google_review_count ? {
+              aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: s.google_rating,
+                reviewCount: s.google_review_count,
+                bestRating: 5,
+              },
+            } : {}),
+          },
+        })),
+      },
+    ],
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      />
       <HeaderWithBreadcrumbs
         breadcrumbs={[{ label: 'Home', href: '/' }, { label: code }]}
       />

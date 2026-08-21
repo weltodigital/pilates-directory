@@ -8,6 +8,7 @@ import HeaderWithBreadcrumbs from '@/components/HeaderWithBreadcrumbs';
 import EquipmentStrip from '@/components/EquipmentStrip';
 import ReviewsCta from '@/components/ReviewsCta';
 import StudioLocationsMap from '@/components/StudioLocationsMap';
+import { isOutwardCode } from '@/lib/geo';
 
 
 interface StudioPageProps {
@@ -182,6 +183,8 @@ export default async function StudioPage({ params }: StudioPageProps) {
   ];
 
   const fullAddress = `${studioData.address}, ${studioData.city}, ${studioData.postcode}`;
+  // Outward code links the studio to its postcode district page.
+  const outwardCode = (studioData.postcode || '').trim().split(/\s+/)[0] || null;
   const hasMap = Boolean(studioData.latitude && studioData.longitude);
 
   return (
@@ -317,7 +320,15 @@ export default async function StudioPage({ params }: StudioPageProps) {
                     <dd className="mt-1.5 text-sm leading-relaxed text-ink-muted">
                       {studioData.address}
                       <br />
-                      {studioData.city}, {studioData.postcode}
+                      {studioData.city},{' '}
+                      {outwardCode ? (
+                        <Link
+                          href={`/${outwardCode.toLowerCase()}`}
+                          className="text-brand underline-offset-4 hover:underline"
+                        >
+                          {studioData.postcode}
+                        </Link>
+                      ) : studioData.postcode}
                     </dd>
                   </div>
                 </div>
