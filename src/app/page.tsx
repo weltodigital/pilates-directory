@@ -174,15 +174,46 @@ async function getFeaturedPilatesStudios(limit: number = 6): Promise<PilatesStud
   return candidates.sort((a, b) => score(b) - score(a)).slice(0, limit);
 }
 
+/**
+ * Mean Google rating across every rated active studio. PostgREST aggregate
+ * functions are disabled on this project, so the ratings are paged through
+ * and averaged here. This runs at build time, not per request.
+ */
+async function getAverageRating(): Promise<number | null> {
+  const supabase = getSupabase();
+  if (!supabase) return null;
+
+  const ratings: number[] = [];
+  for (let from = 0; ; from += 1000) {
+    const { data, error } = await supabase
+      .from('pilates_studios')
+      .select('google_rating')
+      .eq('is_active', true)
+      .not('google_rating', 'is', null)
+      .range(from, from + 999);
+
+    if (error) {
+      console.error('Error fetching ratings:', error);
+      return null;
+    }
+    ratings.push(...data.map(r => r.google_rating as number));
+    if (data.length < 1000) break;
+  }
+
+  if (!ratings.length) return null;
+  return ratings.reduce((sum, r) => sum + r, 0) / ratings.length;
+}
+
 function studioHref(studio: PilatesStudio) {
   return `/${studio.full_url_path || `${studio.county_slug}/${studio.city_slug}/${studio.slug || studio.id}`}`;
 }
 
 export default async function Home() {
   // Get counties with their associated locations and featured studios
-  const [countiesWithLocations, featuredStudios] = await Promise.all([
+  const [countiesWithLocations, featuredStudios, averageRating] = await Promise.all([
     getCountiesWithLocations(),
-    getFeaturedPilatesStudios(6)
+    getFeaturedPilatesStudios(6),
+    getAverageRating()
   ]);
 
   const totalLocations = countiesWithLocations.reduce(
@@ -290,12 +321,14 @@ export default async function Home() {
             ============================================================ */}
         <section className="shell">
           <div className="rule-fade" />
-          <dl className="grid grid-cols-2 gap-8 py-12 sm:grid-cols-4">
+          <dl className="grid grid-cols-2 gap-8 py-12 sm:grid-cols-3">
             {[
               { value: countiesWithLocations.length || '—', label: 'Counties covered' },
               { value: totalLocations || '—', label: 'Towns & cities' },
-              { value: '4.0+', label: 'Minimum rating' },
-              { value: 'Weekly', label: 'Data refresh' },
+              {
+                value: averageRating ? averageRating.toFixed(1) : '—',
+                label: 'Average studio rating',
+              },
             ].map((stat) => (
               <div key={stat.label}>
                 <dt className="sr-only">{stat.label}</dt>
