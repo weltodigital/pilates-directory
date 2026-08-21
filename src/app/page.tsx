@@ -1,5 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { MapPin, Star, Phone, Clock, Activity, ArrowRight, ArrowUpRight, ShieldCheck, Sparkles } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 import SEOSchemaMarkup from '@/components/SEOSchemaMarkup'
@@ -209,48 +210,76 @@ export default async function Home() {
             aria-hidden="true"
           />
 
-          <div className="shell pb-20 pt-20 sm:pb-28 sm:pt-28">
-            <div className="mx-auto max-w-3xl text-center">
-              <span className="chip chip-brand">
-                <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-                The UK&apos;s pilates directory
-              </span>
+          <div className="shell pb-20 pt-16 sm:pb-28 sm:pt-20">
+            <div className="grid items-center gap-16 lg:grid-cols-[1.05fr_1fr] lg:gap-12">
+              {/* Copy */}
+              <div className="text-center lg:text-left">
+                <span className="chip chip-brand">
+                  <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+                  The UK&apos;s pilates directory
+                </span>
 
-              <h1 className="mt-7 text-display-sm sm:text-display lg:text-display-lg">
-                Find the perfect pilates studio{' '}
-                <em className="not-italic text-brand [font-variation-settings:'SOFT'_60,'WONK'_1]">
-                  near you
-                </em>
-              </h1>
+                <h1 className="mt-7 text-display-sm sm:text-display">
+                  Find the perfect pilates studio{' '}
+                  <em className="not-italic text-brand [font-variation-settings:'SOFT'_60,'WONK'_1]">
+                    near you
+                  </em>
+                </h1>
 
-              <p className="mx-auto mt-7 max-w-xl text-lg leading-relaxed text-ink-muted">
-                Reformer, mat and clinical pilates across the UK — with class
-                schedules, verified reviews and studio details in one place.
-              </p>
+                <p className="mx-auto mt-7 max-w-xl text-lg leading-relaxed text-ink-muted lg:mx-0">
+                  Reformer, mat and clinical pilates across the UK — with class
+                  schedules, verified reviews and studio details in one place.
+                </p>
 
-              <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-                <Link href="#browse-counties" className="pill-brand">
-                  Browse all locations
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </Link>
-                <Link href="#featured-studios" className="pill-outline">
-                  View featured studios
-                </Link>
+                <div className="mt-10 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
+                  <Link href="#browse-counties" className="pill-brand">
+                    Browse all locations
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </Link>
+                  <Link href="#featured-studios" className="pill-outline">
+                    View featured studios
+                  </Link>
+                </div>
               </div>
 
-              <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-ink-faint">
-                <span className="inline-flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-brand" aria-hidden="true" />
-                  Verified listings
-                </span>
-                <span className="inline-flex items-center gap-2">
-                  <Star className="h-4 w-4 text-brand" aria-hidden="true" />
-                  Real Google reviews
-                </span>
-                <span className="inline-flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-brand" aria-hidden="true" />
-                  Nationwide coverage
-                </span>
+              {/* Image bubble, with the trust badges orbiting it */}
+              <div className="relative mx-auto w-full max-w-[26rem] lg:max-w-none">
+                <div className="relative aspect-square">
+                  {/* Soft ring behind the photo */}
+                  <div
+                    className="absolute -inset-4 rounded-full bg-brand/10 blur-2xl"
+                    aria-hidden="true"
+                  />
+
+                  <div className="absolute inset-0 overflow-hidden rounded-full border-4 border-surface shadow-[0_20px_60px_-20px_hsl(var(--brand)/0.45)]">
+                    <Image
+                      src="/pilates-classes-near.png"
+                      alt="A reformer pilates class in a UK studio"
+                      fill
+                      priority
+                      sizes="(max-width: 1024px) 26rem, 30rem"
+                      className="object-cover"
+                      style={{ objectPosition: '38% 50%' }}
+                    />
+                  </div>
+
+                  {/* Orbiting badges. Percentage offsets keep them on the
+                      circle's edge as it scales. */}
+                  <span className="orbit-chip absolute left-[-6%] top-[10%]">
+                    <ShieldCheck className="h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
+                    Verified listings
+                  </span>
+
+                  <span className="orbit-chip absolute right-[-9%] top-[42%]">
+                    <Star className="h-4 w-4 shrink-0 fill-brand text-brand" aria-hidden="true" />
+                    Real Google reviews
+                  </span>
+
+                  <span className="orbit-chip absolute bottom-[8%] left-[2%]">
+                    <MapPin className="h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
+                    Nationwide coverage
+                  </span>
+                </div>
               </div>
             </div>
           </div>
