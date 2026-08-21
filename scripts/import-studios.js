@@ -277,6 +277,29 @@ function categories(r) {
       cityName = ((r.neighborhood || '').split(',')[0].trim()) || parish || p.post_town || p.admin_district || '';
     }
 
+    // Addresses ending "<word> <postcode>" make the extractor read that word as
+    // the town: "Ripley Ln, West Horsley, Penylan KT24 6JJ" yields "Penylan".
+    //
+    // Replace it only when the name is BOTH uncorroborated by the postcode's
+    // administrative data AND unknown as a town anywhere in the directory.
+    // Requiring only the first of those was tried and was wrong - it swapped
+    // real postal towns for the villages they cover (Crawley -> Worth).
+    const areaNames = [p.admin_district, p.parish, p.post_town, p.admin_county].filter(Boolean);
+    const inArea = v => !!v && areaNames.some(a => a.toLowerCase().includes(v.toLowerCase()));
+    const knownTown = townCounties.has(slug(cityName));
+    if (cityName && !inArea(cityName) && !knownTown) {
+      // Only Google's own neighborhood, or the parish for a stub like "Cr".
+      // Never admin_district: that is an administrative area ("Mole Valley"),
+      // not a town, and substituting it renamed Ashtead and Dorking.
+      const nb = (r.neighborhood || '').split(',')[0].trim();
+      const parishName = p.parish && !/unparished/i.test(p.parish) ? p.parish : null;
+      const better = nb || (cityName.length <= 3 ? parishName : null);
+      if (better && better.toLowerCase() !== cityName.toLowerCase()) {
+        relocated.push({ name: r.title, from: cityName, to: better, county: countySlug, postcode: r.postalCode });
+        cityName = better;
+      }
+    }
+
     // Take only the leading locality: neighborhoods arrive as "Streetly,
     // Walsall" and the second half is the wider district.
     cityName = cityName.split(',')[0].trim();
