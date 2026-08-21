@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { MapPin, Star, Phone, Clock, Activity, ArrowRight, ArrowUpRight, ShieldCheck, Sparkles } from 'lucide-react'
+import { MapPin, Star, Phone, Clock, Activity, ArrowRight, ArrowUpRight, ShieldCheck, Sparkles, Navigation } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 import SEOSchemaMarkup from '@/components/SEOSchemaMarkup'
 import Header from '@/components/Header'
@@ -267,8 +267,9 @@ export default async function Home() {
                     Browse all locations
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </Link>
-                  <Link href="#top-rated-studios" className="pill-outline">
-                    View top rated studios
+                  <Link href="/near" className="pill-outline">
+                    <Navigation className="h-4 w-4" aria-hidden="true" />
+                    Find studios near me
                   </Link>
                 </div>
               </div>

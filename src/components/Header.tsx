@@ -14,6 +14,7 @@ interface HeaderProps {
 }
 
 const NAV_LINKS = [
+  { label: 'Near me', href: '/near' },
   { label: 'Browse locations', href: '/#browse-counties' },
   { label: 'Top rated studios', href: '/#top-rated-studios' },
 ]
