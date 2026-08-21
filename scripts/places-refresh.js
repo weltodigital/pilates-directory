@@ -49,6 +49,10 @@ const FIELD_MASK = [
   'regularOpeningHours',
   'accessibilityOptions',
   'location',
+  'primaryType',
+  'primaryTypeDisplayName',
+  'types',
+  'editorialSummary',
 ].join(',');
 
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -102,7 +106,10 @@ function mapToColumns(p, current) {
     // Keep postcode in step with the address, otherwise a relocation leaves
     // the two columns disagreeing.
     const m = p.formattedAddress.match(UK_POSTCODE);
-    if (m) out.postcode = `${m[1].toUpperCase()} ${m[2].toUpperCase()}`;
+    if (m) {
+      out.postcode = `${m[1].toUpperCase()} ${m[2].toUpperCase()}`;
+      out.outward_code = m[1].toUpperCase();
+    }
   }
 
   // Only move coordinates on a real relocation. Most differences are
@@ -116,6 +123,29 @@ function mapToColumns(p, current) {
       out.longitude = p.location.longitude;
     }
   }
+  if (p.businessStatus) out.business_status = p.businessStatus;
+  if (p.primaryTypeDisplayName?.text || p.primaryType) {
+    out.google_primary_type = p.primaryTypeDisplayName?.text || p.primaryType;
+  }
+  if (Array.isArray(p.types) && p.types.length) out.google_types = p.types;
+  if (p.editorialSummary?.text) out.google_editorial_summary = p.editorialSummary.text;
+
+  if (p.accessibilityOptions && Object.keys(p.accessibilityOptions).length) {
+    out.accessibility = p.accessibilityOptions;
+    // Only the flags Google actually set to true, as readable labels.
+    // NOTE: wheelchairAccessibleParking is deliberately NOT mapped to
+    // parking_available - "has accessible parking" is not "has parking".
+    const LABELS = {
+      wheelchairAccessibleEntrance: 'Wheelchair accessible entrance',
+      wheelchairAccessibleParking: 'Wheelchair accessible parking',
+      wheelchairAccessibleRestroom: 'Wheelchair accessible toilet',
+      wheelchairAccessibleSeating: 'Wheelchair accessible seating',
+    };
+    const feats = Object.entries(p.accessibilityOptions)
+      .filter(([k, v]) => v === true && LABELS[k]).map(([k]) => LABELS[k]);
+    if (feats.length) out.accessibility_features = feats;
+  }
+
   if (p.regularOpeningHours?.weekdayDescriptions?.length) {
     // "Monday: 9:00 AM – 5:00 PM" -> { monday: "9:00 AM – 5:00 PM" }
     out.opening_hours = Object.fromEntries(
@@ -138,7 +168,7 @@ async function run() {
   for (;;) {
     const { data, error } = await sb
       .from('pilates_studios')
-      .select('id,name,google_place_id,phone,website,google_rating,google_review_count,address,postcode,latitude,longitude,opening_hours')
+      .select('id,name,full_url_path,google_place_id,phone,website,google_rating,google_review_count,address,postcode,outward_code,latitude,longitude,opening_hours,business_status,accessibility,accessibility_features,google_primary_type,google_types,google_editorial_summary,field_sources')
       .eq('is_active', true)
       .not('google_place_id', 'is', null)
       .range(from, from + 999);
@@ -180,10 +210,11 @@ async function run() {
         notOperational.push({ id: s.id, name: s.name, businessStatus: p.businessStatus });
       }
 
-      // Permanently closed businesses come off the directory. Temporarily
-      // closed ones are left active - they reopen.
-      const closePermanently = p.businessStatus === 'CLOSED_PERMANENTLY';
-      if (closePermanently) deactivated.push({ id: s.id, name: s.name });
+      // Reported, never auto-deactivated. business_status is stored so the
+      // permanently-closed list can be reviewed and actioned separately.
+      if (p.businessStatus === 'CLOSED_PERMANENTLY') {
+        deactivated.push({ id: s.id, name: s.name, url: s.full_url_path });
+      }
 
       const incoming = mapToColumns(p, s);
       const diff = {};
@@ -198,13 +229,26 @@ async function run() {
         else fieldDiffs[k] = (fieldDiffs[k] || 0) + 1;
       }
 
-      if (!Object.keys(diff).length && !closePermanently) { stats.unchanged++; continue; }
+      if (!Object.keys(diff).length) { stats.unchanged++; continue; }
       changes.push({ id: s.id, name: s.name, businessStatus: p.businessStatus, diff });
 
       if (EXECUTE) {
+        const now = new Date().toISOString();
         const update = Object.fromEntries(Object.entries(diff).map(([k, v]) => [k, v.after]));
-        update.last_scraped_at = new Date().toISOString();
-        if (closePermanently) update.is_active = false;
+        // Record where each value came from. Precedence is owner > website >
+        // google_places > inferred, so never clobber a higher-tier source.
+        const sources = { ...(s.field_sources || {}) };
+        for (const k of Object.keys(diff)) {
+          const existing = sources[k]?.source;
+          if (existing === 'owner' || existing === 'website') {
+            delete update[k];
+            continue;
+          }
+          sources[k] = { source: 'google_places', at: now, confidence: 1 };
+        }
+        update.field_sources = sources;
+        update.last_scraped_at = now;
+        update.last_verified_at = now;
         const { error } = await sb.from('pilates_studios').update(update).eq('id', s.id);
         if (error) errors.push({ id: s.id, name: s.name, error: `write failed: ${error.message}` });
       }
@@ -224,7 +268,7 @@ async function run() {
   console.log(`  would change             : ${changes.length}`);
   console.log(`  NOT operational          : ${stats.closed}  <- closed / temporarily closed`);
 
-  console.log(`\n  permanently closed -> deactivated : ${deactivated.length}`);
+  console.log(`\n  permanently closed (reported only): ${deactivated.length}`);
 
   console.log('\nBUSINESS STATUS');
   Object.entries(statusBreakdown).sort((a,b)=>b[1]-a[1])
