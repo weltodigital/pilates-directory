@@ -1,6 +1,7 @@
 import React from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase';
 import { MapPin, Star, Phone, Mail, Globe, Activity, Users, Award, Calendar, Navigation, Instagram, Facebook } from 'lucide-react';
 import HeaderWithBreadcrumbs from '@/components/HeaderWithBreadcrumbs';
@@ -169,18 +170,7 @@ export default async function StudioPage({ params }: StudioPageProps) {
   const locationData = await getLocationData(county, city);
 
   if (!studioData || !locationData) {
-    return (
-      <>
-        <HeaderWithBreadcrumbs breadcrumbs={[{ label: 'Home', href: '/' }]} />
-        <main className="shell band text-center">
-          <h1 className="text-display-sm">Studio not found</h1>
-          <p className="mx-auto mt-5 max-w-md text-lg text-ink-muted">
-            The requested pilates studio could not be found.
-          </p>
-          <Link href="/" className="pill-brand mt-8">Back to all locations</Link>
-        </main>
-      </>
-    );
+    notFound();
   }
 
   const breadcrumbs = [

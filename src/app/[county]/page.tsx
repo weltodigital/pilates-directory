@@ -2,6 +2,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { MapPin, Users, Activity, Star, ArrowRight } from 'lucide-react';
 import HeaderWithBreadcrumbs from '@/components/HeaderWithBreadcrumbs';
 import EquipmentStrip from '@/components/EquipmentStrip';
@@ -211,18 +212,7 @@ export default async function CountyPage({ params }: CountyPageProps) {
   const location = await getCountyData(resolvedParams.county);
 
   if (!location) {
-    return (
-      <>
-        <HeaderWithBreadcrumbs breadcrumbs={[{ label: 'Home', href: '/' }]} />
-        <main className="shell band text-center">
-          <h1 className="text-display-sm">County not found</h1>
-          <p className="mx-auto mt-5 max-w-md text-lg text-ink-muted">
-            The requested county could not be found.
-          </p>
-          <Link href="/" className="pill-brand mt-8">Back to all locations</Link>
-        </main>
-      </>
-    );
+    notFound();
   }
 
   const citiesAndTowns = await getCitiesAndTowns(resolvedParams.county, location.id);

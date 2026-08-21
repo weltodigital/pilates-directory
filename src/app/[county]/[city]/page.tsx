@@ -2,6 +2,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { MapPin, Star, Users, Activity, Clock, Phone, Navigation, Award, ArrowRight } from 'lucide-react';
 import EquipmentStrip from '@/components/EquipmentStrip';
 import ReviewsCta from '@/components/ReviewsCta';
@@ -203,18 +204,7 @@ export default async function CityPage({ params }: CityPageProps) {
   const { location, county } = await getCityData(resolvedParams.county, resolvedParams.city);
 
   if (!location || !county) {
-    return (
-      <>
-        <HeaderWithBreadcrumbs breadcrumbs={[{ label: 'Home', href: '/' }]} />
-        <main className="shell band text-center">
-          <h1 className="text-display-sm">Location not found</h1>
-          <p className="mx-auto mt-5 max-w-md text-lg text-ink-muted">
-            The requested city could not be found.
-          </p>
-          <Link href="/" className="pill-brand mt-8">Back to all locations</Link>
-        </main>
-      </>
-    );
+    notFound();
   }
 
   const studios = await getCityStudios(resolvedParams.county, resolvedParams.city);
