@@ -124,7 +124,11 @@ const BAD_CITY = /^(business park|village|villlage|unit|the )/i;
 // extractor reads the word before the postcode as the town.
 const NOT_A_TOWN = new Set(['yorkshire','england','scotland','wales','northern ireland',
   'united kingdom','uk','great britain','midlands','east midlands','west midlands',
-  'near','nr','uk.','n/a','unknown']);
+  'near','nr','uk.','n/a','unknown',
+  // Generic building words the extractor picks out of addresses such as
+  // "Cowfold, Hall RH13 8AA".
+  'hall','village hall','community centre','community center','studio','centre',
+  'center','church','school','club','gym']);
 
 function openingHours(r) {
   const out = {};
