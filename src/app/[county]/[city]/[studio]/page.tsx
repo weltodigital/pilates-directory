@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase';
-import { MapPin, Star, Phone, Mail, Globe, Activity, Users, Award, Calendar, Navigation, Instagram, Facebook } from 'lucide-react';
+import { MapPin, Star, Phone, Mail, Globe, Activity, Award, Navigation } from 'lucide-react';
 import HeaderWithBreadcrumbs from '@/components/HeaderWithBreadcrumbs';
 import EquipmentStrip from '@/components/EquipmentStrip';
 import ReviewsCta from '@/components/ReviewsCta';
@@ -254,28 +254,34 @@ export default async function StudioPage({ params }: StudioPageProps) {
         </section>
 
         <div className="shell space-y-20 py-20">
-          {/* ------------------------------------------- Details + aside */}
-          <section className="grid gap-6 lg:grid-cols-3">
-            <div className="space-y-6 lg:col-span-2">
+          {/* The three detail rows are one group, spaced tighter than the
+              major bands around them. */}
+          <div className="space-y-6">
+          {/* --------------------------------------------- Classes offered */}
+          {((studioData.class_types?.length ?? 0) > 0 ||
+            (studioData.equipment_available?.length ?? 0) > 0 ||
+            (studioData.specialties?.length ?? 0) > 0) && (
+            <section className="card-flat p-7 sm:p-8">
+              <h2 className="font-fraunces text-xl font-semibold">Classes offered</h2>
+
               {studioData.class_types && studioData.class_types.length > 0 && (
-                <div className="card-flat p-7">
-                  <h2 className="font-fraunces text-xl font-semibold">Classes offered</h2>
-                  <div className="mt-5 flex flex-wrap gap-2">
-                    {studioData.class_types.map((type: string, index: number) => (
-                      <span key={index} className="chip chip-brand">{type}</span>
-                    ))}
-                  </div>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {studioData.class_types.map((type: string, i: number) => (
+                    <span key={i} className="chip chip-brand">{type}</span>
+                  ))}
                 </div>
               )}
 
               {studioData.equipment_available && studioData.equipment_available.length > 0 && (
-                <div className="card-flat p-7">
-                  <h2 className="font-fraunces text-xl font-semibold">Equipment available</h2>
-                  <ul className="mt-5 grid gap-3 sm:grid-cols-2">
-                    {studioData.equipment_available.map((equipment: string, index: number) => (
-                      <li key={index} className="flex items-center gap-2.5 text-sm text-ink-muted">
+                <div className="mt-7 border-t border-line pt-6">
+                  <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-faint">
+                    Equipment
+                  </h3>
+                  <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {studioData.equipment_available.map((item: string, i: number) => (
+                      <li key={i} className="flex items-center gap-2.5 text-sm text-ink-muted">
                         <Activity className="h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
-                        {equipment}
+                        {item}
                       </li>
                     ))}
                   </ul>
@@ -283,134 +289,111 @@ export default async function StudioPage({ params }: StudioPageProps) {
               )}
 
               {studioData.specialties && studioData.specialties.length > 0 && (
-                <div className="card-flat p-7">
-                  <h2 className="font-fraunces text-xl font-semibold">Specialties</h2>
-                  <div className="mt-5 flex flex-wrap gap-2">
-                    {studioData.specialties.map((item: string, index: number) => (
-                      <span key={index} className="chip">{item}</span>
+                <div className="mt-7 border-t border-line pt-6">
+                  <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-faint">
+                    Specialties
+                  </h3>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {studioData.specialties.map((item: string, i: number) => (
+                      <span key={i} className="chip">{item}</span>
                     ))}
                   </div>
                 </div>
               )}
-            </div>
+            </section>
+          )}
 
-            {/* Aside */}
-            <aside className="space-y-6 lg:col-span-1">
-              <div className="card-flat p-7">
-                <h2 className="font-fraunces text-xl font-semibold">Contact</h2>
-                <dl className="mt-6 space-y-5 text-sm">
-                  <div className="flex items-start gap-3">
-                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
-                    <div>
-                      <dt className="font-medium text-ink">Address</dt>
-                      <dd className="mt-1 leading-relaxed text-ink-muted">
-                        {studioData.address}
-                        <br />
-                        {studioData.city}, {studioData.postcode}
-                      </dd>
-                    </div>
-                  </div>
-
-                  {studioData.phone && (
-                    <div className="flex items-start gap-3">
-                      <Phone className="mt-0.5 h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
-                      <div>
-                        <dt className="font-medium text-ink">Phone</dt>
-                        <dd className="mt-1">
-                          <a
-                            href={`tel:${studioData.phone}`}
-                            className="text-brand underline-offset-4 hover:underline"
-                          >
-                            {studioData.phone}
-                          </a>
-                        </dd>
-                      </div>
-                    </div>
-                  )}
-
-                  {studioData.email && (
-                    <div className="flex items-start gap-3">
-                      <Mail className="mt-0.5 h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
-                      <div>
-                        <dt className="font-medium text-ink">Email</dt>
-                        <dd className="mt-1">
-                          <a
-                            href={`mailto:${studioData.email}`}
-                            className="break-all text-brand underline-offset-4 hover:underline"
-                          >
-                            {studioData.email}
-                          </a>
-                        </dd>
-                      </div>
-                    </div>
-                  )}
-
-                  {studioData.website && (
-                    <div className="flex items-start gap-3">
-                      <Globe className="mt-0.5 h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
-                      <div>
-                        <dt className="font-medium text-ink">Website</dt>
-                        <dd className="mt-1">
-                          <a
-                            href={studioData.website}
-                            target="_blank"
-                            rel="nofollow noopener noreferrer"
-                            className="text-brand underline-offset-4 hover:underline"
-                          >
-                            Visit website
-                          </a>
-                        </dd>
-                      </div>
-                    </div>
-                  )}
-                </dl>
+          {/* ----------------------------------------------------- Contact */}
+          <section className="card-flat p-7 sm:p-8">
+            <h2 className="font-fraunces text-xl font-semibold">Contact</h2>
+            <dl className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="flex items-start gap-3">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
+                <div>
+                  <dt className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-faint">
+                    Address
+                  </dt>
+                  <dd className="mt-1.5 text-sm leading-relaxed text-ink-muted">
+                    {studioData.address}
+                    <br />
+                    {studioData.city}, {studioData.postcode}
+                  </dd>
+                </div>
               </div>
 
-              {(studioData.instagram || studioData.facebook) && (
-                <div className="card-flat p-7">
-                  <h2 className="font-fraunces text-xl font-semibold">Social</h2>
-                  <div className="mt-5 space-y-3 text-sm">
-                    {studioData.instagram && (
-                      <a
-                        href={studioData.instagram}
-                        target="_blank"
-                        rel="nofollow noopener noreferrer"
-                        className="flex items-center gap-2.5 text-ink-muted transition-colors hover:text-brand"
-                      >
-                        <Instagram className="h-4 w-4" aria-hidden="true" />
-                        Follow on Instagram
+              {studioData.phone && (
+                <div className="flex items-start gap-3">
+                  <Phone className="mt-0.5 h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
+                  <div>
+                    <dt className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-faint">
+                      Phone
+                    </dt>
+                    <dd className="mt-1.5 text-sm">
+                      <a href={`tel:${studioData.phone}`} className="text-brand underline-offset-4 hover:underline">
+                        {studioData.phone}
                       </a>
-                    )}
-                    {studioData.facebook && (
-                      <a
-                        href={studioData.facebook}
-                        target="_blank"
-                        rel="nofollow noopener noreferrer"
-                        className="flex items-center gap-2.5 text-ink-muted transition-colors hover:text-brand"
-                      >
-                        <Facebook className="h-4 w-4" aria-hidden="true" />
-                        Follow on Facebook
-                      </a>
-                    )}
+                    </dd>
                   </div>
                 </div>
               )}
 
-              {studioData.opening_hours && Object.keys(studioData.opening_hours).length > 0 && (
-                <div className="card-flat p-7">
-                  <h2 className="font-fraunces text-xl font-semibold">Opening hours</h2>
-                  <dl className="mt-5 space-y-2.5 text-sm">
-                    {Object.entries(studioData.opening_hours).map(([day, hours]) => (
-                      <div key={day} className="flex justify-between gap-4">
-                        <dt className="capitalize text-ink-muted">{day}</dt>
-                        <dd className="text-right font-medium text-ink">{String(hours)}</dd>
-                      </div>
-                    ))}
-                  </dl>
+              {studioData.website && (
+                <div className="flex items-start gap-3">
+                  <Globe className="mt-0.5 h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
+                  <div className="min-w-0">
+                    <dt className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-faint">
+                      Website
+                    </dt>
+                    <dd className="mt-1.5 text-sm">
+                      <a
+                        href={studioData.website}
+                        target="_blank"
+                        rel="nofollow noopener noreferrer"
+                        className="text-brand underline-offset-4 hover:underline"
+                      >
+                        Visit website
+                      </a>
+                    </dd>
+                  </div>
                 </div>
               )}
-            </aside>
+
+              {studioData.email && (
+                <div className="flex items-start gap-3">
+                  <Mail className="mt-0.5 h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
+                  <div className="min-w-0">
+                    <dt className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-faint">
+                      Email
+                    </dt>
+                    <dd className="mt-1.5 break-all text-sm">
+                      <a href={`mailto:${studioData.email}`} className="text-brand underline-offset-4 hover:underline">
+                        {studioData.email}
+                      </a>
+                    </dd>
+                  </div>
+                </div>
+              )}
+            </dl>
           </section>
+
+          {/* ----------------------------------------------- Opening hours */}
+          {studioData.opening_hours && Object.keys(studioData.opening_hours).length > 0 && (
+            <section className="card-flat p-7 sm:p-8">
+              <h2 className="font-fraunces text-xl font-semibold">Opening hours</h2>
+              <dl className="mt-6 grid gap-x-10 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
+                {Object.entries(studioData.opening_hours).map(([day, hours]) => (
+                  <div
+                    key={day}
+                    className="flex items-baseline justify-between gap-4 border-b border-line pb-3 text-sm"
+                  >
+                    <dt className="capitalize text-ink-muted">{day}</dt>
+                    <dd className="text-right font-medium text-ink">{String(hours)}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          )}
+          </div>
 
           <ReviewsCta locationName={studioData.name} />
 
