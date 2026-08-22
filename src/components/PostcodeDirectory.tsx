@@ -157,7 +157,14 @@ export default function PostcodeDirectory({
                   {towns.length > 0 && `Covering ${towns.slice(0, 3).map(([t]) => t).join(', ')}`}
                 </p>
               </div>
-              <StudioLocationsMap studios={studios as any} heightClass="h-[28rem]" />
+              <StudioLocationsMap
+                studios={studios.map(s => ({
+                  id: s.id, name: s.name, latitude: s.latitude, longitude: s.longitude,
+                  full_url_path: s.full_url_path, address: s.address,
+                  google_rating: s.google_rating, google_review_count: s.google_review_count,
+                }))}
+                heightClass="h-[28rem]"
+              />
             </div>
           </section>
 

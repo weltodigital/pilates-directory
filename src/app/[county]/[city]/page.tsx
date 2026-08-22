@@ -119,6 +119,28 @@ async function getCityStudios(countySlug: string, citySlug: string): Promise<Pil
   return data || [];
 }
 
+/**
+ * Trim a studio to the fields the map actually renders.
+ *
+ * StudioLocationsMap is a client component, so anything handed to it is
+ * serialised into the RSC payload and shipped to the browser twice. A full
+ * studio row is ~5KB - description, class_types, opening_hours, field_sources -
+ * against the ~270 bytes the map needs. On a county with 479 studios that was
+ * 2.25MB of payload nobody reads.
+ */
+function toMapStudio(s: any) {
+  return {
+    id: s.id,
+    name: s.name,
+    latitude: s.latitude,
+    longitude: s.longitude,
+    full_url_path: s.full_url_path,
+    address: s.address,
+    google_rating: s.google_rating,
+    google_review_count: s.google_review_count,
+  };
+}
+
 export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {
   const resolvedParams = await params;
   const { location } = await getCityData(resolvedParams.county, resolvedParams.city);
@@ -363,7 +385,7 @@ export default async function CityPage({ params }: CityPageProps) {
                     {studios.filter(s => s.latitude && s.longitude).length} of {studios.length} studios shown on the map
                   </p>
                 </div>
-                <StudioLocationsMap studios={studios} heightClass="h-[28rem]" />
+                <StudioLocationsMap studios={studios.map(toMapStudio)} heightClass="h-[28rem]" />
               </div>
             </section>
           )}

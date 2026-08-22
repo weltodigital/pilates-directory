@@ -210,6 +210,28 @@ async function getNeighbouringCodes(code: string) {
     .map(([c, count]) => ({ code: c, count }));
 }
 
+/**
+ * Trim a studio to the fields the map actually renders.
+ *
+ * StudioLocationsMap is a client component, so anything handed to it is
+ * serialised into the RSC payload and shipped to the browser twice. A full
+ * studio row is ~5KB - description, class_types, opening_hours, field_sources -
+ * against the ~270 bytes the map needs. On a county with 479 studios that was
+ * 2.25MB of payload nobody reads.
+ */
+function toMapStudio(s: any) {
+  return {
+    id: s.id,
+    name: s.name,
+    latitude: s.latitude,
+    longitude: s.longitude,
+    full_url_path: s.full_url_path,
+    address: s.address,
+    google_rating: s.google_rating,
+    google_review_count: s.google_review_count,
+  };
+}
+
 export async function generateMetadata({ params }: CountyPageProps): Promise<Metadata> {
   const resolvedParams = await params;
 
@@ -327,6 +349,23 @@ export default async function CountyPage({ params }: CountyPageProps) {
 
   const totalStudioCount = studios.length;
 
+  // A county page listing every studio is unusable and enormous: London's 479
+  // cards produce 3.5MB of HTML. Show the best of them and let the town pages
+  // carry the rest - they are the better landing pages anyway, and this
+  // concentrates internal links on them.
+  const COUNTY_LIST_LIMIT = 24;
+  const countyMean = studios.length
+    ? studios.reduce((sum, s: any) => sum + (s.google_rating || 0), 0) / studios.length
+    : 0;
+  const rank = (s: any) => {
+    const v = s.google_review_count || 0;
+    const r = s.google_rating || 0;
+    const m = 50;   // same Bayesian prior as the homepage
+    return (v / (v + m)) * r + (m / (v + m)) * countyMean;
+  };
+  const listedStudios = [...studios].sort((a, b) => rank(b) - rank(a)).slice(0, COUNTY_LIST_LIMIT);
+  const hasMoreStudios = studios.length > listedStudios.length;
+
   // ItemList so a location page is machine-readable as a ranked directory
   // listing, matching what the postcode pages already emit.
   const BASE = 'https://www.pilatesclassesnear.com';
@@ -343,8 +382,8 @@ export default async function CountyPage({ params }: CountyPageProps) {
       {
         '@type': 'ItemList',
         name: `Pilates studios in ${location.name}`,
-        numberOfItems: studios.length,
-        itemListElement: studios.slice(0, 30).map((s: any, i: number) => ({
+        numberOfItems: listedStudios.length,
+        itemListElement: listedStudios.map((s: any, i: number) => ({
           '@type': 'ListItem',
           position: i + 1,
           item: {
@@ -425,7 +464,7 @@ export default async function CountyPage({ params }: CountyPageProps) {
           <EquipmentStrip />
 
           {/* ------------------------------------------------- Locations */}
-          <section>
+          <section id="browse-towns">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
                 <span className="eyebrow">Towns &amp; cities</span>
@@ -482,7 +521,7 @@ export default async function CountyPage({ params }: CountyPageProps) {
                     {mappableStudios} of {studios.length} studios shown on the map
                   </p>
                 </div>
-                <StudioLocationsMap studios={studios} heightClass="h-[28rem]" />
+                <StudioLocationsMap studios={studios.map(toMapStudio)} heightClass="h-[28rem]" />
               </div>
             </section>
           )}
@@ -494,16 +533,20 @@ export default async function CountyPage({ params }: CountyPageProps) {
                 <div>
                   <span className="eyebrow">Full directory</span>
                   <h2 className="mt-3 text-display-sm">
-                    All pilates studios in {location.name}
+                    {hasMoreStudios
+                      ? `Top rated studios in ${location.name}`
+                      : `All pilates studios in ${location.name}`}
                   </h2>
                 </div>
                 <span className="text-sm text-ink-faint">
-                  {studios.length} studios
+                  {hasMoreStudios
+                    ? `${listedStudios.length} of ${studios.length} studios`
+                    : `${studios.length} studios`}
                 </span>
               </div>
 
               <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {studios.map((studio) => (
+                {listedStudios.map((studio) => (
                   <Link
                     key={studio.id}
                     href={`/${studio.full_url_path || `${studio.county_slug}/${studio.city_slug}/${studio.slug || studio.id}`}`}
@@ -529,6 +572,17 @@ export default async function CountyPage({ params }: CountyPageProps) {
                   </Link>
                 ))}
               </div>
+
+              {hasMoreStudios && (
+                <p className="mt-8 text-sm text-ink-muted">
+                  Showing the {listedStudios.length} highest rated of{' '}
+                  {studios.length} studios in {location.name}.{' '}
+                  <a href="#browse-towns" className="font-semibold text-brand underline-offset-4 hover:underline">
+                    Browse by town
+                  </a>{' '}
+                  to see them all.
+                </p>
+              )}
             </section>
           )}
 
