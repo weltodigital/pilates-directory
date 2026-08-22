@@ -5,8 +5,8 @@ import { useEffect, useRef, useState } from 'react'
 export interface MapStudio {
   id: string;
   name: string;
-  latitude: number | null;
-  longitude: number | null;
+  latitude?: number | null;
+  longitude?: number | null;
   full_url_path?: string | null;
   address?: string | null;
   google_rating?: number | null;

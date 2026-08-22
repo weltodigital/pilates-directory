@@ -40,6 +40,8 @@ interface County {
 }
 
 interface PilatesStudio {
+  latitude?: number;
+  longitude?: number;
   id: string;
   name: string;
   description: string;
@@ -66,8 +68,8 @@ interface PilatesStudio {
 
 async function getCityData(countySlug: string, citySlug: string): Promise<{ location: Location | null; county: County | null }> {
   const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://zytpgaraxyhlsvvkrrir.supabase.co',
-    process.env.SUPABASE_SECRET_KEY
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SECRET_KEY!
   );
 
   const { data: countyData } = await supabase
@@ -101,8 +103,8 @@ async function getCityData(countySlug: string, citySlug: string): Promise<{ loca
 
 async function getCityStudios(countySlug: string, citySlug: string): Promise<PilatesStudio[]> {
   const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://zytpgaraxyhlsvvkrrir.supabase.co',
-    process.env.SUPABASE_SECRET_KEY
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SECRET_KEY!
   );
 
   const { data } = await supabase
@@ -515,8 +517,8 @@ export default async function CityPage({ params }: CityPageProps) {
 export async function generateStaticParams() {
   try {
     const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://zytpgaraxyhlsvvkrrir.supabase.co',
-      process.env.SUPABASE_SECRET_KEY
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SECRET_KEY!
     );
 
     const { data: citiesAndTowns } = await supabase

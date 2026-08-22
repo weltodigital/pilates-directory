@@ -267,7 +267,9 @@ export default function SEOSchemaMarkup({ studios = [], location, page = 'home' 
     ]
   });
 
-  const schemas = [
+  // Heterogeneous JSON-LD: each generator returns a different schema shape, so
+  // the array cannot be narrowed to one of them.
+  const schemas: Record<string, unknown>[] = [
     generateOrganizationSchema(),
     generateWebsiteSchema(),
     generateBreadcrumbSchema()

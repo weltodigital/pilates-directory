@@ -57,8 +57,8 @@ interface PilatesStudio {
 
 async function getCountyData(countySlug: string): Promise<Location | null> {
   const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://zytpgaraxyhlsvvkrrir.supabase.co',
-    process.env.SUPABASE_SECRET_KEY
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SECRET_KEY!
   );
 
   const { data, error } = await supabase
@@ -77,8 +77,8 @@ async function getCountyData(countySlug: string): Promise<Location | null> {
 
 async function getCitiesAndTowns(countySlug: string, countyId: string) {
   const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://zytpgaraxyhlsvvkrrir.supabase.co',
-    process.env.SUPABASE_SECRET_KEY
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SECRET_KEY!
   );
 
   // Try both approaches - parent_id and county_slug
@@ -136,8 +136,8 @@ async function getCitiesAndTowns(countySlug: string, countyId: string) {
 
 async function getCountyStudios(countySlug: string): Promise<PilatesStudio[]> {
   const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://zytpgaraxyhlsvvkrrir.supabase.co',
-    process.env.SUPABASE_SECRET_KEY
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SECRET_KEY!
   );
 
   const { data, error } = await supabase
@@ -219,7 +219,7 @@ export async function generateMetadata({ params }: CountyPageProps): Promise<Met
     if (!studios.length) {
       return { title: 'Postcode Not Found | Pilates Classes Near' };
     }
-    const towns = [...new Set(studios.map((s: any) => s.city).filter(Boolean))].slice(0, 3);
+    const towns = Array.from(new Set(studios.map((s: any) => s.city).filter(Boolean))).slice(0, 3);
     return {
       title: `Pilates Studios in ${code} | ${studios.length} Studios Near You`,
       description: `Find ${studios.length} pilates studios in the ${code} postcode district${towns.length ? ` covering ${towns.join(', ')}` : ''}. Compare ratings, opening hours and verified Google reviews.`,
@@ -498,8 +498,8 @@ export default async function CountyPage({ params }: CountyPageProps) {
 
 export async function generateStaticParams() {
   const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://zytpgaraxyhlsvvkrrir.supabase.co',
-    process.env.SUPABASE_SECRET_KEY
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SECRET_KEY!
   );
 
   const { data } = await supabase

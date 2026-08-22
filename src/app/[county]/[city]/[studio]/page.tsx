@@ -53,6 +53,15 @@ interface PilatesStudio {
   google_place_id?: string;
   google_rating?: number;
   google_review_count: number;
+  business_status?: string;
+  outward_code?: string;
+  booking_url?: string;
+  booking_platform?: string;
+  price_drop_in?: number;
+  price_class_pack?: string;
+  price_membership?: string;
+  class_size_max?: number;
+  instructor_qualifications?: string[];
   county_slug: string;
   city_slug: string;
   full_url_path: string;
@@ -65,8 +74,8 @@ interface Location {
 
 async function getStudio(countySlug: string, citySlug: string, studioSlug: string): Promise<PilatesStudio | null> {
   const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://zytpgaraxyhlsvvkrrir.supabase.co',
-    process.env.SUPABASE_SECRET_KEY
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SECRET_KEY!
   );
 
   const fullPath = `${countySlug}/${citySlug}/${studioSlug}`;
@@ -83,8 +92,8 @@ async function getStudio(countySlug: string, citySlug: string, studioSlug: strin
 
 async function getLocationData(countySlug: string, citySlug: string): Promise<{ county: Location; city: Location } | null> {
   const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://zytpgaraxyhlsvvkrrir.supabase.co',
-    process.env.SUPABASE_SECRET_KEY
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SECRET_KEY!
   );
 
   const [countyResult, cityResult] = await Promise.all([
