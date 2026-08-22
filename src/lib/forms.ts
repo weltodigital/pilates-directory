@@ -57,8 +57,15 @@ export async function lookupPostcode(postcode: string) {
     if (!res.ok) return null;
     const j = await res.json();
     if (!j.result) return null;
+    // "Wandsworth, unparished area" is an administrative label, not a town,
+    // and anything after a comma is the wider district rather than the place.
+    const parish: string | null =
+      j.result.parish && !/unparished/i.test(j.result.parish)
+        ? String(j.result.parish).split(',')[0].trim()
+        : null;
+
     return {
-      town: j.result.post_town || j.result.parish || j.result.admin_district || null,
+      town: j.result.post_town || parish || j.result.admin_district || null,
       county: j.result.admin_county || j.result.admin_district || null,
       country: j.result.country as string,
       latitude: j.result.latitude as number,
