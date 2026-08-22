@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import {
   serverClient, field, isEmail, submitterHash, isRateLimited, looksLikeBot,
+  domainOf, isSharedHost, emailMatchesDomain,
 } from '@/lib/forms'
 
 export const dynamic = 'force-dynamic'
@@ -37,9 +38,6 @@ export async function POST(request: Request) {
   if (!claimantName) errors.claimant_name = 'Enter your name.';
   if (!claimantEmail) errors.claimant_email = 'Enter your email address.';
   else if (!isEmail(claimantEmail)) errors.claimant_email = 'Enter a valid email address.';
-  if (!field(body.evidence, 1000)) {
-    errors.evidence = 'Tell us how we can verify you are connected to this studio.';
-  }
   if (Object.keys(errors).length) {
     return NextResponse.json({ errors }, { status: 400 });
   }
@@ -50,13 +48,34 @@ export async function POST(request: Request) {
 
   const { data: studio } = await supabase
     .from('pilates_studios')
-    .select('id,name')
+    .select('id,name,website')
     .eq('full_url_path', studioPath)
     .eq('is_active', true)
     .single();
 
   if (!studio) {
     return NextResponse.json({ error: 'We could not find that studio.' }, { status: 404 });
+  }
+
+  // Ownership is proved by holding an address at the studio's own domain.
+  // It is the only check that stands on its own: anything typed into a form
+  // is just an assertion, and this directory has published unverified claims
+  // about real businesses before.
+  const siteDomain = domainOf(studio.website);
+  if (!siteDomain || isSharedHost(siteDomain)) {
+    return NextResponse.json({
+      error: studio.website
+        ? 'This listing links to a shared host rather than the studio\'s own domain, so it cannot be claimed automatically. Please contact us instead.'
+        : 'This listing has no website, so it cannot be claimed automatically. Please contact us instead.',
+    }, { status: 422 });
+  }
+
+  if (!emailMatchesDomain(claimantEmail!, siteDomain)) {
+    return NextResponse.json({
+      errors: {
+        claimant_email: `Use an email address at ${siteDomain} \u2014 that is how we confirm you are connected to the studio.`,
+      },
+    }, { status: 400 });
   }
 
   const hash = submitterHash(request);

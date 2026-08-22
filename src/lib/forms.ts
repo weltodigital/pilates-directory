@@ -124,3 +124,53 @@ export function cleanClassTypes(value: unknown): string[] | null {
   const out = value.filter((v): v is string => typeof v === 'string' && allowed.has(v));
   return out.length ? out : null;
 }
+
+/**
+ * Registrable-ish domain from a URL or email address, lowercased and without
+ * a leading www. Not a public-suffix parser: it keeps the full host, which is
+ * what the claim check compares.
+ */
+export function domainOf(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const raw = value.includes('@') ? value.split('@').pop()! : value;
+  try {
+    const host = raw.includes('://')
+      ? new URL(raw).hostname
+      : new URL(`https://${raw}`).hostname;
+    return host.toLowerCase().replace(/^www\./, '') || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Website builders and marketplaces host studios on a shared domain, so an
+ * address there proves nothing about the business.
+ */
+const SHARED_HOSTS = [
+  'wixsite.com', 'squarespace.com', 'weebly.com', 'wordpress.com', 'business.site',
+  'godaddysites.com', 'myshopify.com', 'sitey.me', 'webador.co.uk', 'mailchimpsites.com',
+  'linktr.ee', 'facebook.com', 'instagram.com', 'google.com', 'sites.google.com',
+  'classpass.com', 'mindbodyonline.com', 'momence.com', 'teamup.com', 'bookwhen.com',
+  'gymcatch.com', 'glofox.com', 'acuityscheduling.com',
+];
+
+/** True when the domain cannot be used to prove ownership of a studio. */
+export function isSharedHost(domain: string | null): boolean {
+  if (!domain) return true;
+  return SHARED_HOSTS.some(h => domain === h || domain.endsWith(`.${h}`));
+}
+
+/**
+ * Whether an email address belongs to a studio's own domain. Subdomains on
+ * either side are accepted, so info@mail.studio.co.uk matches studio.co.uk.
+ */
+export function emailMatchesDomain(email: string, siteDomain: string): boolean {
+  const emailDomain = domainOf(email);
+  if (!emailDomain) return false;
+  return (
+    emailDomain === siteDomain ||
+    emailDomain.endsWith(`.${siteDomain}`) ||
+    siteDomain.endsWith(`.${emailDomain}`)
+  );
+}

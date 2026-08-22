@@ -8,9 +8,11 @@ import { Field, Honeypot, inputClass } from '@/components/FormField'
 interface ClaimStudioFormProps {
   studioPath: string;
   studioName: string;
+  /** The studio's own domain; claims must come from an address here. */
+  studioDomain: string;
 }
 
-export default function ClaimStudioForm({ studioPath, studioName }: ClaimStudioFormProps) {
+export default function ClaimStudioForm({ studioPath, studioName, studioDomain }: ClaimStudioFormProps) {
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<{ already?: boolean } | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -31,7 +33,6 @@ export default function ClaimStudioForm({ studioPath, studioName }: ClaimStudioF
           claimant_email: fd.get('claimant_email'),
           claimant_phone: fd.get('claimant_phone'),
           claimant_role: fd.get('claimant_role'),
-          evidence: fd.get('evidence'),
           message: fd.get('message'),
           company: fd.get('company'),   // honeypot
         }),
@@ -62,7 +63,7 @@ export default function ClaimStudioForm({ studioPath, studioName }: ClaimStudioF
         <p className="mt-4 leading-relaxed text-ink-muted">
           {done.already
             ? `We already have an open claim for ${studioName} from this email address, so there's nothing more you need to do.`
-            : `We'll check your connection to ${studioName} by hand before the listing is marked as verified. Claiming is free. We won't email you in the meantime.`}
+            : `Your address at ${studioDomain} confirms you're connected to ${studioName}. We check every claim by hand before marking a listing verified. Claiming is free, and we won't email you in the meantime.`}
         </p>
         <Link href={`/${studioPath}`} className="pill-outline mt-8">
           Back to the listing
@@ -91,25 +92,15 @@ export default function ClaimStudioForm({ studioPath, studioName }: ClaimStudioF
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2">
-        <Field id="claimant_email" label="Your email" required error={errors.claimant_email}
-               hint="Ideally an address at the studio's own domain.">
-          <input id="claimant_email" name="claimant_email" type="email" className={inputClass} autoComplete="email" />
+        <Field id="claimant_email" label={`Your email at ${studioDomain}`} required error={errors.claimant_email}
+               hint={`Must be an address at ${studioDomain}. Holding one is how we confirm you're connected to the studio.`}>
+          <input id="claimant_email" name="claimant_email" type="email" className={inputClass}
+                 autoComplete="email" placeholder={`you@${studioDomain}`} />
         </Field>
         <Field id="claimant_phone" label="Phone" error={errors.claimant_phone}>
           <input id="claimant_phone" name="claimant_phone" className={inputClass} inputMode="tel" autoComplete="tel" />
         </Field>
       </div>
-
-      <Field
-        id="evidence"
-        label="How can we verify you?"
-        required
-        error={errors.evidence}
-        hint="An email at the studio's domain, a mention of you on its website, or its Google Business Profile."
-      >
-        <textarea id="evidence" name="evidence" rows={3} className={inputClass}
-                  placeholder="e.g. I'm listed as the owner on our website's about page." />
-      </Field>
 
       <Field id="message" label="Anything to correct?" error={errors.message}
              hint="Tell us about anything on the listing that's out of date.">
@@ -123,7 +114,7 @@ export default function ClaimStudioForm({ studioPath, studioName }: ClaimStudioF
         </button>
         <p className="mt-4 text-xs text-ink-faint">
           Claiming is free. We check every claim by hand before a listing is
-          marked as verified.
+          marked as verified. No access to your inbox is requested or needed.
         </p>
       </div>
     </form>

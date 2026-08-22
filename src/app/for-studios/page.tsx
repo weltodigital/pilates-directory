@@ -120,8 +120,9 @@ export default async function ForStudiosPage() {
               <h2 className="mt-5 font-fraunces text-2xl font-semibold">Already listed?</h2>
               <p className="mt-4 flex-1 leading-relaxed text-ink-muted">
                 Find your studio using the search, then use the
-                &ldquo;Own this studio?&rdquo; link on its page. Claiming lets you
-                correct anything that&apos;s wrong and keeps it accurate.
+                &ldquo;Own this studio?&rdquo; link on its page. We confirm
+                ownership with an email address at your studio&apos;s own
+                domain, so there&apos;s nothing to upload or prove.
               </p>
               <Link href="/near" className="pill-outline mt-8 self-start">
                 Find your studio
@@ -157,6 +158,15 @@ export default async function ForStudiosPage() {
                 <dd className="mt-2 text-sm leading-relaxed text-ink-muted">
                   By rating and review volume, or by distance when someone
                   searches from a postcode. Never by payment.
+                </dd>
+              </div>
+              <div>
+                <dt className="font-semibold text-ink">How do you verify a claim?</dt>
+                <dd className="mt-2 text-sm leading-relaxed text-ink-muted">
+                  You claim from an email address at your studio&apos;s own
+                  domain. If your listing has no website, or points at Facebook
+                  or a booking platform, email us and we&apos;ll verify it
+                  another way.
                 </dd>
               </div>
               <div>
