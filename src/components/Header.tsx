@@ -17,6 +17,7 @@ const NAV_LINKS = [
   { label: 'Near me', href: '/near' },
   { label: 'Browse locations', href: '/#browse-counties' },
   { label: 'Top rated studios', href: '/#top-rated-studios' },
+  { label: 'For studios', href: '/for-studios' },
 ]
 
 export default function Header({ breadcrumbs }: HeaderProps = {}) {

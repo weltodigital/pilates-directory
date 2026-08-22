@@ -37,6 +37,8 @@ async function getFeaturedCounties(): Promise<County[]> {
 }
 
 const COMPANY_LINKS = [
+  { label: 'For studio owners', href: '/for-studios' },
+  { label: 'Add your studio', href: '/add-studio' },
   { label: 'Contact', href: 'mailto:pilatesclassesnear@weltodigital.com' },
   { label: 'Privacy Policy', href: '/privacy-policy' },
   { label: 'Terms of Service', href: '/terms-of-service' },

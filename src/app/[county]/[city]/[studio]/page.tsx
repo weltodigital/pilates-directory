@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase';
-import { MapPin, Star, Phone, Mail, Globe, Activity, Award, Navigation, CalendarCheck, Users } from 'lucide-react';
+import { MapPin, Star, Phone, Mail, Globe, Activity, Award, Navigation, CalendarCheck, Users, ShieldCheck } from 'lucide-react';
 import HeaderWithBreadcrumbs from '@/components/HeaderWithBreadcrumbs';
 import EquipmentStrip from '@/components/EquipmentStrip';
 import ReviewsCta from '@/components/ReviewsCta';
@@ -477,6 +477,31 @@ export default async function StudioPage({ params }: StudioPageProps) {
             )}
 
           </div>
+
+          {/* Ownership: a verified studio shows the badge, everyone else
+              gets an invitation to claim. */}
+          <section className="rounded-xl border border-line bg-surface-sunken p-7 sm:p-8">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="font-fraunces text-xl font-semibold">
+                  {studioData.is_verified
+                    ? `${studioData.name} is verified`
+                    : `Own ${studioData.name}?`}
+                </h2>
+                <p className="mt-2 max-w-xl text-sm leading-relaxed text-ink-muted">
+                  {studioData.is_verified
+                    ? 'The owner has claimed this listing and keeps its details up to date.'
+                    : 'Claim this listing to correct anything that is wrong and keep your classes, prices and opening hours current. It is free.'}
+                </p>
+              </div>
+              {!studioData.is_verified && (
+                <Link href={`/claim/${studioData.full_url_path}`} className="pill-brand shrink-0">
+                  <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+                  Claim this listing
+                </Link>
+              )}
+            </div>
+          </section>
 
           <ReviewsCta locationName={studioData.name} />
 
