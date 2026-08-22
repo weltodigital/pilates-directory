@@ -105,12 +105,15 @@ async function getCountiesWithLocations(): Promise<CountyWithLocations[]> {
     return [];
   }
 
-  // Get all cities and towns
+  // Only towns that have studios: an empty town on the homepage spends a
+  // link on a page with nothing to show. Ordered by size so the cap below
+  // keeps the towns people actually search for.
   const { data: citiesAndTowns, error: locationsError } = await supabase
     .from('public_locations')
     .select('id, name, slug, full_path, county_slug, butcher_count, type')
     .in('type', ['city', 'town'])
-    .order('name');
+    .gt('butcher_count', 0)
+    .order('butcher_count', { ascending: false });
 
   if (locationsError) {
     console.error('Error fetching cities and towns:', locationsError);
@@ -123,6 +126,11 @@ async function getCountiesWithLocations(): Promise<CountyWithLocations[]> {
     locations: citiesAndTowns.filter(location => location.county_slug === county.slug)
   }));
 }
+
+// Listing all 647 towns on the homepage spread authority across 758 links and
+// made the page 368KB. Counties get their busiest towns; the county page
+// carries the rest, which is where that link is worth more anyway.
+const HOMEPAGE_TOWNS_PER_COUNTY = 8;
 
 // A studio needs real review volume before a perfect score means anything.
 const TOP_RATED_MIN_REVIEWS = 20;
@@ -503,13 +511,23 @@ export default async function Home() {
 
                     {locations.length > 0 ? (
                       <ul className="mt-5 space-y-2.5 border-t border-line pt-5">
-                        {locations.map((location) => (
+                        {locations.slice(0, HOMEPAGE_TOWNS_PER_COUNTY).map((location) => (
                           <li key={location.id}>
                             <Link href={`/${location.full_path}`} className="link-quiet text-sm">
                               {location.name}
                             </Link>
                           </li>
                         ))}
+                        {locations.length > HOMEPAGE_TOWNS_PER_COUNTY && (
+                          <li>
+                            <Link
+                              href={`/${county.slug}`}
+                              className="text-sm font-semibold text-brand underline-offset-4 hover:underline"
+                            >
+                              + {locations.length - HOMEPAGE_TOWNS_PER_COUNTY} more in {county.name}
+                            </Link>
+                          </li>
+                        )}
                       </ul>
                     ) : (
                       <p className="mt-5 border-t border-line pt-5 text-sm text-ink-faint">

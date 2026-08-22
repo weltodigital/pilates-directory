@@ -152,6 +152,12 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
     };
   }
 
+  // A town page with no studios has nothing to offer a searcher. Keeping it
+  // reachable is fine - it fills in as soon as we list one - but submitting
+  // it to the index invites a rank-then-bounce, which is worse than absence.
+  const studioCount = (await getCityStudios(resolvedParams.county, resolvedParams.city)).length;
+  const indexable = studioCount > 0;
+
   const localKeywords = [
     `pilates ${location.name}`,
     `pilates near me ${location.name}`,
@@ -185,10 +191,10 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
       description: `Find the best pilates studios in ${location.name}. Browse classes, read reviews & book online.`,
     },
     robots: {
-      index: true,
+      index: indexable,
       follow: true,
       googleBot: {
-        index: true,
+        index: indexable,
         follow: true,
         'max-video-preview': -1,
         'max-image-preview': 'large',

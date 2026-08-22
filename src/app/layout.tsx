@@ -20,7 +20,9 @@ export const metadata: Metadata = {
   // Makes every relative canonical, Open Graph and Twitter URL absolute.
   // Without it Next warns and social crawlers can receive relative paths.
   metadataBase: new URL('https://www.pilatesclassesnear.com'),
-  title: 'Pilates Classes Near - Find The Best Pilates Studios Near You | #1 UK Directory',
+  // Kept near 60 characters so it is not truncated in results, leading with
+  // the phrase people actually search.
+  title: 'Find Pilates Studios Near You | UK Pilates Directory',
   description: 'Discover the UK\'s best pilates studios with live class schedules, verified reviews, and instant booking. Find reformer, mat, and clinical pilates classes near you.',
   keywords: 'pilates, reformer pilates, mat pilates, clinical pilates, fitness, UK, studios, classes, instructors, booking, reviews, London, Manchester, Edinburgh, Birmingham',
   openGraph: {
