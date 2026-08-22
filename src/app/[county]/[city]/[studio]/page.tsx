@@ -149,6 +149,7 @@ export async function generateMetadata({ params }: StudioPageProps): Promise<Met
       ...studioData.class_types || [],
       ...studioData.specialties || []
     ].join(', '),
+    alternates: { canonical: `/${county}/${city}/${studio}` },
     openGraph: {
       title,
       description,
@@ -192,12 +193,110 @@ export default async function StudioPage({ params }: StudioPageProps) {
   ];
 
   const fullAddress = `${studioData.address}, ${studioData.city}, ${studioData.postcode}`;
+  const BASE = 'https://www.pilatesclassesnear.com';
+  const studioUrl = `${BASE}/${studioData.full_url_path}`;
+
+  // Opening hours arrive as { monday: "9:00 AM \u2013 5:00 PM" }. Schema.org wants
+  // 24-hour opens/closes, so only ranges we can parse confidently are emitted;
+  // a day we cannot read is left out rather than guessed at.
+  const DAY_NAMES: Record<string, string> = {
+    monday: 'Monday', tuesday: 'Tuesday', wednesday: 'Wednesday',
+    thursday: 'Thursday', friday: 'Friday', saturday: 'Saturday', sunday: 'Sunday',
+  };
+  const to24 = (t: string): string | null => {
+    const m = t.trim().match(/^(\d{1,2})(?::(\d{2}))?\s*([AaPp])\.?[Mm]\.?$/);
+    if (!m) return null;
+    let h = parseInt(m[1], 10);
+    const min = m[2] || '00';
+    const pm = m[3].toLowerCase() === 'p';
+    if (h === 12) h = pm ? 12 : 0; else if (pm) h += 12;
+    return `${String(h).padStart(2, '0')}:${min}`;
+  };
+  const openingHoursSpec = Object.entries(studioData.opening_hours || {})
+    .map(([day, hours]) => {
+      const dayName = DAY_NAMES[day.toLowerCase()];
+      const parts = String(hours).split(/\u2013|\u2014|-|to/i);
+      if (!dayName || parts.length < 2) return null;
+      const opens = to24(parts[0]);
+      const closes = to24(parts[1]);
+      if (!opens || !closes) return null;
+      return {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: `https://schema.org/${dayName}`,
+        opens, closes,
+      };
+    })
+    .filter(Boolean);
+
+  const studioSchema: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: BASE },
+          { '@type': 'ListItem', position: 2, name: locationData.county.name, item: `${BASE}/${locationData.county.slug}` },
+          { '@type': 'ListItem', position: 3, name: locationData.city.name, item: `${BASE}/${locationData.county.slug}/${locationData.city.slug}` },
+          { '@type': 'ListItem', position: 4, name: studioData.name, item: studioUrl },
+        ],
+      },
+      {
+        '@type': ['LocalBusiness', 'HealthAndBeautyBusiness', 'SportsActivityLocation'],
+        '@id': studioUrl,
+        name: studioData.name,
+        url: studioUrl,
+        ...(studioData.description ? { description: studioData.description } : {}),
+        ...(studioData.website ? { sameAs: [studioData.website] } : {}),
+        ...(studioData.phone ? { telephone: studioData.phone } : {}),
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: studioData.address,
+          addressLocality: studioData.city,
+          addressRegion: studioData.county,
+          postalCode: studioData.postcode,
+          addressCountry: 'GB',
+        },
+        ...(studioData.latitude && studioData.longitude ? {
+          geo: {
+            '@type': 'GeoCoordinates',
+            latitude: studioData.latitude,
+            longitude: studioData.longitude,
+          },
+        } : {}),
+        // Only emitted with both a score and a count: Google rejects an
+        // aggregateRating missing either, and an invalid one can cost the
+        // whole rich result.
+        ...(studioData.google_rating && studioData.google_review_count ? {
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: studioData.google_rating,
+            reviewCount: studioData.google_review_count,
+            bestRating: 5,
+            worstRating: 1,
+          },
+        } : {}),
+        ...(openingHoursSpec.length ? { openingHoursSpecification: openingHoursSpec } : {}),
+        ...(studioData.class_types?.length ? { keywords: studioData.class_types.join(', ') } : {}),
+        ...(studioData.price_drop_in ? { priceRange: `\u00a3${studioData.price_drop_in}` } : {}),
+        ...(studioData.booking_url ? {
+          potentialAction: {
+            '@type': 'ReserveAction',
+            target: { '@type': 'EntryPoint', urlTemplate: studioData.booking_url },
+          },
+        } : {}),
+      },
+    ],
+  };
   // Outward code links the studio to its postcode district page.
   const outwardCode = (studioData.postcode || '').trim().split(/\s+/)[0] || null;
   const hasMap = Boolean(studioData.latitude && studioData.longitude);
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(studioSchema) }}
+      />
       <HeaderWithBreadcrumbs breadcrumbs={breadcrumbs} />
 
       <main>

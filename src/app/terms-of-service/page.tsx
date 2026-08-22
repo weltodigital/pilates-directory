@@ -5,6 +5,7 @@ import Footer from '@/components/Footer';
 export const metadata: Metadata = {
   title: 'Terms of Service | Pilates Classes Near',
   description: 'Terms of service for Pilates Classes Near - the terms and conditions for using our pilates studio directory.',
+  alternates: { canonical: '/terms-of-service' },
   robots: {
     index: true,
     follow: true,

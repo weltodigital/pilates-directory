@@ -5,6 +5,7 @@ import Footer from '@/components/Footer';
 export const metadata: Metadata = {
   title: 'Privacy Policy | Pilates Classes Near',
   description: 'Privacy policy for Pilates Classes Near - how we collect, use, and protect your personal information.',
+  alternates: { canonical: '/privacy-policy' },
   robots: {
     index: true,
     follow: true,

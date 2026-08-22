@@ -252,6 +252,7 @@ export async function generateMetadata({ params }: CountyPageProps): Promise<Met
 
   return {
     title: location.seo_title || `Pilates Studios in ${location.name} | Find Pilates Classes Near You`,
+    alternates: { canonical: `/${resolvedParams.county}` },
     description: location.meta_description || `Find the best pilates studios in ${location.name}. Browse reformer, mat & clinical pilates classes. Read reviews, check schedules & book online. ${location.butcher_count}+ studios listed.`,
     keywords: [...pilatesKeywords, ...(location.seo_keywords || [])].join(', '),
     openGraph: {
@@ -325,6 +326,52 @@ export default async function CountyPage({ params }: CountyPageProps) {
   const studios = await getCountyStudios(resolvedParams.county);
 
   const totalStudioCount = studios.length;
+
+  // ItemList so a location page is machine-readable as a ranked directory
+  // listing, matching what the postcode pages already emit.
+  const BASE = 'https://www.pilatesclassesnear.com';
+  const listSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: BASE },
+          { '@type': 'ListItem', position: 2, name: location.name, item: `${BASE}/${resolvedParams.county}` },
+        ],
+      },
+      {
+        '@type': 'ItemList',
+        name: `Pilates studios in ${location.name}`,
+        numberOfItems: studios.length,
+        itemListElement: studios.slice(0, 30).map((s: any, i: number) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          item: {
+            '@type': 'HealthAndBeautyBusiness',
+            name: s.name,
+            ...(s.full_url_path ? { url: `${BASE}/${s.full_url_path}` } : {}),
+            address: {
+              '@type': 'PostalAddress',
+              streetAddress: s.address || undefined,
+              addressLocality: s.city || undefined,
+              postalCode: s.postcode || undefined,
+              addressCountry: 'GB',
+            },
+            ...(s.google_rating && s.google_review_count ? {
+              aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: s.google_rating,
+                reviewCount: s.google_review_count,
+                bestRating: 5,
+              },
+            } : {}),
+          },
+        })),
+      },
+    ],
+  };
+
   const mappableStudios = studios.filter(s => s.latitude && s.longitude).length;
 
   const breadcrumbs = [
@@ -334,6 +381,8 @@ export default async function CountyPage({ params }: CountyPageProps) {
 
   return (
     <>
+      <script type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(listSchema) }} />
       <HeaderWithBreadcrumbs breadcrumbs={breadcrumbs} />
 
       <main>
