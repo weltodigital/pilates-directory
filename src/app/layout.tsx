@@ -17,6 +17,9 @@ const fraunces = Fraunces({
 })
 
 export const metadata: Metadata = {
+  // Makes every relative canonical, Open Graph and Twitter URL absolute.
+  // Without it Next warns and social crawlers can receive relative paths.
+  metadataBase: new URL('https://www.pilatesclassesnear.com'),
   title: 'Pilates Classes Near - Find The Best Pilates Studios Near You | #1 UK Directory',
   description: 'Discover the UK\'s best pilates studios with live class schedules, verified reviews, and instant booking. Find reformer, mat, and clinical pilates classes near you.',
   keywords: 'pilates, reformer pilates, mat pilates, clinical pilates, fitness, UK, studios, classes, instructors, booking, reviews, London, Manchester, Edinburgh, Birmingham',
@@ -26,11 +29,21 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_GB',
     siteName: 'Pilates Classes Near',
+    url: '/',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'A reformer pilates class in a UK studio',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Pilates Classes Near - Find The Best Pilates Studios Near You',
     description: 'Discover the UK\'s best pilates studios with live class schedules, verified reviews, and instant booking.',
+    images: ['/og-image.jpg'],
   },
   robots: {
     index: true,
