@@ -61,8 +61,8 @@ export default function ClaimStudioForm({ studioPath, studioName }: ClaimStudioF
         </h2>
         <p className="mt-4 leading-relaxed text-ink-muted">
           {done.already
-            ? `We already have an open claim for ${studioName} from this email address. We'll be in touch.`
-            : `We'll verify your connection to ${studioName} and email you once it's confirmed. Claiming is free.`}
+            ? `We already have an open claim for ${studioName} from this email address, so there's nothing more you need to do.`
+            : `We'll check your connection to ${studioName} by hand before the listing is marked as verified. Claiming is free. We won't email you in the meantime.`}
         </p>
         <Link href={`/${studioPath}`} className="pill-outline mt-8">
           Back to the listing

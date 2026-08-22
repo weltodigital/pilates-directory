@@ -70,8 +70,10 @@ export default function AddStudioForm() {
         </span>
         <h2 className="mt-6 font-fraunces text-2xl font-semibold">Thank you</h2>
         <p className="mt-4 leading-relaxed text-ink-muted">
-          We&apos;ve received your studio and will review it before it goes live.
-          Listings are free, and we&apos;ll email you once it&apos;s published.
+          We&apos;ve received your studio. Listings are free, and we check
+          submissions by hand before publishing them, so it may be a little
+          while before it appears. We won&apos;t email you in the meantime,
+          so do check back.
         </p>
         {done.duplicate && (
           <p className="mt-6 rounded-md border border-line bg-surface-sunken px-5 py-4 text-left text-sm text-ink-muted">
@@ -163,7 +165,7 @@ export default function AddStudioForm() {
         </div>
 
         <Field id="contact_email" label="Your email" required error={errors.contact_email}
-               hint="Only used to confirm the listing. Never published.">
+               hint="Only used if we need to check something with you. Never published.">
           <input id="contact_email" name="contact_email" type="email" className={inputClass} autoComplete="email" />
         </Field>
 
@@ -179,8 +181,8 @@ export default function AddStudioForm() {
           Submit studio
         </button>
         <p className="mt-4 text-xs text-ink-faint">
-          Listings are free. We review every submission before publishing, so
-          it may take a few days to appear.
+          Listings are free. Every submission is reviewed by hand before it is
+          published.
         </p>
       </div>
     </form>
