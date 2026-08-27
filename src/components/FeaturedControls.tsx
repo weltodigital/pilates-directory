@@ -110,8 +110,8 @@ export default function FeaturedControls(props: FeaturedControlsProps) {
             {!eligible
               ? 'Once we have verified this listing, you can put it at the top of your town page.'
               : full
-                ? `All ${slotsTotal} featured places in ${townName} are taken at the moment. They come free when a studio stops, and we will add more ways to stand out soon.`
-                : `Sit at the top of the ${townName} page, above every other studio, for ${price} a month. ${slotsFree} of ${slotsTotal} places ${slotsFree === 1 ? 'is' : 'are'} free. Cancel any time.`}
+                ? `All ${slotsTotal} featured places in ${townName} are taken at the moment. One opens up whenever a studio stops, and we will add more ways to stand out soon.`
+                : `Sit at the top of the ${townName} page, above every other studio, for ${price} a month. ${slotsFree} of ${slotsTotal} places ${slotsFree === 1 ? 'is' : 'are'} available. Cancel any time.`}
           </p>
         </div>
 
