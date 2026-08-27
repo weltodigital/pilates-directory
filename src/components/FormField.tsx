@@ -8,6 +8,11 @@ interface FieldProps {
   hint?: string;
   error?: string;
   required?: boolean;
+  /**
+   * Suppresses the "optional" tag. On a form where every field is optional -
+   * the owner dashboard - marking each one adds noise rather than meaning.
+   */
+  hideOptional?: boolean;
   children: ReactNode;
 }
 
@@ -15,13 +20,15 @@ export const inputClass =
   'w-full rounded-md border border-line-strong bg-surface px-4 py-3 text-sm text-ink outline-none ' +
   'transition-colors placeholder:text-ink-faint focus:border-brand disabled:opacity-60';
 
-export function Field({ id, label, hint, error, required, children }: FieldProps) {
+export function Field({ id, label, hint, error, required, hideOptional, children }: FieldProps) {
   return (
     <div>
       <label htmlFor={id} className="block text-sm font-medium text-ink">
         {label}
         {required && <span className="ml-1 text-brand" aria-hidden="true">*</span>}
-        {!required && <span className="ml-2 text-xs font-normal text-ink-faint">optional</span>}
+        {!required && !hideOptional && (
+          <span className="ml-2 text-xs font-normal text-ink-faint">optional</span>
+        )}
       </label>
       {hint && <p className="mt-1 text-xs text-ink-faint">{hint}</p>}
       <div className="mt-2">{children}</div>

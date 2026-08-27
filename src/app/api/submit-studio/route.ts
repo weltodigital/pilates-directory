@@ -3,6 +3,7 @@ import {
   serverClient, field, isEmail, normaliseUrl, normalisePostcode, lookupPostcode,
   submitterHash, isRateLimited, looksLikeBot, cleanClassTypes,
 } from '@/lib/forms'
+import { notifyAdmin, siteUrl } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
 
@@ -110,6 +111,16 @@ export async function POST(request: Request) {
     console.error('Studio submission failed:', error.message);
     return NextResponse.json({ error: 'We could not save your submission. Please try again.' }, { status: 500 });
   }
+
+  await notifyAdmin(
+    `Studio submitted: ${name}`,
+    [
+      `${contactName} <${contactEmail}> submitted ${name}, ${postcode}.`,
+      duplicateName ? `\nPossible duplicate of ${duplicateName}.` : '',
+      '',
+      `Review: ${siteUrl()}/admin/submissions`,
+    ].filter(Boolean).join('\n')
+  );
 
   return NextResponse.json({
     ok: true,

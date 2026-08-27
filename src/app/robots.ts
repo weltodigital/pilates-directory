@@ -23,6 +23,11 @@ export default function robots(): MetadataRoute.Robots {
           // Claim forms are per-studio and noindex; crawling them wastes budget
           // on 4,500 near-identical pages.
           '/claim/',
+          // Signed-in areas. Both are noindex already; this keeps crawlers from
+          // requesting them at all and filling the logs with redirects.
+          '/admin',
+          '/dashboard',
+          '/studio-login',
         ],
       },
     ],

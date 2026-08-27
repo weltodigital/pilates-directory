@@ -3,6 +3,7 @@ import {
   serverClient, field, isEmail, submitterHash, isRateLimited, looksLikeBot,
   domainOf, isSharedHost, emailMatchesDomain,
 } from '@/lib/forms'
+import { notifyAdmin, siteUrl } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
 
@@ -111,6 +112,16 @@ export async function POST(request: Request) {
     console.error('Claim failed:', error.message);
     return NextResponse.json({ error: 'We could not save your claim. Please try again.' }, { status: 500 });
   }
+
+  await notifyAdmin(
+    `Claim submitted: ${studio.name}`,
+    [
+      `${claimantName} <${claimantEmail}> claims ${studio.name}.`,
+      `The address is at ${siteDomain}, which matches the listing's website.`,
+      '',
+      `Review: ${siteUrl()}/admin/claims`,
+    ].join('\n')
+  );
 
   return NextResponse.json({ ok: true, studio: studio.name });
 }
