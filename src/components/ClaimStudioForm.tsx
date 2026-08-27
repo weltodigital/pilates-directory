@@ -63,8 +63,26 @@ export default function ClaimStudioForm({ studioPath, studioName, studioDomain }
         <p className="mt-4 leading-relaxed text-ink-muted">
           {done.already
             ? `We already have an open claim for ${studioName} from this email address, so there's nothing more you need to do.`
-            : `Your address at ${studioDomain} confirms you're connected to ${studioName}. We check every claim by hand before marking a listing verified. Claiming is free, and we won't email you in the meantime.`}
+            : `Your address at ${studioDomain} matches ${studioName}'s website, so the claim is with us. We check every one by hand.`}
         </p>
+        {!done.already && (
+          <ol className="mx-auto mt-6 max-w-sm space-y-3 text-left text-sm leading-relaxed text-ink-muted">
+            <li className="flex gap-3">
+              <span className="font-semibold text-brand">1</span>
+              We review the claim, usually the same day.
+            </li>
+            <li className="flex gap-3">
+              <span className="font-semibold text-brand">2</span>
+              You get an email at that address with a link to choose a password.
+              Following it is what proves the address is really yours.
+            </li>
+            <li className="flex gap-3">
+              <span className="font-semibold text-brand">3</span>
+              Sign in any time to update your classes, prices, opening hours and
+              booking link. Changes are checked by us before they go live.
+            </li>
+          </ol>
+        )}
         <Link href={`/${studioPath}`} className="pill-outline mt-8">
           Back to the listing
         </Link>
@@ -112,9 +130,10 @@ export default function ClaimStudioForm({ studioPath, studioName, studioDomain }
           {busy && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
           Submit claim
         </button>
-        <p className="mt-4 text-xs text-ink-faint">
-          Claiming is free. We check every claim by hand before a listing is
-          marked as verified. No access to your inbox is requested or needed.
+        <p className="mt-4 text-xs leading-relaxed text-ink-faint">
+          Claiming is free. Once we&apos;ve approved it, we email this address a
+          link to set a password, and you can sign in and keep the listing up to
+          date. We never ask for access to your inbox or your booking system.
         </p>
       </div>
     </form>

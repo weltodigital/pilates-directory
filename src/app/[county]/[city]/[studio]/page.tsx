@@ -419,7 +419,7 @@ export default async function StudioPage({ params }: StudioPageProps) {
                 <StudioLocationsMap
                   studios={[studioData]}
                   heightClass="h-64"
-                  singleZoom={16}
+                  singleZoom={13}
                 />
                 <div className="border-t border-line p-5">
                   <p className="text-sm leading-relaxed text-ink-muted">{fullAddress}</p>

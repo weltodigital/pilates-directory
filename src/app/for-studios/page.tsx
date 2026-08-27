@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { createClient } from '@supabase/supabase-js'
 import {
   Building2, ShieldCheck, PlusCircle, MapPin, Star, CalendarCheck, ArrowRight,
+  KeyRound, Pencil,
 } from 'lucide-react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -80,6 +81,13 @@ export default async function ForStudiosPage() {
                 Claim an existing listing
               </Link>
             </div>
+
+            <p className="mt-6 text-sm text-ink-muted">
+              Already claimed yours?{' '}
+              <Link href="/studio-login" className="font-semibold text-brand underline-offset-4 hover:underline">
+                Sign in to your dashboard
+              </Link>
+            </p>
           </div>
         </section>
 
@@ -119,14 +127,66 @@ export default async function ForStudiosPage() {
               <ShieldCheck className="h-6 w-6 text-brand" aria-hidden="true" />
               <h2 className="mt-5 font-fraunces text-2xl font-semibold">Already listed?</h2>
               <p className="mt-4 flex-1 leading-relaxed text-ink-muted">
-                Find your studio using the search, then use the
-                &ldquo;Own this studio?&rdquo; link on its page. We confirm
-                ownership with an email address at your studio&apos;s own
-                domain, so there&apos;s nothing to upload or prove.
+                Find your studio using the search, then press
+                &ldquo;Claim this listing&rdquo; beside its name. Claim from an
+                email address at your studio&apos;s own domain and there is
+                nothing to upload or prove &mdash; holding that address is the
+                evidence.
               </p>
               <Link href="/near" className="pill-outline mt-8 self-start">
                 Find your studio
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </div>
+          </section>
+
+          {/* What claiming actually gets you, which the site never said */}
+          <section>
+            <span className="eyebrow">After you claim</span>
+            <h2 className="mt-3 text-display-sm">What happens next</h2>
+            <ol className="mt-10 grid gap-6 md:grid-cols-3">
+              {[
+                {
+                  icon: ShieldCheck,
+                  step: 'We check the claim',
+                  body: 'By hand, usually the same day. Your listing gets a Verified badge on its own page and everywhere it is listed, so people can see the details come from you.',
+                },
+                {
+                  icon: KeyRound,
+                  step: 'You get a sign-in',
+                  body: 'We email the address you claimed from a link to choose a password. Following it is what proves the address really is yours \u2014 typing it into a form only proved the domain existed.',
+                },
+                {
+                  icon: Pencil,
+                  step: 'You keep it current',
+                  body: 'Sign in whenever you like to update classes, prices, opening hours, booking link and more. We check changes before they go live, and email you when they do.',
+                },
+              ].map(({ icon: Icon, step, body }, i) => (
+                <li key={step} className="card-flat p-7">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-tint text-xs font-semibold text-brand">
+                      {i + 1}
+                    </span>
+                    <Icon className="h-5 w-5 text-brand" aria-hidden="true" />
+                  </div>
+                  <h3 className="mt-4 font-fraunces text-xl font-semibold">{step}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-ink-muted">{body}</p>
+                </li>
+              ))}
+            </ol>
+
+            <div className="mt-8 flex flex-wrap items-center gap-4 rounded-xl border border-line bg-surface-sunken px-7 py-6">
+              <div className="min-w-0 flex-1">
+                <h3 className="font-fraunces text-lg font-semibold">
+                  Already claimed your studio?
+                </h3>
+                <p className="mt-1 text-sm leading-relaxed text-ink-muted">
+                  Sign in with the email address you claimed from.
+                </p>
+              </div>
+              <Link href="/studio-login" className="pill-brand shrink-0">
+                <KeyRound className="h-4 w-4" aria-hidden="true" />
+                Sign in
               </Link>
             </div>
           </section>
@@ -164,9 +224,28 @@ export default async function ForStudiosPage() {
                 <dt className="font-semibold text-ink">How do you verify a claim?</dt>
                 <dd className="mt-2 text-sm leading-relaxed text-ink-muted">
                   You claim from an email address at your studio&apos;s own
-                  domain. If your listing has no website, or points at Facebook
+                  domain, we check it by hand, and then we email that address a
+                  link to set a password. The link arriving is the real proof:
+                  typing an address into a form shows only that the domain
+                  exists. If your listing has no website, or points at Facebook
                   or a booking platform, email us and we&apos;ll verify it
                   another way.
+                </dd>
+              </div>
+              <div>
+                <dt className="font-semibold text-ink">What can I change once I&apos;ve claimed?</dt>
+                <dd className="mt-2 text-sm leading-relaxed text-ink-muted">
+                  Your description, contact details, booking link, class types
+                  and levels, prices, opening hours, equipment, qualifications
+                  and accessibility. Not the name, address or postcode &mdash;
+                  those set your page&apos;s web address, so email us instead.
+                </dd>
+              </div>
+              <div>
+                <dt className="font-semibold text-ink">Do my changes go live straight away?</dt>
+                <dd className="mt-2 text-sm leading-relaxed text-ink-muted">
+                  No. We read every change before it publishes, and email you
+                  once it is live. It is usually the same day.
                 </dd>
               </div>
               <div>
