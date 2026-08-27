@@ -95,11 +95,17 @@ export async function POST(request: Request) {
     ].join('\n'),
   });
 
+  // Without a provider key the send is a console log, which is useful in
+  // development and must not be recorded as delivery: a row marked delivered
+  // that nobody received is worse than one marked failed.
+  const configured = Boolean(process.env.RESEND_API_KEY);
   await supabase
     .from('contact_messages')
     .update({
-      delivered,
-      delivery_error: delivered ? null : 'Provider rejected the message',
+      delivered: delivered && configured,
+      delivery_error: !configured
+        ? 'No email provider configured; message saved but not sent'
+        : delivered ? null : 'Provider rejected the message',
     })
     .eq('id', row.id);
 
