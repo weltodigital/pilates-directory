@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, KeyRound } from 'lucide-react'
 
 interface Breadcrumb {
   label: string;
@@ -48,10 +48,24 @@ export default function Header({ breadcrumbs }: HeaderProps = {}) {
             ))}
           </nav>
 
-          <Link href="/#browse-counties" className="pill-brand px-5 py-2.5">
-            Find a studio
-            <ChevronRight className="h-4 w-4" aria-hidden="true" />
-          </Link>
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+            {/* Owners arrive knowing they have an account and nothing else.
+                The label is hidden on narrow screens rather than the button,
+                so the way in survives on a phone. */}
+            <Link
+              href="/studio-login"
+              className="pill-outline px-3.5 py-2.5 sm:px-5"
+              aria-label="Studio sign in"
+            >
+              <KeyRound className="h-4 w-4" aria-hidden="true" />
+              <span className="hidden sm:inline">Studio login</span>
+            </Link>
+
+            <Link href="/#browse-counties" className="pill-brand px-5 py-2.5">
+              Find a studio
+              <ChevronRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          </div>
         </div>
 
         {breadcrumbs && breadcrumbs.length > 0 && (
