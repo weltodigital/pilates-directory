@@ -310,13 +310,34 @@ export default async function StudioPage({ params }: StudioPageProps) {
             aria-hidden="true"
           />
           <div className="shell py-16 sm:py-20">
-            <div className="max-w-3xl">
+            <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-start lg:gap-12">
+            <div className="min-w-0">
               <span className="eyebrow">
                 {locationData.city.name}, {locationData.county.name}
               </span>
-              <h1 className="mt-4 text-display-sm sm:text-display">
-                {studioData.name}
-              </h1>
+
+              {/* Ownership sits with the name, because it qualifies the name:
+                  either the studio stands behind these details, or nobody has
+                  claimed them yet. */}
+              <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-3">
+                <h1 className="text-display-sm sm:text-display">
+                  {studioData.name}
+                </h1>
+                {studioData.is_verified ? (
+                  <span className="chip chip-brand" title="The owner has claimed this listing and keeps it up to date">
+                    <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+                    Verified
+                  </span>
+                ) : (
+                  <Link
+                    href={`/claim/${studioData.full_url_path}`}
+                    className="chip transition-colors hover:border-brand hover:text-brand"
+                  >
+                    <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+                    Claim this listing
+                  </Link>
+                )}
+              </div>
               <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-muted">
                 {studioData.description ||
                   `${studioData.name} is a professional pilates studio in ${locationData.city.name}, ${locationData.county.name}, offering expert instruction and modern equipment for every level.`}
@@ -390,6 +411,30 @@ export default async function StudioPage({ params }: StudioPageProps) {
                   )}
                 </div>
               )}
+            </div>
+
+            {/* Where it is, at the point someone is deciding whether to go. */}
+            {hasMap && (
+              <div className="card-flat overflow-hidden lg:sticky lg:top-24">
+                <StudioLocationsMap
+                  studios={[studioData]}
+                  heightClass="h-64"
+                  singleZoom={16}
+                />
+                <div className="border-t border-line p-5">
+                  <p className="text-sm leading-relaxed text-ink-muted">{fullAddress}</p>
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(fullAddress)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="pill-brand mt-4 w-full justify-center"
+                  >
+                    <Navigation className="h-4 w-4" aria-hidden="true" />
+                    Get directions
+                  </a>
+                </div>
+              </div>
+            )}
             </div>
           </div>
         </section>
@@ -669,61 +714,8 @@ export default async function StudioPage({ params }: StudioPageProps) {
 
           </div>
 
-          {/* Ownership: a verified studio shows the badge, everyone else
-              gets an invitation to claim. */}
-          <section className="rounded-xl border border-line bg-surface-sunken p-7 sm:p-8">
-            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h2 className="font-fraunces text-xl font-semibold">
-                  {studioData.is_verified
-                    ? `${studioData.name} is verified`
-                    : `Own ${studioData.name}?`}
-                </h2>
-                <p className="mt-2 max-w-xl text-sm leading-relaxed text-ink-muted">
-                  {studioData.is_verified
-                    ? 'The owner has claimed this listing and keeps its details up to date.'
-                    : 'Claim this listing to correct anything that is wrong and keep your classes, prices and opening hours current. It is free.'}
-                </p>
-              </div>
-              {!studioData.is_verified && (
-                <Link href={`/claim/${studioData.full_url_path}`} className="pill-brand shrink-0">
-                  <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-                  Claim this listing
-                </Link>
-              )}
-            </div>
-          </section>
 
 
-          {/* ------------------------------------------------------- Map */}
-          {hasMap && (
-            <section>
-              <div className="card-flat overflow-hidden">
-                <div className="border-b border-line p-6">
-                  <h2 className="font-fraunces text-xl font-semibold">Studio location</h2>
-                  <p className="mt-1 text-sm text-ink-muted">
-                    Find {studioData.name} at {fullAddress}
-                  </p>
-                </div>
-                <StudioLocationsMap
-                  studios={[studioData]}
-                  heightClass="h-[26rem]"
-                  singleZoom={16}
-                />
-                <div className="border-t border-line p-6">
-                  <a
-                    href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(fullAddress)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="pill-brand"
-                  >
-                    <Navigation className="h-4 w-4" aria-hidden="true" />
-                    Get directions
-                  </a>
-                </div>
-              </div>
-            </section>
-          )}
 
           <EquipmentStrip />
         </div>

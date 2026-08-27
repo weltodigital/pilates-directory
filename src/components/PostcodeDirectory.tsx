@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { MapPin, Star, Phone, ArrowRight, Navigation } from 'lucide-react'
+import { MapPin, Star, Phone, ArrowRight, Navigation, ShieldCheck } from 'lucide-react'
 import HeaderWithBreadcrumbs from '@/components/HeaderWithBreadcrumbs'
 import StudioLocationsMap from '@/components/StudioLocationsMap'
 import ReviewsCta from '@/components/ReviewsCta'
@@ -17,6 +17,7 @@ export interface PostcodeStudio {
   google_rating: number | null;
   google_review_count: number | null;
   full_url_path: string | null;
+  is_verified?: boolean | null;
 }
 
 interface PostcodeDirectoryProps {
@@ -178,12 +179,18 @@ export default function PostcodeDirectory({
                 <article key={studio.id} className="card-flat flex flex-col p-7">
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
-                      <h3 className="font-fraunces text-xl font-semibold leading-snug">
+                      <h3 className="flex flex-wrap items-center gap-x-2.5 gap-y-1 font-fraunces text-xl font-semibold leading-snug">
                         {studio.full_url_path ? (
                           <Link href={`/${studio.full_url_path}`} className="transition-colors hover:text-brand">
                             {studio.name}
                           </Link>
                         ) : studio.name}
+                        {studio.is_verified && (
+                          <span className="chip chip-brand shrink-0 font-sans">
+                            <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+                            Verified
+                          </span>
+                        )}
                       </h3>
                       <p className="mt-2 flex items-start gap-1.5 text-sm text-ink-muted">
                         <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />

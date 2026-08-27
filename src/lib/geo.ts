@@ -56,11 +56,12 @@ export interface NearbyStudio {
   google_rating: number | null;
   google_review_count: number | null;
   full_url_path: string | null;
+  is_verified: boolean | null;
   distanceMetres: number;
 }
 
 const SELECT =
-  'id,name,city,county,address,postcode,latitude,longitude,google_rating,google_review_count,full_url_path';
+  'id,name,city,county,address,postcode,latitude,longitude,google_rating,google_review_count,full_url_path,is_verified';
 
 /**
  * Nearest active studios, closest first.

@@ -56,6 +56,15 @@ export default function OwnerEditForm({ studioId, values, hasPending }: OwnerEdi
         return;
       }
       setDone({ fields: data.fields, unchanged: data.unchanged });
+
+      // Back to the listings once something has actually been sent: the card
+      // there shows the changes are waiting, and staying on a form whose
+      // values no longer match what is live invites a second submission.
+      // An unchanged save stays put, because the reason nothing happened only
+      // makes sense next to the form.
+      if (!data.unchanged) {
+        router.push('/dashboard');
+      }
       router.refresh();
     } catch {
       setFormError('Something went wrong. Please try again.');

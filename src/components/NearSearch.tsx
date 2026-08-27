@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { MapPin, Star, Navigation, Search, Loader2, ArrowRight } from 'lucide-react'
+import { MapPin, Star, Navigation, Search, Loader2, ArrowRight, ShieldCheck } from 'lucide-react'
 import StudioLocationsMap from '@/components/StudioLocationsMap'
 import { formatDistance } from '@/lib/geo'
 
@@ -18,6 +18,7 @@ interface Result {
   google_review_count: number | null;
   full_url_path: string | null;
   distanceMetres: number;
+  is_verified: boolean | null;
 }
 
 export default function NearSearch() {
@@ -146,10 +147,16 @@ export default function NearSearch() {
                     <span className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-faint">
                       {i + 1} · {formatDistance(s.distanceMetres)}
                     </span>
-                    <h3 className="mt-2 font-fraunces text-xl font-semibold leading-snug">
+                    <h3 className="mt-2 flex flex-wrap items-center gap-x-2.5 gap-y-1 font-fraunces text-xl font-semibold leading-snug">
                       {s.full_url_path
                         ? <Link href={`/${s.full_url_path}`} className="transition-colors hover:text-brand">{s.name}</Link>
                         : s.name}
+                      {s.is_verified && (
+                        <span className="chip chip-brand shrink-0 font-sans">
+                          <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+                          Verified
+                        </span>
+                      )}
                     </h3>
                     <p className="mt-2 flex items-start gap-1.5 text-sm text-ink-muted">
                       <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />

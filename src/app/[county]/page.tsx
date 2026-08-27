@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { MapPin, Users, Activity, Star, ArrowRight } from 'lucide-react';
+import { MapPin, Users, Activity, Star, ArrowRight, ShieldCheck } from 'lucide-react';
 import HeaderWithBreadcrumbs from '@/components/HeaderWithBreadcrumbs';
 import EquipmentStrip from '@/components/EquipmentStrip';
 import ReviewsCta from '@/components/ReviewsCta';
@@ -52,6 +52,7 @@ interface PilatesStudio {
   description?: string;
   city: string;
   county: string;
+  is_verified?: boolean | null;
 }
 
 
@@ -170,7 +171,7 @@ async function getPostcodeStudios(code: string) {
 
   const { data, error } = await supabase
     .from('pilates_studios')
-    .select('id,name,city,county,county_slug,address,postcode,latitude,longitude,google_rating,google_review_count,full_url_path')
+    .select('id,name,city,county,county_slug,address,postcode,latitude,longitude,google_rating,google_review_count,full_url_path,is_verified')
     .eq('is_active', true)
     .ilike('outward_code', code)
     .order('google_rating', { ascending: false, nullsFirst: false });
@@ -553,8 +554,14 @@ export default async function CountyPage({ params }: CountyPageProps) {
                     className="card-flat block p-5"
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <h3 className="text-sm font-semibold text-ink">
+                      <h3 className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-semibold text-ink">
                         {studio.name}
+                        {studio.is_verified && (
+                          <ShieldCheck
+                            className="h-3.5 w-3.5 shrink-0 text-brand"
+                            aria-label="Verified by the studio"
+                          />
+                        )}
                       </h3>
                       {studio.google_rating && (
                         <span className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-brand">

@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { MapPin, Star, Users, Activity, Clock, Phone, Navigation, Award, ArrowRight } from 'lucide-react';
+import { MapPin, Star, Users, Activity, Clock, Phone, Navigation, Award, ArrowRight, ShieldCheck } from 'lucide-react';
 import EquipmentStrip from '@/components/EquipmentStrip';
 import ReviewsCta from '@/components/ReviewsCta';
 import StudioLocationsMap from '@/components/StudioLocationsMap';
@@ -64,6 +64,7 @@ interface PilatesStudio {
   is_active: boolean;
   google_rating?: number;
   full_url_path: string;
+  is_verified?: boolean | null;
 }
 
 async function getCityData(countySlug: string, citySlug: string): Promise<{ location: Location | null; county: County | null }> {
@@ -420,13 +421,19 @@ export default async function CityPage({ params }: CityPageProps) {
                     <article key={studio.id} className="card-flat flex flex-col p-7">
                       <div className="flex items-start justify-between gap-4">
                         <div className="min-w-0">
-                          <h3 className="font-fraunces text-xl font-semibold leading-snug">
+                          <h3 className="flex flex-wrap items-center gap-x-2.5 gap-y-1 font-fraunces text-xl font-semibold leading-snug">
                             <Link
                               href={`/${studio.full_url_path}`}
                               className="transition-colors hover:text-brand"
                             >
                               {studio.name}
                             </Link>
+                            {studio.is_verified && (
+                              <span className="chip chip-brand shrink-0 font-sans">
+                                <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+                                Verified
+                              </span>
+                            )}
                           </h3>
                           <p className="mt-2 flex items-start gap-1.5 text-sm text-ink-muted">
                             <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
