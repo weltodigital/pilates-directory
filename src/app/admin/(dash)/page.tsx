@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { serverClient } from '@/lib/forms'
 import DecidedAt from '@/components/admin/DecidedAt'
+import ConfigWarning from '@/components/admin/ConfigWarning'
 
 export const dynamic = 'force-dynamic'
 
@@ -71,6 +72,8 @@ export default async function AdminOverviewPage() {
 
   return (
     <>
+      <ConfigWarning />
+
       <h1 className="font-fraunces text-2xl font-semibold">
         {total === 0 ? 'Nothing waiting' : `${total} waiting for review`}
       </h1>
