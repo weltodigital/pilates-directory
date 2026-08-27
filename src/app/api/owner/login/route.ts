@@ -1,16 +1,15 @@
 import { NextResponse } from 'next/server'
-import { field, isEmail, submitterHash } from '@/lib/forms'
-import { looksLikeBot } from '@/lib/forms'
-import { requestLoginLink } from '@/lib/owner-auth'
+import { field, isEmail, looksLikeBot } from '@/lib/forms'
+import { OWNER_COOKIE, ownerCookieOptions, signIn } from '@/lib/owner-auth'
 
 export const dynamic = 'force-dynamic'
 
-/**
- * POST /api/owner/login
- *
- * Always answers the same way. Whether an address belongs to a studio owner
- * is not something an anonymous caller gets to find out by asking.
- */
+const MESSAGES = {
+  credentials: 'That email address and password do not match.',
+  locked: 'Too many attempts. Wait a few minutes and try again.',
+  no_password: 'This account has no password yet. Use the link we emailed you, or ask for a new one below.',
+}
+
 export async function POST(request: Request) {
   let body: Record<string, unknown>;
   try {
@@ -22,13 +21,21 @@ export async function POST(request: Request) {
   if (looksLikeBot(body)) return NextResponse.json({ ok: true });
 
   const email = field(body.email, 254);
-  if (!email || !isEmail(email)) {
+  const password = typeof body.password === 'string' ? body.password : '';
+
+  if (!email || !isEmail(email) || !password) {
+    return NextResponse.json({ error: MESSAGES.credentials }, { status: 400 });
+  }
+
+  const result = await signIn(email, password, request.headers.get('user-agent'));
+  if (!result.ok) {
     return NextResponse.json(
-      { errors: { email: 'Enter a valid email address.' } },
-      { status: 400 }
+      { error: MESSAGES[result.reason] },
+      { status: result.reason === 'locked' ? 429 : 401 }
     );
   }
 
-  await requestLoginLink(email, submitterHash(request));
-  return NextResponse.json({ ok: true });
+  const res = NextResponse.json({ ok: true });
+  res.cookies.set(OWNER_COOKIE, result.session, ownerCookieOptions);
+  return res;
 }

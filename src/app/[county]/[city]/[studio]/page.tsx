@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase';
-import { MapPin, Star, Phone, Mail, Globe, Activity, Award, Navigation, CalendarCheck, Users, ShieldCheck } from 'lucide-react';
+import { MapPin, Star, Phone, Mail, Globe, Activity, Award, Navigation, CalendarCheck, Users, ShieldCheck, Accessibility, Car, Clock, Sparkles, Target } from 'lucide-react';
 import HeaderWithBreadcrumbs from '@/components/HeaderWithBreadcrumbs';
 import EquipmentStrip from '@/components/EquipmentStrip';
 import ReviewsCta from '@/components/ReviewsCta';
@@ -56,6 +56,10 @@ interface PilatesStudio {
   business_status?: string;
   outward_code?: string;
   booking_url?: string;
+  class_levels?: string[];
+  goal_tags?: string[];
+  schedule_tags?: string[];
+  price_intro_offer?: string;
   booking_platform?: string;
   price_drop_in?: number;
   price_class_pack?: string;
@@ -337,6 +341,12 @@ export default async function StudioPage({ params }: StudioPageProps) {
                     Beginner friendly
                   </span>
                 )}
+                {studioData.online_booking_available && !studioData.booking_url && (
+                  <span className="chip">
+                    <CalendarCheck className="h-3.5 w-3.5" aria-hidden="true" />
+                    Book online
+                  </span>
+                )}
                 {studioData.instructor_qualifications?.map((q: string) => (
                   <span key={q} className="chip">
                     <Award className="h-3.5 w-3.5" aria-hidden="true" />
@@ -393,7 +403,9 @@ export default async function StudioPage({ params }: StudioPageProps) {
             {/* ------------------------------------------- Classes offered */}
             {((studioData.class_types?.length ?? 0) > 0 ||
               (studioData.equipment_available?.length ?? 0) > 0 ||
-              (studioData.specialties?.length ?? 0) > 0) && (
+              (studioData.specialties?.length ?? 0) > 0 ||
+              (studioData.class_levels?.length ?? 0) > 0 ||
+              (studioData.goal_tags?.length ?? 0) > 0) && (
               <section className="card-flat h-full p-7">
                 <h2 className="font-fraunces text-xl font-semibold">Classes offered</h2>
 
@@ -405,13 +417,54 @@ export default async function StudioPage({ params }: StudioPageProps) {
                   </div>
                 )}
 
+                {studioData.class_levels && studioData.class_levels.length > 0 && (
+                  <div className="mt-6 border-t border-line pt-5">
+                    <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-faint">
+                      Levels taught
+                    </h3>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {studioData.class_levels.map((level: string) => (
+                        <span key={level} className="chip">{level}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {studioData.goal_tags && studioData.goal_tags.length > 0 && (
+                  <div className="mt-6 border-t border-line pt-5">
+                    <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-faint">
+                      Good for
+                    </h3>
+                    <ul className="mt-3 space-y-2">
+                      {studioData.goal_tags.map((goal: string) => (
+                        <li key={goal} className="flex items-center gap-2.5 text-sm text-ink-muted">
+                          <Target className="h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
+                          {goal}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
                 {(studioData.price_drop_in || studioData.price_class_pack ||
-                  studioData.price_membership || studioData.class_size_max) && (
+                  studioData.price_membership || studioData.class_size_max ||
+                  studioData.price_intro_offer) && (
                   <div className="mt-6 border-t border-line pt-5">
                     <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-faint">
                       Prices
                     </h3>
                     <dl className="mt-3 space-y-2.5 text-sm">
+                      {studioData.price_intro_offer && (
+                        <div className="flex items-baseline justify-between gap-4">
+                          <dt className="flex shrink-0 items-center gap-1.5 text-ink-muted">
+                            <Sparkles className="h-3.5 w-3.5 text-brand" aria-hidden="true" />
+                            Intro offer
+                          </dt>
+                          <dd className="text-right font-semibold text-brand">
+                            {studioData.price_intro_offer}
+                          </dd>
+                        </div>
+                      )}
                       {studioData.price_drop_in && (
                         <div className="flex items-baseline justify-between gap-4">
                           <dt className="text-ink-muted">Drop-in</dt>
@@ -555,14 +608,38 @@ export default async function StudioPage({ params }: StudioPageProps) {
                   </div>
                 )}
               </dl>
+
+              {(studioData.parking_available ||
+                (studioData.accessibility_features?.length ?? 0) > 0) && (
+                <div className="mt-6 border-t border-line pt-5">
+                  <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-faint">
+                    Getting there
+                  </h3>
+                  <ul className="mt-3 space-y-2">
+                    {studioData.parking_available && (
+                      <li className="flex items-center gap-2.5 text-sm text-ink-muted">
+                        <Car className="h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
+                        Parking available
+                      </li>
+                    )}
+                    {studioData.accessibility_features?.map((feature: string) => (
+                      <li key={feature} className="flex items-center gap-2.5 text-sm text-ink-muted">
+                        <Accessibility className="h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </section>
 
             {/* --------------------------------------------- Opening hours */}
-            {studioData.opening_hours && Object.keys(studioData.opening_hours).length > 0 && (
+            {((studioData.opening_hours && Object.keys(studioData.opening_hours).length > 0) ||
+              (studioData.schedule_tags?.length ?? 0) > 0) && (
               <section className="card-flat h-full p-7">
                 <h2 className="font-fraunces text-xl font-semibold">Opening hours</h2>
                 <dl className="mt-6 space-y-2.5">
-                  {Object.entries(studioData.opening_hours).map(([day, hours]) => (
+                  {Object.entries(studioData.opening_hours || {}).map(([day, hours]) => (
                     <div
                       key={day}
                       className="flex items-baseline justify-between gap-4 border-b border-line pb-2.5 text-sm last:border-0 last:pb-0"
@@ -572,6 +649,22 @@ export default async function StudioPage({ params }: StudioPageProps) {
                     </div>
                   ))}
                 </dl>
+
+                {studioData.schedule_tags && studioData.schedule_tags.length > 0 && (
+                  <div className="mt-6 border-t border-line pt-5">
+                    <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-faint">
+                      Classes run
+                    </h3>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {studioData.schedule_tags.map((slot: string) => (
+                        <span key={slot} className="chip">
+                          <Clock className="h-3.5 w-3.5" aria-hidden="true" />
+                          {slot}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </section>
             )}
 

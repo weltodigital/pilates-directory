@@ -1,6 +1,6 @@
 import { lookupPostcode } from '@/lib/forms'
 import { recordAction } from '@/lib/admin-auth'
-import { requestLoginLink } from '@/lib/owner-auth'
+import { requestPasswordLink } from '@/lib/owner-auth'
 import { sendEmail, siteUrl } from '@/lib/email'
 import { EDITABLE_KEYS, fieldSpec, parseValue } from '@/lib/editable'
 
@@ -290,9 +290,9 @@ export async function approveClaim(
     studio_id: claim.studio_id, owner_id: ownerId,
   }, note);
 
-  await requestLoginLink(email, 'admin-approval');
+  await requestPasswordLink(email, 'set_password', 'admin-approval');
 
-  return { ok: true, message: `${claim.pilates_studios?.name} verified. Sign-in link sent to ${email}.` };
+  return { ok: true, message: `${claim.pilates_studios?.name} verified. Password setup link sent to ${email}.` };
 }
 
 export async function rejectClaim(

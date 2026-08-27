@@ -14,18 +14,8 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 }
 
-const ERRORS: Record<string, string> = {
-  missing: 'That link was incomplete. Ask for a new one below.',
-  expired: 'That link has expired or has already been used. Ask for a new one below.',
-}
-
-interface PageProps {
-  searchParams: Promise<{ error?: string }>;
-}
-
-export default async function StudioLoginPage({ searchParams }: PageProps) {
+export default async function StudioLoginPage() {
   if (await getOwner()) redirect('/dashboard');
-  const { error } = await searchParams;
 
   return (
     <>
@@ -48,12 +38,11 @@ export default async function StudioLoginPage({ searchParams }: PageProps) {
         </section>
 
         <div className="shell py-16 sm:py-20">
-          {error && ERRORS[error] && (
-            <p className="mx-auto mb-6 max-w-md rounded-md border border-line-strong bg-surface-sunken px-4 py-3 text-sm text-ink">
-              {ERRORS[error]}
-            </p>
-          )}
           <StudioLoginForm />
+          <p className="mx-auto mt-8 max-w-md text-center text-sm leading-relaxed text-ink-faint">
+            Not claimed your listing yet? Find your studio on the site and use the
+            &ldquo;Claim this listing&rdquo; button on its page.
+          </p>
         </div>
       </main>
 
