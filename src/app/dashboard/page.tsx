@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ExternalLink, Pencil, ShieldCheck } from 'lucide-react'
 import { requireOwner, ownedStudios } from '@/lib/owner-auth'
 import { serverClient } from '@/lib/forms'
+import ReviewsCta from '@/components/ReviewsCta'
 
 export const dynamic = 'force-dynamic'
 
@@ -78,6 +79,10 @@ export default async function DashboardPage() {
             </div>
           </article>
         ))}
+      </div>
+
+      <div className="mt-10">
+        <ReviewsCta variant="owner" />
       </div>
     </>
   );

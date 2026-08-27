@@ -6,7 +6,6 @@ import { createClient } from '@/lib/supabase';
 import { MapPin, Star, Phone, Mail, Globe, Activity, Award, Navigation, CalendarCheck, Users, ShieldCheck, Accessibility, Car, Clock, Sparkles, Target } from 'lucide-react';
 import HeaderWithBreadcrumbs from '@/components/HeaderWithBreadcrumbs';
 import EquipmentStrip from '@/components/EquipmentStrip';
-import ReviewsCta from '@/components/ReviewsCta';
 import StudioLocationsMap from '@/components/StudioLocationsMap';
 import { isOutwardCode } from '@/lib/geo';
 
@@ -695,7 +694,6 @@ export default async function StudioPage({ params }: StudioPageProps) {
             </div>
           </section>
 
-          <ReviewsCta locationName={studioData.name} />
 
           {/* ------------------------------------------------------- Map */}
           {hasMap && (
