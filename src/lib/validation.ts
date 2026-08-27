@@ -25,7 +25,15 @@ export function normaliseUrl(value: string | null): string | null {
   const withScheme = /^https?:\/\//i.test(value) ? value : `https://${value}`;
   try {
     const u = new URL(withScheme);
-    return u.hostname.includes('.') ? u.toString() : null;
+    if (!u.hostname.includes('.')) return null;
+
+    // An email address typed into a website field parses as a URL: the part
+    // before the @ becomes the username and gmail.com becomes the host. It
+    // published as a link to https://someone@gmail.com/, which goes nowhere.
+    // Credentials in a URL are never something a studio means to give us.
+    if (u.username || u.password) return null;
+
+    return u.toString();
   } catch {
     return null;
   }
