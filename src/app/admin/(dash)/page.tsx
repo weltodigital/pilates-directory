@@ -12,13 +12,15 @@ async function overview() {
   const pending = (table: string) =>
     supabase.from(table).select('*', { count: 'exact', head: true }).eq('status', 'pending');
 
-  const [subs, claims, edits, verified, owners, actions] = await Promise.all([
+  const [subs, claims, edits, verified, owners, featured, actions] = await Promise.all([
     pending('studio_submissions'),
     pending('studio_claims'),
     pending('studio_edits'),
     supabase.from('pilates_studios').select('*', { count: 'exact', head: true })
       .eq('is_active', true).eq('is_verified', true),
     supabase.from('studio_owners').select('*', { count: 'exact', head: true }),
+    supabase.from('featured_listings').select('*', { count: 'exact', head: true })
+      .in('status', ['active', 'past_due']),
     supabase.from('admin_actions').select('action,note,detail,created_at')
       .not('action', 'like', 'admin.login%')
       .order('created_at', { ascending: false }).limit(12),
@@ -30,6 +32,7 @@ async function overview() {
     edits: edits.count || 0,
     verified: verified.count || 0,
     owners: owners.count || 0,
+    featured: featured.count || 0,
     recent: actions.data || [],
   };
 }
@@ -84,6 +87,7 @@ export default async function AdminOverviewPage() {
         <Tile href="/admin/edits" label="Edits pending" value={data.edits} waiting />
         <Tile href="/admin/claims" label="Verified listings" value={data.verified} />
         <Tile href="/admin/claims" label="Owner accounts" value={data.owners} />
+        <Tile href="/admin/claims" label="Featured listings" value={data.featured} />
       </div>
 
       <h2 className="mt-12 font-fraunces text-lg font-semibold">Recent decisions</h2>

@@ -326,7 +326,7 @@ export async function ownedStudios(ownerId: string) {
 
   const { data } = await supabase
     .from('studio_owner_studios')
-    .select('studio_id, pilates_studios(id,name,city,county,full_url_path,is_verified)')
+    .select('studio_id, pilates_studios(id,name,city,county,city_slug,county_slug,full_url_path,is_verified)')
     .eq('owner_id', ownerId);
 
   return (data || [])

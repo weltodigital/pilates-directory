@@ -5,6 +5,9 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { MapPin, Star, Users, Activity, Clock, Phone, Navigation, Award, ArrowRight, ShieldCheck } from 'lucide-react';
 import EquipmentStrip from '@/components/EquipmentStrip';
+import FeaturedStudios from '@/components/FeaturedStudios';
+import { serverClient } from '@/lib/forms';
+import { featuredForTown } from '@/lib/featured';
 import ReviewsCta from '@/components/ReviewsCta';
 import StudioLocationsMap from '@/components/StudioLocationsMap';
 import HeaderWithBreadcrumbs from '@/components/HeaderWithBreadcrumbs';
@@ -232,6 +235,13 @@ const CITY_BENEFITS = [
   },
 ];
 
+/** Paid placements for this town, longest-standing first. */
+async function getFeaturedStudios(countySlug: string, citySlug: string) {
+  const supabase = serverClient();
+  if (!supabase) return [];
+  return featuredForTown(supabase, countySlug, citySlug);
+}
+
 export default async function CityPage({ params }: CityPageProps) {
   const resolvedParams = await params;
   const { location, county } = await getCityData(resolvedParams.county, resolvedParams.city);
@@ -241,6 +251,7 @@ export default async function CityPage({ params }: CityPageProps) {
   }
 
   const studios = await getCityStudios(resolvedParams.county, resolvedParams.city);
+  const featured = await getFeaturedStudios(resolvedParams.county, resolvedParams.city);
 
   // Postcode districts covered by this town, so the district pages are
   // reachable rather than orphaned.
@@ -357,6 +368,8 @@ export default async function CityPage({ params }: CityPageProps) {
         </section>
 
         <div className="shell space-y-20 py-20">
+          <FeaturedStudios studios={featured} townName={location.name} />
+
           <EquipmentStrip />
 
           {postcodeDistricts.length > 0 && (

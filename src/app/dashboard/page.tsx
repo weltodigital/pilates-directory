@@ -3,6 +3,11 @@ import { ExternalLink, Pencil, ShieldCheck } from 'lucide-react'
 import { requireOwner, ownedStudios } from '@/lib/owner-auth'
 import { serverClient } from '@/lib/forms'
 import ReviewsCta from '@/components/ReviewsCta'
+import FeaturedControls from '@/components/FeaturedControls'
+import {
+  FEATURED_SLOTS_PER_TOWN, featuredConfigured, formatPrice, studioFeature,
+  townAvailability,
+} from '@/lib/featured'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,10 +25,31 @@ async function pendingByStudio(studioIds: string[]): Promise<Set<string>> {
   return new Set((data || []).map((row: any) => row.studio_id));
 }
 
+/**
+ * The featured state of each listing, and how much room is left in its town.
+ * Read per studio rather than in one query because an owner with listings in
+ * two towns is asking two separate questions.
+ */
+async function featuredByStudio(studios: any[]) {
+  const supabase = serverClient();
+  if (!supabase || !studios.length) return {};
+
+  const entries = await Promise.all(studios.map(async (studio: any) => {
+    const [feature, availability] = await Promise.all([
+      studioFeature(supabase, studio.id),
+      townAvailability(supabase, studio.county_slug, studio.city_slug),
+    ]);
+    return [studio.id, { feature, availability }] as const;
+  }));
+
+  return Object.fromEntries(entries);
+}
+
 export default async function DashboardPage() {
   const owner = await requireOwner();
   const studios = await ownedStudios(owner.id);
   const pending = await pendingByStudio(studios.map((s: any) => s.id));
+  const featured = await featuredByStudio(studios);
 
   if (!studios.length) {
     return (
@@ -76,6 +102,23 @@ export default async function DashboardPage() {
                   View listing
                 </Link>
               </div>
+            </div>
+
+            <div className="mt-7 border-t border-line pt-7">
+              <FeaturedControls
+                studioId={studio.id}
+                townName={studio.city || 'your town'}
+                eligible={Boolean(studio.is_verified)}
+                available={featuredConfigured()}
+                price={formatPrice()}
+                slotsTotal={FEATURED_SLOTS_PER_TOWN}
+                slotsFree={featured[studio.id]?.availability?.free ?? 0}
+                feature={featured[studio.id]?.feature ? {
+                  status: featured[studio.id].feature.status,
+                  currentPeriodEnd: featured[studio.id].feature.current_period_end,
+                  cancelAtPeriodEnd: featured[studio.id].feature.cancel_at_period_end,
+                } : null}
+              />
             </div>
           </article>
         ))}
