@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { CreditCard, Loader2, Sparkles } from 'lucide-react'
+import { ArrowUpRight, CalendarCheck, CreditCard, Loader2, Sparkles, XCircle } from 'lucide-react'
 
 interface FeaturedControlsProps {
   studioId: string;
@@ -79,10 +79,10 @@ export default function FeaturedControls(props: FeaturedControlsProps) {
               {feature.status === 'past_due'
                 ? 'Your last payment did not go through. Your place is held while we retry — update your card to keep it.'
                 : feature.cancelAtPeriodEnd
-                  ? `Cancelled. You stay featured until ${renews ?? 'the end of the period'}, then the place is released.`
+                  ? `Cancelled. You stay featured until ${renews ?? 'the end of the month you have paid for'}, and will not be charged again.`
                   : renews
-                    ? `${price} a month. Renews ${renews}.`
-                    : `${price} a month.`}
+                    ? `${price} a month, renewing ${renews}. Cancel any time under Manage billing — you keep the place until the end of the month you have paid for.`
+                    : `${price} a month. Cancel any time under Manage billing.`}
             </p>
           </div>
 
@@ -140,36 +140,126 @@ export default function FeaturedControls(props: FeaturedControlsProps) {
   // ------------------------------------------------------- not subscribed
   const full = slotsFree === 0;
 
+  if (!eligible) {
+    return (
+      <div className="rounded-xl border border-line-strong bg-surface-sunken p-6 sm:p-7">
+        <h3 className="flex items-center gap-2 font-fraunces text-lg font-semibold">
+          <Sparkles className="h-4 w-4 text-brand" aria-hidden="true" />
+          Feature this listing
+        </h3>
+        <p className="mt-2 max-w-xl text-sm leading-relaxed text-ink-muted">
+          Once we have verified this listing, you can put it at the top of your
+          town page.
+        </p>
+      </div>
+    );
+  }
+
+  if (full) {
+    return (
+      <div className="rounded-xl border border-line-strong bg-surface-sunken p-6 sm:p-7">
+        <h3 className="flex items-center gap-2 font-fraunces text-lg font-semibold">
+          <Sparkles className="h-4 w-4 text-brand" aria-hidden="true" />
+          Featured places in {townName} are taken
+        </h3>
+        <p className="mt-2 max-w-xl text-sm leading-relaxed text-ink-muted">
+          There are only {slotsTotal}, and all of them are in use at the moment.
+          One opens up whenever a studio stops, and we are working on other ways
+          to stand out. It is worth checking back.
+        </p>
+      </div>
+    );
+  }
+
+  // The claims here are things the page actually does. A directory that
+  // promises bookings it cannot deliver is one nobody renews.
+  const REASONS = [
+    {
+      icon: ArrowUpRight,
+      title: `Above every other studio in ${townName}`,
+      body: 'Your listing sits in its own panel at the top of the town page, above the map and above the full list — the first studios anyone sees on it.',
+    },
+    {
+      icon: Sparkles,
+      title: `Only ${slotsTotal} studios can hold it`,
+      body: 'Not an auction and not an ad slot. Three places per town, and your position does not change with your rating or how recently you were reviewed.',
+    },
+    {
+      icon: CalendarCheck,
+      title: 'A booking button, not just a link',
+      body: 'Your rating, your classes and a Book a class button that goes straight to your own booking system, so someone ready to book does not have to hunt for it.',
+    },
+  ];
+
   return (
-    <div className="rounded-xl border border-line-strong bg-surface-sunken p-6 sm:p-7">
-      <div className="flex flex-wrap items-start justify-between gap-5">
-        <div className="min-w-0 max-w-xl">
-          <h3 className="flex items-center gap-2 font-fraunces text-lg font-semibold">
-            <Sparkles className="h-4 w-4 text-brand" aria-hidden="true" />
-            Feature this listing
-          </h3>
-          <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-            {!eligible
-              ? 'Once we have verified this listing, you can put it at the top of your town page.'
-              : full
-                ? `All ${slotsTotal} featured places in ${townName} are taken at the moment. One opens up whenever a studio stops, and we will add more ways to stand out soon.`
-                : `Sit at the top of the ${townName} page, above every other studio, for ${price} a month. ${slotsFree} of ${slotsTotal} places ${slotsFree === 1 ? 'is' : 'are'} available. Cancel any time.`}
-          </p>
+    <div className="overflow-hidden rounded-xl border-2 border-brand/25 bg-brand-tint">
+      <div className="p-6 sm:p-8">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0 max-w-2xl">
+            <span className="chip border-transparent bg-brand text-white">
+              <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+              Featured listing
+            </span>
+            <h3 className="mt-4 font-fraunces text-xl font-semibold text-brand-ink">
+              Be the first studio people see in {townName}
+            </h3>
+            <p className="mt-2 text-sm leading-relaxed text-brand-ink/80">
+              {slotsFree} of {slotsTotal} places {slotsFree === 1 ? 'is' : 'are'} available.
+            </p>
+          </div>
         </div>
 
-        {eligible && !full && available && (
-          <button
-            type="button"
-            onClick={() => go('/api/owner/featured/checkout')}
-            disabled={busy}
-            className="pill-brand shrink-0"
-          >
-            {busy && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
-            {busy ? 'Opening' : `Feature for ${price}/month`}
-          </button>
-        )}
+        <ul className="mt-7 grid gap-5 sm:grid-cols-3">
+          {REASONS.map(({ icon: Icon, title, body }) => (
+            <li key={title}>
+              <Icon className="h-5 w-5 text-brand" aria-hidden="true" />
+              <h4 className="mt-3 text-sm font-semibold text-brand-ink">{title}</h4>
+              <p className="mt-1.5 text-sm leading-relaxed text-brand-ink/75">{body}</p>
+            </li>
+          ))}
+        </ul>
       </div>
-      {error && <p className="mt-4 text-sm text-destructive" role="alert">{error}</p>}
+
+      <div className="border-t border-brand/15 bg-surface px-6 py-6 sm:px-8">
+        <div className="flex flex-wrap items-center justify-between gap-5">
+          <div className="min-w-0">
+            <p className="font-fraunces text-2xl font-semibold">
+              {price}
+              <span className="ml-1.5 font-sans text-base font-normal text-ink-muted">
+                a month
+              </span>
+            </p>
+            <p className="mt-1.5 flex items-start gap-1.5 text-sm leading-relaxed text-ink-muted">
+              <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-ink-faint" aria-hidden="true" />
+              <span>
+                Cancel any time from this page. No contract and no notice
+                period — you keep the place until the end of the month you have
+                paid for, and are not charged again.
+              </span>
+            </p>
+          </div>
+
+          {available && (
+            <button
+              type="button"
+              onClick={() => go('/api/owner/featured/checkout')}
+              disabled={busy}
+              className="pill-brand shrink-0"
+            >
+              {busy && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
+              {busy ? 'Opening' : `Feature for ${price} a month`}
+            </button>
+          )}
+        </div>
+
+        {error && <p className="mt-4 text-sm text-destructive" role="alert">{error}</p>}
+
+        <p className="mt-4 text-xs leading-relaxed text-ink-faint">
+          Payment is handled by Stripe; we never see your card details. Your
+          place starts the moment payment goes through, and renews on the same
+          date each month until you stop it.
+        </p>
+      </div>
     </div>
   );
 }
