@@ -33,6 +33,13 @@
   --brand-tint: 270 100% 98%;    /* #faf5ff wash */
   --brand-ink: 273 60% 25%;      /* readable purple on tint */
 
+  /* Signal — the one colour on the site that is not brand purple, reserved
+     for the single thing asking an unconvinced reader to act. Purple is the
+     page; an invitation painted in it cannot stand out from it. Contrast
+     against white is 4.6:1, so the label stays readable. */
+  --signal: 21 90% 40%;          /* #c2410c */
+  --signal-hover: 19 89% 34%;    /* #9a3412 */
+
   /* Radii — soft, generous */
   --radius: 0.875rem;
   --radius-lg: 1.25rem;

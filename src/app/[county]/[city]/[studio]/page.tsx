@@ -331,7 +331,7 @@ export default async function StudioPage({ params }: StudioPageProps) {
                 ) : (
                   <Link
                     href={`/claim/${studioData.full_url_path}`}
-                    className="inline-flex items-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_24px_-8px_hsl(var(--brand)/0.7)] ring-2 ring-brand/25 transition-colors hover:bg-brand-hover"
+                    className="inline-flex items-center gap-2 rounded-full bg-signal px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_24px_-8px_hsl(var(--signal)/0.75)] ring-2 ring-signal/25 transition-colors hover:bg-signal-hover"
                   >
                     <ShieldCheck className="h-4 w-4" aria-hidden="true" />
                     Claim this listing
