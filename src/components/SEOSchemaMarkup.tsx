@@ -1,5 +1,7 @@
 'use client';
 
+import { CONTACT_EMAIL } from '@/lib/site'
+
 interface PilatesStudio {
   id: string;
   name: string;
@@ -43,7 +45,7 @@ export default function SEOSchemaMarkup({ studios = [], location, page = 'home' 
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'customer service',
-      email: 'pilatesclassesnear@weltodigital.com',
+      email: CONTACT_EMAIL,
       areaServed: 'GB',
       availableLanguage: 'en'
     },

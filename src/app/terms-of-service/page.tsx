@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { CONTACT_EMAIL } from '@/lib/site'
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
@@ -196,7 +197,7 @@ export default function TermsOfServicePage() {
               </p>
               <div className="rounded-md border border-line bg-surface-sunken p-5">
                 <p className="leading-relaxed text-ink-muted">
-                  <strong>Email:</strong> pilatesclassesnear@weltodigital.com<br />
+                  <strong>Email:</strong> {CONTACT_EMAIL}<br />
                   <strong>Website:</strong> pilatesclassesnear.com
                 </p>
               </div>

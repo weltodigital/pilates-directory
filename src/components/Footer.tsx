@@ -40,7 +40,7 @@ const COMPANY_LINKS = [
   { label: 'For studio owners', href: '/for-studios' },
   { label: 'Add your studio', href: '/add-studio' },
   { label: 'Studio sign in', href: '/studio-login' },
-  { label: 'Contact', href: 'mailto:pilatesclassesnear@weltodigital.com' },
+  { label: 'Contact', href: '/contact' },
   { label: 'Privacy Policy', href: '/privacy-policy' },
   { label: 'Terms of Service', href: '/terms-of-service' },
   { label: 'Sitemap', href: '/sitemap.xml' },

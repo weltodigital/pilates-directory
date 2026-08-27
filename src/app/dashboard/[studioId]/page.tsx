@@ -5,6 +5,7 @@ import { requireOwner, ownsStudio } from '@/lib/owner-auth'
 import { serverClient } from '@/lib/forms'
 import { EDITABLE_KEYS, displayValue, fieldSpec } from '@/lib/editable'
 import OwnerEditForm from '@/components/OwnerEditForm'
+import { CONTACT_EMAIL } from '@/lib/site'
 
 export const dynamic = 'force-dynamic'
 
@@ -60,8 +61,8 @@ export default async function EditStudioPage({ params }: PageProps) {
       <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-faint">
         Name, address and postcode are not editable here because they decide the
         page&apos;s address on the site. Email{' '}
-        <a href="mailto:pilatesclassesnear@weltodigital.com" className="link-quiet">
-          pilatesclassesnear@weltodigital.com
+        <a href={`mailto:${CONTACT_EMAIL}`} className="link-quiet">
+          {CONTACT_EMAIL}
         </a>{' '}
         if one of those is wrong.
       </p>

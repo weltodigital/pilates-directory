@@ -13,11 +13,13 @@ interface Message {
   to: string;
   subject: string;
   text: string;
+  /** Where a reply should go, when that is not the sending address. */
+  replyTo?: string;
 }
 
 const DEFAULT_FROM = 'Pilates Classes Near <info@pilatesclassesnear.com>'
 
-export async function sendEmail({ to, subject, text }: Message): Promise<boolean> {
+export async function sendEmail({ to, subject, text, replyTo }: Message): Promise<boolean> {
   const key = process.env.RESEND_API_KEY;
 
   if (!key) {
@@ -39,6 +41,7 @@ export async function sendEmail({ to, subject, text }: Message): Promise<boolean
         to: [to],
         subject,
         text,
+        ...(replyTo ? { reply_to: [replyTo] } : {}),
       }),
     });
     if (!res.ok) {

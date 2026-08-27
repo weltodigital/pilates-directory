@@ -6,6 +6,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import ClaimStudioForm from '@/components/ClaimStudioForm'
 import { domainOf, isSharedHost } from '@/lib/forms'
+import { CONTACT_EMAIL } from '@/lib/site'
 
 interface ClaimPageProps {
   params: Promise<{ path: string[] }>;
@@ -101,7 +102,7 @@ export default async function ClaimPage({ params }: ClaimPageProps) {
                 Email us and we&apos;ll sort it out directly.
               </p>
               <a
-                href={`mailto:pilatesclassesnear@weltodigital.com?subject=${encodeURIComponent(`Claim listing: ${studio.name}`)}`}
+                href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`Claim listing: ${studio.name}`)}`}
                 className="pill-brand mt-8"
               >
                 Email us about this listing
