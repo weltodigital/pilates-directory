@@ -221,11 +221,31 @@ export function parseValue(spec: EditableField, raw: unknown): { value: any } | 
   }
 }
 
+/**
+ * Stable JSON, with object keys in a fixed order.
+ *
+ * Needed because opening_hours is a jsonb column: Postgres stores its keys in
+ * its own canonical order (by length, then bytewise), while the form rebuilds
+ * them Monday-first. Comparing the two with plain JSON.stringify reported a
+ * change on every save, whether or not a single hour had been touched.
+ */
+function canonical(value: unknown): string {
+  if (value === null || value === undefined) return 'null';
+  if (Array.isArray(value)) return `[${value.map(canonical).join(',')}]`;
+  if (typeof value === 'object') {
+    const entries = Object.entries(value as Record<string, unknown>)
+      .filter(([, v]) => v !== undefined)
+      .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
+    return `{${entries.map(([k, v]) => `${JSON.stringify(k)}:${canonical(v)}`).join(',')}}`;
+  }
+  return JSON.stringify(value);
+}
+
 /** True when a stored value and a submitted one are the same edit. */
 export function sameValue(a: unknown, b: unknown): boolean {
   if (a === b) return true;
   if ((a ?? null) === null && (b ?? null) === null) return true;
-  return JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
+  return canonical(a ?? null) === canonical(b ?? null);
 }
 
 /** Human-readable rendering of a stored value, for the review screen. */

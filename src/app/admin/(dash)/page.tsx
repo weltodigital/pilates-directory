@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { serverClient } from '@/lib/forms'
+import DecidedAt from '@/components/admin/DecidedAt'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,6 +31,17 @@ async function overview() {
     owners: owners.count || 0,
     recent: actions.data || [],
   };
+}
+
+/** admin_actions stores machine names; the log is read by a person. */
+const ACTION_LABELS: Record<string, string> = {
+  'submission.approved': 'Submission published',
+  'submission.rejected': 'Submission rejected',
+  'submission.duplicate': 'Submission marked duplicate',
+  'claim.approved': 'Claim approved',
+  'claim.rejected': 'Claim rejected',
+  'edit.approved': 'Edit published',
+  'edit.rejected': 'Edit rejected',
 }
 
 function Tile({ href, label, value, waiting }: {
@@ -77,13 +89,21 @@ export default async function AdminOverviewPage() {
       ) : (
         <ul className="mt-4 divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface">
           {data.recent.map((row: any, i: number) => (
-            <li key={i} className="flex flex-wrap items-baseline justify-between gap-3 px-5 py-3 text-sm">
-              <span className="font-medium">{row.action}</span>
-              <span className="text-ink-faint">
-                {new Date(row.created_at).toLocaleString('en-GB', {
-                  day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
-                })}
+            <li key={i} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-5 py-3 text-sm">
+              <span className="min-w-0">
+                <span className="font-medium">{ACTION_LABELS[row.action] || row.action}</span>
+                {Array.isArray(row.detail?.fields) && (
+                  <span className="text-ink-faint">
+                    {' · '}{row.detail.fields.length} field
+                    {row.detail.fields.length === 1 ? '' : 's'}
+                  </span>
+                )}
+                {row.detail?.path && (
+                  <span className="text-ink-faint">{' · /'}{row.detail.path}</span>
+                )}
+                {row.note && <span className="text-ink-faint">{' · '}{row.note}</span>}
               </span>
+              <DecidedAt at={row.created_at} />
             </li>
           ))}
         </ul>

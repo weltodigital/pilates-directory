@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { serverClient } from '@/lib/forms'
 import { displayValue, fieldSpec } from '@/lib/editable'
 import ReviewActions from '@/components/admin/ReviewActions'
+import DecidedAt from '@/components/admin/DecidedAt'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,8 +15,8 @@ async function load() {
       .select('*, pilates_studios(name,full_url_path), studio_owners(email,name)')
       .eq('status', 'pending').order('created_at', { ascending: true }),
     supabase.from('studio_edits')
-      .select('id,status,reviewed_at,review_note,pilates_studios(name),studio_owners(email)')
-      .neq('status', 'pending').order('reviewed_at', { ascending: false }).limit(25),
+      .select('id,status,changes,previous,note,created_at,reviewed_at,applied_at,review_note,pilates_studios(name,full_url_path),studio_owners(email,name)')
+      .neq('status', 'pending').order('reviewed_at', { ascending: false }).limit(40),
   ]);
 
   return { pending: pending.data || [], decided: decided.data || [] };
@@ -115,18 +116,102 @@ export default async function AdminEditsPage() {
 
       {data.decided.length > 0 && (
         <>
-          <h2 className="mt-14 font-fraunces text-lg font-semibold">Already decided</h2>
-          <ul className="mt-4 divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface">
-            {data.decided.map((edit: any) => (
-              <li key={edit.id} className="flex flex-wrap items-baseline justify-between gap-3 px-5 py-3 text-sm">
-                <span>
-                  <span className="font-medium">{edit.pilates_studios?.name}</span>
-                  <span className="text-ink-faint"> · {edit.studio_owners?.email}</span>
-                </span>
-                <span className="text-ink-faint">{edit.status}</span>
-              </li>
-            ))}
-          </ul>
+          <h2 className="mt-14 font-fraunces text-lg font-semibold">Decision log</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-muted">
+            The last {data.decided.length} decisions, most recent first. Open one to
+            see exactly what changed.
+          </p>
+
+          <div className="mt-4 divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface">
+            {data.decided.map((edit: any) => {
+              const keys = Object.keys(edit.changes || {});
+              const owner = edit.studio_owners;
+
+              return (
+                <details key={edit.id} className="group">
+                  <summary className="flex cursor-pointer flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-5 py-3.5 text-sm hover:bg-surface-sunken">
+                    <span className="min-w-0">
+                      <span className="font-medium">{edit.pilates_studios?.name}</span>
+                      <span className="text-ink-faint">
+                        {' · '}{keys.length} field{keys.length === 1 ? '' : 's'}
+                        {owner?.email ? ` · ${owner.email}` : ''}
+                      </span>
+                    </span>
+                    <span className="flex shrink-0 items-baseline gap-3">
+                      <span
+                        className={
+                          edit.status === 'approved'
+                            ? 'font-medium text-brand'
+                            : 'text-ink-faint'
+                        }
+                      >
+                        {edit.status}
+                      </span>
+                      <DecidedAt at={edit.reviewed_at} />
+                    </span>
+                  </summary>
+
+                  <div className="border-t border-line bg-surface-sunken px-5 py-4">
+                    <dl className="flex flex-wrap gap-x-8 gap-y-1 text-xs text-ink-muted">
+                      <div className="flex gap-2">
+                        <dt className="text-ink-faint">Sent</dt>
+                        <dd><DecidedAt at={edit.created_at} /></dd>
+                      </div>
+                      <div className="flex gap-2">
+                        <dt className="text-ink-faint">Reviewed</dt>
+                        <dd><DecidedAt at={edit.reviewed_at} /></dd>
+                      </div>
+                      {edit.status === 'approved' && (
+                        <div className="flex gap-2">
+                          <dt className="text-ink-faint">Published</dt>
+                          <dd><DecidedAt at={edit.applied_at} /></dd>
+                        </div>
+                      )}
+                    </dl>
+
+                    {edit.note && (
+                      <p className="mt-3 text-sm text-ink-muted">
+                        <span className="text-ink-faint">From the owner:</span> {edit.note}
+                      </p>
+                    )}
+                    {edit.review_note && (
+                      <p className="mt-1 text-sm text-ink-muted">
+                        <span className="text-ink-faint">Your note:</span> {edit.review_note}
+                      </p>
+                    )}
+
+                    <div className="mt-4 overflow-x-auto">
+                      <table className="w-full min-w-[32rem] text-sm">
+                        <thead>
+                          <tr className="border-b border-line text-left text-xs uppercase tracking-wide text-ink-faint">
+                            <th className="py-2 pr-4 font-medium">Field</th>
+                            <th className="py-2 pr-4 font-medium">Was</th>
+                            <th className="py-2 font-medium">
+                              {edit.status === 'approved' ? 'Became' : 'Proposed'}
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-line">
+                          {keys.map(key => {
+                            const spec = fieldSpec(key);
+                            return (
+                              <tr key={key} className="align-top">
+                                <td className="py-2 pr-4 font-medium">{spec?.label || key}</td>
+                                <td className="py-2 pr-4 text-ink-faint">
+                                  {displayValue(spec, edit.previous?.[key])}
+                                </td>
+                                <td className="py-2">{displayValue(spec, edit.changes[key])}</td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </details>
+              );
+            })}
+          </div>
         </>
       )}
     </>

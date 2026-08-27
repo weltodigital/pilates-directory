@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { serverClient, domainOf } from '@/lib/forms'
 import ReviewActions from '@/components/admin/ReviewActions'
+import DecidedAt from '@/components/admin/DecidedAt'
 
 export const dynamic = 'force-dynamic'
 
@@ -110,15 +111,21 @@ export default async function AdminClaimsPage() {
 
       {data.decided.length > 0 && (
         <>
-          <h2 className="mt-14 font-fraunces text-lg font-semibold">Already decided</h2>
+          <h2 className="mt-14 font-fraunces text-lg font-semibold">Decision log</h2>
           <ul className="mt-4 divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface">
             {data.decided.map((claim: any) => (
-              <li key={claim.id} className="flex flex-wrap items-baseline justify-between gap-3 px-5 py-3 text-sm">
-                <span>
+              <li key={claim.id} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-5 py-3 text-sm">
+                <span className="min-w-0">
                   <span className="font-medium">{claim.pilates_studios?.name}</span>
                   <span className="text-ink-faint"> · {claim.claimant_email}</span>
+                  {claim.review_note && <span className="text-ink-faint"> · {claim.review_note}</span>}
                 </span>
-                <span className="text-ink-faint">{claim.status}</span>
+                <span className="flex shrink-0 items-baseline gap-3">
+                  <span className={claim.status === 'approved' ? 'font-medium text-brand' : 'text-ink-faint'}>
+                    {claim.status}
+                  </span>
+                  <DecidedAt at={claim.reviewed_at} />
+                </span>
               </li>
             ))}
           </ul>

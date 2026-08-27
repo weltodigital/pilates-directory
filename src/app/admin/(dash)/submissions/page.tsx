@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { serverClient } from '@/lib/forms'
 import { slugify } from '@/lib/review'
 import ReviewActions from '@/components/admin/ReviewActions'
+import DecidedAt from '@/components/admin/DecidedAt'
 
 export const dynamic = 'force-dynamic'
 
@@ -128,16 +129,21 @@ export default async function AdminSubmissionsPage() {
 
       {data.decided.length > 0 && (
         <>
-          <h2 className="mt-14 font-fraunces text-lg font-semibold">Already decided</h2>
+          <h2 className="mt-14 font-fraunces text-lg font-semibold">Decision log</h2>
           <ul className="mt-4 divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface">
             {data.decided.map((sub: any) => (
-              <li key={sub.id} className="flex flex-wrap items-baseline justify-between gap-3 px-5 py-3 text-sm">
-                <span>
+              <li key={sub.id} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-5 py-3 text-sm">
+                <span className="min-w-0">
                   <span className="font-medium">{sub.name}</span>
                   {sub.town && <span className="text-ink-faint"> · {sub.town}</span>}
                   {sub.review_note && <span className="text-ink-faint"> · {sub.review_note}</span>}
                 </span>
-                <span className="text-ink-faint">{sub.status}</span>
+                <span className="flex shrink-0 items-baseline gap-3">
+                  <span className={sub.status === 'approved' ? 'font-medium text-brand' : 'text-ink-faint'}>
+                    {sub.status}
+                  </span>
+                  <DecidedAt at={sub.reviewed_at} />
+                </span>
               </li>
             ))}
           </ul>
