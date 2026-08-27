@@ -5,12 +5,17 @@ import { CreditCard, Loader2, Sparkles } from 'lucide-react'
 
 interface FeaturedControlsProps {
   studioId: string;
-  /** Present when this listing already holds a slot. */
+  /** Present only when the listing is actually paid for. */
   feature: {
     status: string;
     currentPeriodEnd: string | null;
     cancelAtPeriodEnd: boolean;
   } | null;
+  /**
+   * Set when a checkout was started and never finished. The place is held,
+   * but nothing has been paid, and saying "Featured" here would be a lie.
+   */
+  reservedUntil: string | null;
   townName: string;
   slotsFree: number;
   slotsTotal: number;
@@ -29,7 +34,10 @@ function formatDate(value: string | null) {
 }
 
 export default function FeaturedControls(props: FeaturedControlsProps) {
-  const { studioId, feature, townName, slotsFree, slotsTotal, price, eligible, available } = props;
+  const {
+    studioId, feature, reservedUntil, townName, slotsFree, slotsTotal, price,
+    eligible, available,
+  } = props;
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -88,6 +96,40 @@ export default function FeaturedControls(props: FeaturedControlsProps) {
               ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
               : <CreditCard className="h-4 w-4" aria-hidden="true" />}
             Manage billing
+          </button>
+        </div>
+        {error && <p className="mt-4 text-sm text-destructive" role="alert">{error}</p>}
+      </div>
+    );
+  }
+
+  // --------------------------------------------- started, never finished
+  if (reservedUntil) {
+    const until = new Date(reservedUntil).toLocaleTimeString('en-GB', {
+      hour: '2-digit', minute: '2-digit',
+    });
+    return (
+      <div className="rounded-xl border border-line-strong bg-surface-sunken p-6 sm:p-7">
+        <div className="flex flex-wrap items-start justify-between gap-5">
+          <div className="min-w-0 max-w-xl">
+            <h3 className="flex items-center gap-2 font-fraunces text-lg font-semibold">
+              <Sparkles className="h-4 w-4 text-ink-faint" aria-hidden="true" />
+              Payment not finished
+            </h3>
+            <p className="mt-2 text-sm leading-relaxed text-ink-muted">
+              You started featuring this listing but did not complete the
+              payment, so nothing has been charged and it is not featured yet.
+              We are holding your place until {until}.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => go('/api/owner/featured/checkout')}
+            disabled={busy}
+            className="pill-brand shrink-0"
+          >
+            {busy && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
+            {busy ? 'Opening' : 'Finish payment'}
           </button>
         </div>
         {error && <p className="mt-4 text-sm text-destructive" role="alert">{error}</p>}

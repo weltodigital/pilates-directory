@@ -113,11 +113,20 @@ export default async function DashboardPage() {
                 price={formatPrice()}
                 slotsTotal={FEATURED_SLOTS_PER_TOWN}
                 slotsFree={featured[studio.id]?.availability?.free ?? 0}
-                feature={featured[studio.id]?.feature ? {
-                  status: featured[studio.id].feature.status,
-                  currentPeriodEnd: featured[studio.id].feature.current_period_end,
-                  cancelAtPeriodEnd: featured[studio.id].feature.cancel_at_period_end,
-                } : null}
+                {...(() => {
+                  // A pending row is a held place, not a subscription. Only a
+                  // slot Stripe has actually collected for counts as featured.
+                  const held = featured[studio.id]?.feature;
+                  const paid = held && held.status !== 'pending';
+                  return {
+                    feature: paid ? {
+                      status: held.status,
+                      currentPeriodEnd: held.current_period_end,
+                      cancelAtPeriodEnd: held.cancel_at_period_end,
+                    } : null,
+                    reservedUntil: held && !paid ? held.reserved_until : null,
+                  };
+                })()}
               />
             </div>
           </article>

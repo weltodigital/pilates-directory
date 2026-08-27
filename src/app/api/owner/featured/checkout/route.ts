@@ -3,7 +3,8 @@ import { field, serverClient } from '@/lib/forms'
 import { getOwner, ownsStudio } from '@/lib/owner-auth'
 import { siteUrl } from '@/lib/email'
 import {
-  FEATURED_SLOTS_PER_TOWN, featuredConfigured, reserveSlot, stripeClient,
+  FEATURED_SLOTS_PER_TOWN, extendReservation, featuredConfigured, reserveSlot,
+  stripeClient, studioFeature,
 } from '@/lib/featured'
 
 export const dynamic = 'force-dynamic'
@@ -60,14 +61,29 @@ export async function POST(request: Request) {
     );
   }
 
-  const reservation = await reserveSlot(supabase, studio, owner.id);
-  if (!reservation.ok) {
-    const messages = {
-      full: `All ${FEATURED_SLOTS_PER_TOWN} featured places in ${studio.city} are taken.`,
-      exists: 'This listing is already featured.',
-      error: 'We could not start that. Please try again.',
-    };
-    return NextResponse.json({ error: messages[reservation.reason] }, { status: 409 });
+  // An abandoned checkout leaves the slot held. Resume it rather than
+  // refusing: the owner still wants the place they were part-way through
+  // buying, and asking them to wait half an hour for it to lapse is absurd.
+  const existing = await studioFeature(supabase, studioId);
+  if (existing && existing.status !== 'pending') {
+    return NextResponse.json({ error: 'This listing is already featured.' }, { status: 409 });
+  }
+
+  let reservationId: string;
+  if (existing) {
+    await extendReservation(supabase, existing.id);
+    reservationId = existing.id;
+  } else {
+    const reservation = await reserveSlot(supabase, studio, owner.id);
+    if (!reservation.ok) {
+      const messages = {
+        full: `All ${FEATURED_SLOTS_PER_TOWN} featured places in ${studio.city} are taken.`,
+        exists: 'This listing is already featured.',
+        error: 'We could not start that. Please try again.',
+      };
+      return NextResponse.json({ error: messages[reservation.reason] }, { status: 409 });
+    }
+    reservationId = reservation.id;
   }
 
   try {
@@ -79,21 +95,21 @@ export async function POST(request: Request) {
       cancel_url: `${siteUrl()}/dashboard?featured=cancelled`,
       // Carried through to the webhook, which is the only place the slot is
       // confirmed. Reading it back beats trusting the browser's return trip.
-      client_reference_id: reservation.id,
+      client_reference_id: reservationId,
       subscription_data: {
         metadata: {
-          featured_listing_id: reservation.id,
+          featured_listing_id: reservationId,
           studio_id: studio.id,
           studio_name: studio.name,
         },
       },
-      metadata: { featured_listing_id: reservation.id },
+      metadata: { featured_listing_id: reservationId },
     });
 
     await supabase
       .from('featured_listings')
       .update({ stripe_checkout_session_id: session.id, updated_at: new Date().toISOString() })
-      .eq('id', reservation.id);
+      .eq('id', reservationId);
 
     return NextResponse.json({ ok: true, url: session.url });
   } catch (err: any) {
@@ -102,7 +118,7 @@ export async function POST(request: Request) {
     await supabase
       .from('featured_listings')
       .update({ status: 'cancelled', ended_at: new Date().toISOString() })
-      .eq('id', reservation.id);
+      .eq('id', reservationId);
 
     console.error('Stripe checkout failed:', err?.message);
     return NextResponse.json({ error: 'We could not reach the payment page. Please try again.' }, { status: 502 });

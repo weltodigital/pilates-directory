@@ -125,8 +125,24 @@ export async function reserveSlot(
   return { ok: false, reason: 'full' };
 }
 
-/** The live slot for a studio, if it has one. */
+/**
+ * Whatever slot this studio currently holds, paid for or merely reserved.
+ *
+ * The caller has to tell the two apart. A pending row is a place held while
+ * Stripe collects, and reading it as a subscription tells an owner they are
+ * featured when they have paid nothing - which is exactly what it did.
+ *
+ * Reservations that have run out are released first, so an abandoned checkout
+ * from an hour ago does not keep the owner out of their own slot.
+ */
 export async function studioFeature(supabase: any, studioId: string) {
+  await supabase
+    .from('featured_listings')
+    .update({ status: 'cancelled', ended_at: new Date().toISOString() })
+    .eq('studio_id', studioId)
+    .eq('status', 'pending')
+    .lt('reserved_until', new Date().toISOString());
+
   const { data } = await supabase
     .from('featured_listings')
     .select('*')
@@ -135,6 +151,18 @@ export async function studioFeature(supabase: any, studioId: string) {
     .order('created_at', { ascending: false })
     .limit(1);
   return data?.[0] ?? null;
+}
+
+/** Push a held slot's expiry out, for an owner returning to finish paying. */
+export async function extendReservation(supabase: any, id: string) {
+  await supabase
+    .from('featured_listings')
+    .update({
+      reserved_until: new Date(Date.now() + RESERVATION_MINUTES * 60 * 1000).toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id)
+    .eq('status', 'pending');
 }
 
 /**
