@@ -73,7 +73,7 @@ export default async function ClaimPage({ params }: ClaimPageProps) {
             <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-ink-muted">
               {studio.city ? `${studio.city}, ${studio.county}. ` : ''}
               {canSelfVerify
-                ? `Claim it with an email address at ${studioDomain}. Once we've checked the claim, you get a sign-in of your own for keeping the classes, prices, opening hours and booking link current.`
+                ? `Claim it with an email address at ${studioDomain}. We email that address to confirm it is yours, then check the claim by hand, then give you a sign-in for keeping the classes, prices, opening hours and booking link current.`
                 : 'Claim it to correct its details and keep classes, prices and opening hours current.'}
             </p>
           </div>

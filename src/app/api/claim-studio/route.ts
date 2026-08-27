@@ -3,7 +3,7 @@ import {
   serverClient, field, isEmail, submitterHash, isRateLimited, looksLikeBot,
   domainOf, isSharedHost, emailMatchesDomain,
 } from '@/lib/forms'
-import { notifyAdmin, siteUrl } from '@/lib/email'
+import { sendConfirmation } from '@/lib/verification'
 
 export const dynamic = 'force-dynamic'
 
@@ -87,7 +87,8 @@ export async function POST(request: Request) {
     );
   }
 
-  const { error } = await supabase.from('studio_claims').insert({
+  const { data: claim, error } = await supabase.from('studio_claims').insert({
+    status: 'unconfirmed',
     studio_id: studio.id,
     claimant_name: claimantName,
     claimant_email: claimantEmail!.toLowerCase(),
@@ -97,31 +98,43 @@ export async function POST(request: Request) {
     message: field(body.message, 2000),
     submitter_hash: hash,
     user_agent: request.headers.get('user-agent')?.slice(0, 300) || null,
-  });
+  }).select('id').single();
 
   if (error) {
     // The partial unique index rejects a second open claim from the same
-    // address for the same studio.
+    // address for the same studio. Resend the link rather than saying no:
+    // the likeliest reason for claiming twice is that the first email was
+    // missed.
     if (error.code === '23505') {
-      return NextResponse.json({
-        ok: true,
-        already: true,
-        studio: studio.name,
-      });
+      const { data: existing } = await supabase
+        .from('studio_claims')
+        .select('id,status')
+        .eq('studio_id', studio.id)
+        .ilike('claimant_email', claimantEmail!)
+        .in('status', ['unconfirmed', 'pending'])
+        .single();
+
+      if (existing?.status === 'unconfirmed') {
+        await sendConfirmation(supabase, 'claim', existing.id, claimantEmail!, {
+          studioName: studio.name,
+          personName: claimantName!,
+        });
+        return NextResponse.json({ ok: true, resent: true, studio: studio.name });
+      }
+
+      return NextResponse.json({ ok: true, already: true, studio: studio.name });
     }
     console.error('Claim failed:', error.message);
     return NextResponse.json({ error: 'We could not save your claim. Please try again.' }, { status: 500 });
   }
 
-  await notifyAdmin(
-    `Claim submitted: ${studio.name}`,
-    [
-      `${claimantName} <${claimantEmail}> claims ${studio.name}.`,
-      `The address is at ${siteDomain}, which matches the listing's website.`,
-      '',
-      `Review: ${siteUrl()}/admin/claims`,
-    ].join('\n')
-  );
+  // Nothing is told to the reviewer yet. The claim reaches the queue when the
+  // link comes back, so what they are asked to judge is always a claim from
+  // someone who reads mail at that address.
+  const sent = await sendConfirmation(supabase, 'claim', claim.id, claimantEmail!, {
+    studioName: studio.name,
+    personName: claimantName!,
+  });
 
-  return NextResponse.json({ ok: true, studio: studio.name });
+  return NextResponse.json({ ok: true, studio: studio.name, emailed: sent });
 }

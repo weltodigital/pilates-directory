@@ -28,6 +28,8 @@ export default function robots(): MetadataRoute.Robots {
           '/admin',
           '/dashboard',
           '/studio-login',
+          // One-time confirmation links; there is nothing here to index.
+          '/confirm',
         ],
       },
     ],

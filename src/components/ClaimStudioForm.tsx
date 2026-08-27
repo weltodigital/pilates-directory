@@ -14,7 +14,7 @@ interface ClaimStudioFormProps {
 
 export default function ClaimStudioForm({ studioPath, studioName, studioDomain }: ClaimStudioFormProps) {
   const [busy, setBusy] = useState(false);
-  const [done, setDone] = useState<{ already?: boolean } | null>(null);
+  const [done, setDone] = useState<{ already?: boolean; resent?: boolean; emailed?: boolean } | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -43,7 +43,7 @@ export default function ClaimStudioForm({ studioPath, studioName, studioDomain }
         if (data.error) setFormError(data.error);
         return;
       }
-      setDone({ already: data.already });
+      setDone({ already: data.already, resent: data.resent, emailed: data.emailed });
     } catch {
       setFormError('Something went wrong. Please try again.');
     } finally {
@@ -58,23 +58,26 @@ export default function ClaimStudioForm({ studioPath, studioName, studioDomain }
           <Check className="h-6 w-6 text-brand" aria-hidden="true" />
         </span>
         <h2 className="mt-6 font-fraunces text-2xl font-semibold">
-          {done.already ? 'Already with us' : 'Claim received'}
+          {done.already ? 'Already with us' : 'Check your email'}
         </h2>
         <p className="mt-4 leading-relaxed text-ink-muted">
           {done.already
-            ? `We already have an open claim for ${studioName} from this email address, so there's nothing more you need to do.`
-            : `Your address at ${studioDomain} matches ${studioName}'s website, so the claim is with us. We check every one by hand.`}
+            ? `This listing has already been claimed from this address and is with us for review, so there's nothing more you need to do.`
+            : done.resent
+              ? `You had already started a claim for ${studioName}, so we've sent the confirmation link again.`
+              : `We've emailed the address you gave at ${studioDomain}. Open it and press the button to confirm the address is yours \u2014 the claim doesn't reach us until you do.`}
         </p>
         {!done.already && (
           <ol className="mx-auto mt-6 max-w-sm space-y-3 text-left text-sm leading-relaxed text-ink-muted">
             <li className="flex gap-3">
               <span className="font-semibold text-brand">1</span>
-              We review the claim, usually the same day.
+              Confirm your email using the link we just sent. This is what shows
+              us the address is really yours rather than just typed in.
             </li>
             <li className="flex gap-3">
               <span className="font-semibold text-brand">2</span>
-              You get an email at that address with a link to choose a password.
-              Following it is what proves the address is really yours.
+              We review the claim by hand, usually the same day, and email you a
+              link to choose a password.
             </li>
             <li className="flex gap-3">
               <span className="font-semibold text-brand">3</span>
@@ -131,9 +134,10 @@ export default function ClaimStudioForm({ studioPath, studioName, studioDomain }
           Submit claim
         </button>
         <p className="mt-4 text-xs leading-relaxed text-ink-faint">
-          Claiming is free. Once we&apos;ve approved it, we email this address a
-          link to set a password, and you can sign in and keep the listing up to
-          date. We never ask for access to your inbox or your booking system.
+          Claiming is free. We email this address to confirm it is yours before
+          the claim reaches us at all, so nobody can claim a studio using an
+          address they cannot read. We never ask for access to your inbox or
+          your booking system.
         </p>
       </div>
     </form>

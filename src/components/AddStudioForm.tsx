@@ -68,12 +68,13 @@ export default function AddStudioForm() {
         <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-brand-tint">
           <Check className="h-6 w-6 text-brand" aria-hidden="true" />
         </span>
-        <h2 className="mt-6 font-fraunces text-2xl font-semibold">Thank you</h2>
+        <h2 className="mt-6 font-fraunces text-2xl font-semibold">Check your email</h2>
         <p className="mt-4 leading-relaxed text-ink-muted">
-          We&apos;ve received your studio. Listings are free, and we check
-          submissions by hand before publishing them, so it may be a little
-          while before it appears. We won&apos;t email you in the meantime,
-          so do check back.
+          We&apos;ve sent you a link to confirm your address. Open it and press
+          the button, and your studio comes to us for review &mdash; it
+          doesn&apos;t reach us until you do. Listings are free, and we check
+          every one by hand before publishing, so it may be a little while
+          before it appears. We&apos;ll email you when it is live.
         </p>
         {done.duplicate && (
           <p className="mt-6 rounded-md border border-line bg-surface-sunken px-5 py-4 text-left text-sm text-ink-muted">

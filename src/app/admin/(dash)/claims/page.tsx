@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { serverClient, domainOf } from '@/lib/forms'
 import ReviewActions from '@/components/admin/ReviewActions'
 import DecidedAt from '@/components/admin/DecidedAt'
+import AwaitingConfirmation from '@/components/admin/AwaitingConfirmation'
 
 export const dynamic = 'force-dynamic'
 
@@ -9,16 +10,22 @@ async function load() {
   const supabase = serverClient();
   if (!supabase) return null;
 
-  const [pending, decided] = await Promise.all([
+  const [pending, decided, unconfirmed] = await Promise.all([
     supabase.from('studio_claims')
       .select('*, pilates_studios(name,city,county,website,full_url_path,is_verified)')
       .eq('status', 'pending').order('created_at', { ascending: true }),
     supabase.from('studio_claims')
       .select('id,claimant_email,status,reviewed_at,review_note,pilates_studios(name,full_url_path)')
-      .neq('status', 'pending').order('reviewed_at', { ascending: false }).limit(25),
+      .not('status', 'in', '(pending,unconfirmed)').order('reviewed_at', { ascending: false }).limit(25),
+    supabase.from('studio_claims')
+      .select('*', { count: 'exact', head: true }).eq('status', 'unconfirmed'),
   ]);
 
-  return { pending: pending.data || [], decided: decided.data || [] };
+  return {
+    pending: pending.data || [],
+    decided: decided.data || [],
+    unconfirmed: unconfirmed.count || 0,
+  };
 }
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
@@ -44,11 +51,15 @@ export default async function AdminClaimsPage() {
         </span>
       </h1>
       <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-muted">
-        The claim form already checked that the address is at the studio&apos;s own
-        domain. Approving marks the listing verified, creates an owner account,
-        and emails a sign-in link &mdash; and it is that email arriving, not the
-        form, that proves they really read mail at the domain.
+        Everything here has already cleared two checks: the address is at the
+        studio&apos;s own domain, and the claimant confirmed a link sent to it,
+        so they demonstrably read mail there. What is left is the judgement only
+        you can make &mdash; whether this person should hold this listing.
+        Approving marks it verified, creates their account and emails a link to
+        set a password.
       </p>
+
+      <AwaitingConfirmation count={data.unconfirmed} noun="claim" />
 
       {data.pending.length === 0 && <p className="mt-8 text-ink-muted">Nothing waiting.</p>}
 

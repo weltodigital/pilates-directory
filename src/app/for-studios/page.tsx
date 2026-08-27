@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { createClient } from '@supabase/supabase-js'
 import {
   Building2, ShieldCheck, PlusCircle, MapPin, Star, CalendarCheck, ArrowRight,
-  KeyRound, Pencil,
+  KeyRound, Pencil, MailCheck,
 } from 'lucide-react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -144,8 +144,13 @@ export default async function ForStudiosPage() {
           <section>
             <span className="eyebrow">After you claim</span>
             <h2 className="mt-3 text-display-sm">What happens next</h2>
-            <ol className="mt-10 grid gap-6 md:grid-cols-3">
+            <ol className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               {[
+                {
+                  icon: MailCheck,
+                  step: 'You confirm your email',
+                  body: 'We send the address you claimed from a link. Pressing the button on it is what shows the address is yours \u2014 typing an address into a form only shows the domain exists. Nothing reaches us until you do.',
+                },
                 {
                   icon: ShieldCheck,
                   step: 'We check the claim',
@@ -224,12 +229,13 @@ export default async function ForStudiosPage() {
                 <dt className="font-semibold text-ink">How do you verify a claim?</dt>
                 <dd className="mt-2 text-sm leading-relaxed text-ink-muted">
                   You claim from an email address at your studio&apos;s own
-                  domain, we check it by hand, and then we email that address a
-                  link to set a password. The link arriving is the real proof:
+                  domain, and we email that address a link you have to confirm
+                  before the claim reaches us at all. That is the real proof:
                   typing an address into a form shows only that the domain
-                  exists. If your listing has no website, or points at Facebook
-                  or a booking platform, email us and we&apos;ll verify it
-                  another way.
+                  exists, while confirming shows you read the mail sent to it.
+                  We then check the claim by hand. If your listing has no
+                  website, or points at Facebook or a booking platform, email us
+                  and we&apos;ll verify it another way.
                 </dd>
               </div>
               <div>

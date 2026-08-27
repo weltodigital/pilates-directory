@@ -3,7 +3,7 @@ import {
   serverClient, field, isEmail, normaliseUrl, normalisePostcode, lookupPostcode,
   submitterHash, isRateLimited, looksLikeBot, cleanClassTypes,
 } from '@/lib/forms'
-import { notifyAdmin, siteUrl } from '@/lib/email'
+import { sendConfirmation } from '@/lib/verification'
 
 export const dynamic = 'force-dynamic'
 
@@ -89,7 +89,8 @@ export async function POST(request: Request) {
     if (hit) { duplicateId = hit.id; duplicateName = hit.name; }
   }
 
-  const { error } = await supabase.from('studio_submissions').insert({
+  const { data: submission, error } = await supabase.from('studio_submissions').insert({
+    status: 'unconfirmed',
     name,
     address: field(body.address, 300),
     postcode,
@@ -105,25 +106,24 @@ export async function POST(request: Request) {
     possible_duplicate_id: duplicateId,
     submitter_hash: hash,
     user_agent: request.headers.get('user-agent')?.slice(0, 300) || null,
-  });
+  }).select('id').single();
 
   if (error) {
     console.error('Studio submission failed:', error.message);
     return NextResponse.json({ error: 'We could not save your submission. Please try again.' }, { status: 500 });
   }
 
-  await notifyAdmin(
-    `Studio submitted: ${name}`,
-    [
-      `${contactName} <${contactEmail}> submitted ${name}, ${postcode}.`,
-      duplicateName ? `\nPossible duplicate of ${duplicateName}.` : '',
-      '',
-      `Review: ${siteUrl()}/admin/submissions`,
-    ].filter(Boolean).join('\n')
-  );
+  // Held back from review until the sender confirms the address. It stops
+  // anonymous submissions arriving in a reviewer's queue, and it means we can
+  // reach whoever sent it if the listing needs a question answered.
+  const sent = await sendConfirmation(supabase, 'submission', submission.id, contactEmail!, {
+    studioName: name!,
+    personName: contactName!,
+  });
 
   return NextResponse.json({
     ok: true,
+    emailed: sent,
     duplicate: duplicateName ? { name: duplicateName } : null,
   });
 }

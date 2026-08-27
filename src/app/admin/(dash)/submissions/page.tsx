@@ -3,6 +3,7 @@ import { serverClient } from '@/lib/forms'
 import { slugify } from '@/lib/review'
 import ReviewActions from '@/components/admin/ReviewActions'
 import DecidedAt from '@/components/admin/DecidedAt'
+import AwaitingConfirmation from '@/components/admin/AwaitingConfirmation'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,21 +11,24 @@ async function load() {
   const supabase = serverClient();
   if (!supabase) return null;
 
-  const [pending, decided, counties] = await Promise.all([
+  const [pending, decided, counties, unconfirmed] = await Promise.all([
     supabase.from('studio_submissions')
       .select('*, pilates_studios!studio_submissions_possible_duplicate_id_fkey(name,full_url_path)')
       .eq('status', 'pending').order('created_at', { ascending: true }),
     supabase.from('studio_submissions')
       .select('id,name,town,status,reviewed_at,review_note,created_studio_id')
-      .neq('status', 'pending').order('reviewed_at', { ascending: false }).limit(25),
+      .not('status', 'in', '(pending,unconfirmed)').order('reviewed_at', { ascending: false }).limit(25),
     supabase.from('public_locations')
       .select('name,slug').in('type', ['county', 'country']).order('name'),
+    supabase.from('studio_submissions')
+      .select('*', { count: 'exact', head: true }).eq('status', 'unconfirmed'),
   ]);
 
   return {
     pending: pending.data || [],
     decided: decided.data || [],
     counties: counties.data || [],
+    unconfirmed: unconfirmed.count || 0,
   };
 }
 
@@ -53,10 +57,14 @@ export default async function AdminSubmissionsPage() {
         </span>
       </h1>
       <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-muted">
-        Approving creates the listing, its town page if it is the first studio there,
-        and emails the sender the live URL. Check the county before you approve:
-        it decides the address the page lives at.
+        Everything here has been confirmed by whoever sent it, so the address
+        will reach a real person if the listing needs a question answered.
+        Approving creates the listing, its town page if it is the first studio
+        there, and emails the sender the live URL. Check the county before you
+        approve: it decides the address the page lives at.
       </p>
+
+      <AwaitingConfirmation count={data.unconfirmed} noun="submission" />
 
       {data.pending.length === 0 && (
         <p className="mt-8 text-ink-muted">Nothing waiting.</p>
