@@ -356,7 +356,9 @@ export default async function CityPage({ params }: CityPageProps) {
           </div>
         </section>
 
-        <div className="shell space-y-20 py-20">
+        {/* Featured studios lead, so they sit closer to the hero than a
+            section of their own would - the gap read as a page break. */}
+        <div className={`shell space-y-20 pb-20 ${featured.length ? 'pt-10' : 'pt-20'}`}>
           <FeaturedStudios studios={featured} townName={location.name} />
 
           <EquipmentStrip />

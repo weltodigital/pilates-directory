@@ -33,14 +33,12 @@ export default function FeaturedStudios({
   return (
     <section aria-label={`Featured studios in ${townName}`}>
       <div className="overflow-hidden rounded-xl border-2 border-brand shadow-[0_16px_40px_-20px_hsl(var(--brand)/0.55)]">
-        <div className="flex flex-wrap items-center justify-between gap-3 bg-brand px-7 py-5">
-          <h2
-            className="flex items-center gap-2.5 font-fraunces text-xl font-semibold text-white sm:text-2xl"
-          >
-            <Sparkles className="h-5 w-5" aria-hidden="true" />
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 bg-brand px-6 py-3">
+          <h2 className="flex items-center gap-2 font-fraunces text-base font-semibold text-white">
+            <Sparkles className="h-4 w-4" aria-hidden="true" />
             Featured
           </h2>
-          <p className="text-sm text-white/80">
+          <p className="text-xs text-white/80">
             {studios.length === 1 ? 'A studio' : 'Studios'} we&apos;re highlighting this month
           </p>
         </div>
