@@ -9,9 +9,13 @@ interface Photo {
 /**
  * Photos the studio uploaded and we approved.
  *
+ * The first is shown large and the rest fill the grid beside and below it.
+ * Every approved photo appears: an owner allowed to upload eight and shown
+ * five has three that exist, were reviewed, and are nowhere.
+ *
  * Plain img rather than next/image: these come from Supabase storage already
- * sized and cached for a year, and routing them through the optimiser would
- * bill us per transformation for pictures that do not change.
+ * sized, and routing them through the optimiser would bill us per
+ * transformation for pictures that do not change.
  */
 export default function StudioGallery({
   photos, studioName,
@@ -35,11 +39,11 @@ export default function StudioGallery({
             alt={lead.alt || `${studioName}`}
             width={lead.width ?? undefined}
             height={lead.height ?? undefined}
-            className="block h-full w-full bg-surface-sunken object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+            className="block aspect-[4/3] w-full bg-surface-sunken object-cover transition-transform duration-300 group-hover:scale-[1.02] sm:aspect-auto sm:h-full"
           />
         </a>
 
-        {rest.slice(0, 4).map((photo, i) => (
+        {rest.map((photo, i) => (
           <a
             key={photo.id}
             href={photo.public_url}
