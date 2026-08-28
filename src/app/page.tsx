@@ -236,7 +236,7 @@ export default async function Home() {
   return (
     <>
       <Header />
-      <SEOSchemaMarkup page="home" />
+      <SEOSchemaMarkup />
 
       <main>
         {/* ============================================================
