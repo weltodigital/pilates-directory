@@ -31,15 +31,14 @@ export default function FeaturedStudios({
   if (!studios.length) return null;
 
   return (
-    <section aria-labelledby="featured-heading">
+    <section aria-label={`Featured studios in ${townName}`}>
       <div className="overflow-hidden rounded-xl border-2 border-brand shadow-[0_16px_40px_-20px_hsl(var(--brand)/0.55)]">
         <div className="flex flex-wrap items-center justify-between gap-3 bg-brand px-7 py-5">
           <h2
-            id="featured-heading"
             className="flex items-center gap-2.5 font-fraunces text-xl font-semibold text-white sm:text-2xl"
           >
             <Sparkles className="h-5 w-5" aria-hidden="true" />
-            Featured in {townName}
+            Featured
           </h2>
           <p className="text-sm text-white/80">
             {studios.length === 1 ? 'A studio' : 'Studios'} we&apos;re highlighting this month
@@ -55,11 +54,6 @@ export default function FeaturedStudios({
 
             return (
               <article key={studio.id} className="flex flex-col bg-surface p-7">
-                <span className="chip mb-4 self-start border-brand/30 bg-brand-tint text-brand-ink">
-                  <Sparkles className="h-3.5 w-3.5 text-brand" aria-hidden="true" />
-                  Featured
-                </span>
-
                 <div className="flex items-start justify-between gap-3">
                   <h3 className="font-fraunces text-lg font-semibold leading-snug">
                     <Link
