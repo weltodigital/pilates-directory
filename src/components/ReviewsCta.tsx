@@ -14,17 +14,17 @@ export default function ReviewsCta({ locationName, variant = 'directory' }: Revi
   const owner = variant === 'owner';
 
   return (
-    <section className="rounded-xl border border-brand/20 bg-brand-tint p-8 sm:p-10">
+    <section className="rounded-xl border border-promo/20 bg-promo-tint p-8 sm:p-10">
       <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
         <div className="max-w-2xl">
-          <h2 className="font-fraunces text-2xl font-semibold text-brand-ink">
+          <h2 className="font-fraunces text-2xl font-semibold text-promo-ink">
             {owner
               ? 'More reviews, more bookings'
               : locationName
                 ? `Own a pilates studio in ${locationName}?`
                 : 'Own a pilates studio?'}
           </h2>
-          <p className="mt-3 leading-relaxed text-brand-ink/80">
+          <p className="mt-3 leading-relaxed text-promo-ink/80">
             {owner
               ? 'Your listing is only half the story - the studios people book are the ones with recent reviews. Grow Our Reviews collects genuine 5-star Google reviews on autopilot.'
               : 'More reviews mean more bookings. Grow Our Reviews helps studios like yours collect genuine 5-star Google reviews on autopilot — so new clients find you first.'}
@@ -34,7 +34,7 @@ export default function ReviewsCta({ locationName, variant = 'directory' }: Revi
           href="https://www.growourreviews.com/"
           target="_blank"
           rel="noopener noreferrer"
-          className="pill-brand shrink-0"
+          className="pill shrink-0 bg-promo text-white hover:bg-promo-hover"
         >
           <Star className="h-4 w-4" aria-hidden="true" />
           Get more reviews

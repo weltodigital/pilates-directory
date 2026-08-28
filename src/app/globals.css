@@ -40,6 +40,14 @@
   --signal: 21 90% 40%;          /* #c2410c */
   --signal-hover: 19 89% 34%;    /* #9a3412 */
 
+  /* Promo — the partner recommendation, which is neither ours nor a call to
+     act on this site. Purple made it look like something we were offering,
+     and it sits next to a purple featured panel selling exactly that. */
+  --promo: 174 84% 25%;          /* #0f766e */
+  --promo-hover: 175 84% 20%;    /* #115e59 */
+  --promo-tint: 166 76% 97%;     /* #f0fdfa */
+  --promo-ink: 176 84% 17%;      /* #134e4a */
+
   /* Radii — soft, generous */
   --radius: 0.875rem;
   --radius-lg: 1.25rem;

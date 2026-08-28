@@ -67,6 +67,10 @@ export default async function DashboardPage() {
 
   return (
     <>
+      <div className="mb-10">
+        <ReviewsCta variant="owner" />
+      </div>
+
       <h1 className="font-fraunces text-2xl font-semibold">
         {studios.length === 1 ? 'Your listing' : 'Your listings'}
       </h1>
@@ -133,10 +137,6 @@ export default async function DashboardPage() {
             </div>
           </article>
         ))}
-      </div>
-
-      <div className="mt-10">
-        <ReviewsCta variant="owner" />
       </div>
     </>
   );

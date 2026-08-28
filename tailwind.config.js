@@ -52,6 +52,12 @@ module.exports = {
           DEFAULT: "hsl(var(--signal))",
           hover: "hsl(var(--signal-hover))",
         },
+        promo: {
+          DEFAULT: "hsl(var(--promo))",
+          hover: "hsl(var(--promo-hover))",
+          tint: "hsl(var(--promo-tint))",
+          ink: "hsl(var(--promo-ink))",
+        },
 
         // shadcn primitives
         border: "hsl(var(--border))",
