@@ -58,7 +58,6 @@ interface PilatesStudio {
   rating?: number;
   review_count: number;
   specialties: string[];
-  images: string[];
   class_types: string[];
   price_range?: string;
   beginner_friendly: boolean;

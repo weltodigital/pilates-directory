@@ -5,6 +5,8 @@ import { requireOwner, ownsStudio } from '@/lib/owner-auth'
 import { serverClient } from '@/lib/forms'
 import { EDITABLE_KEYS, displayValue, fieldSpec } from '@/lib/editable'
 import OwnerEditForm from '@/components/OwnerEditForm'
+import PhotoManager from '@/components/PhotoManager'
+import { MAX_PHOTOS } from '@/lib/photos'
 import { CONTACT_EMAIL } from '@/lib/site'
 
 export const dynamic = 'force-dynamic'
@@ -22,7 +24,7 @@ export default async function EditStudioPage({ params }: PageProps) {
   const supabase = serverClient();
   if (!supabase) notFound();
 
-  const [{ data: studio }, { data: pending }] = await Promise.all([
+  const [{ data: studio }, { data: pending }, { data: photos }] = await Promise.all([
     supabase
       .from('pilates_studios')
       .select(['id', 'name', 'address', 'postcode', 'city', 'county', 'full_url_path', ...EDITABLE_KEYS].join(','))
@@ -35,6 +37,12 @@ export default async function EditStudioPage({ params }: PageProps) {
       .eq('status', 'pending')
       .order('created_at', { ascending: false })
       .limit(1),
+    supabase
+      .from('studio_photos')
+      .select('id, public_url, status, alt, review_note')
+      .eq('studio_id', studioId)
+      .order('position', { ascending: true })
+      .order('created_at', { ascending: true }),
   ]);
 
   if (!studio) notFound();
@@ -88,6 +96,14 @@ export default async function EditStudioPage({ params }: PageProps) {
           </ul>
         </div>
       )}
+
+      <section className="mt-8 card-flat p-6 sm:p-8">
+        <PhotoManager
+          studioId={row.id}
+          photos={(photos || []) as any}
+          max={MAX_PHOTOS}
+        />
+      </section>
 
       <div className="mt-8">
         <OwnerEditForm

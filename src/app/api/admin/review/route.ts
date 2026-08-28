@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server'
 import { field, serverClient } from '@/lib/forms'
 import { isAdmin } from '@/lib/admin-auth'
 import {
-  approveClaim, approveEdit, approveSubmission,
-  rejectClaim, rejectEdit, rejectSubmission,
+  approveClaim, approveEdit, approvePhoto, approveSubmission,
+  rejectClaim, rejectEdit, rejectPhoto, rejectSubmission,
 } from '@/lib/review'
 
 export const dynamic = 'force-dynamic'
@@ -58,6 +58,9 @@ export async function POST(request: Request) {
   } else if (kind === 'edit') {
     if (action === 'approve') result = await approveEdit(supabase, id, note);
     else if (action === 'reject') result = await rejectEdit(supabase, id, note);
+  } else if (kind === 'photo') {
+    if (action === 'approve') result = await approvePhoto(supabase, id, note);
+    else if (action === 'reject') result = await rejectPhoto(supabase, id, note);
   }
 
   if (!result) {

@@ -10,6 +10,7 @@ const TABS = [
   { href: '/admin/submissions', label: 'Submissions', table: 'studio_submissions' },
   { href: '/admin/claims', label: 'Claims', table: 'studio_claims' },
   { href: '/admin/edits', label: 'Edits', table: 'studio_edits' },
+  { href: '/admin/photos', label: 'Photos', table: 'studio_photos' },
 ]
 
 /** How many rows are waiting in each queue, shown against the tab. */

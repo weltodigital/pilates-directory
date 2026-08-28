@@ -54,7 +54,6 @@ interface PilatesStudio {
   review_count: number;
   specialties: string[];
   opening_hours: Record<string, string>;
-  images: string[];
   class_types: string[];
   instructor_names: string[];
   price_range?: string;

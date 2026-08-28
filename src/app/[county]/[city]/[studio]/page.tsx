@@ -7,7 +7,9 @@ import { MapPin, Star, Phone, Mail, Globe, Activity, Award, Navigation, Calendar
 import HeaderWithBreadcrumbs from '@/components/HeaderWithBreadcrumbs';
 import EquipmentStrip from '@/components/EquipmentStrip';
 import StudioLocationsMap from '@/components/StudioLocationsMap';
-import { isOutwardCode } from '@/lib/geo';
+import StudioGallery from '@/components/StudioGallery';
+import { studioPhotos } from '@/lib/photos';
+import { serverClient } from '@/lib/forms';
 
 
 interface StudioPageProps {
@@ -37,7 +39,6 @@ interface PilatesStudio {
   review_count: number;
   specialties: string[];
   opening_hours: Record<string, string>;
-  images: (string | { url: string; type?: string; attribution?: string; })[];
   class_types: string[];
   instructor_names: string[];
   price_range?: string;
@@ -188,6 +189,11 @@ export default async function StudioPage({ params }: StudioPageProps) {
     notFound();
   }
 
+  const supabaseForPhotos = serverClient();
+  const photos = supabaseForPhotos
+    ? await studioPhotos(supabaseForPhotos, studioData.id)
+    : [];
+
   const breadcrumbs = [
     { label: 'Home', href: '/' },
     { label: locationData.county.name, href: `/${locationData.county.slug}` },
@@ -249,6 +255,9 @@ export default async function StudioPage({ params }: StudioPageProps) {
         name: studioData.name,
         url: studioUrl,
         ...(studioData.description ? { description: studioData.description } : {}),
+        // Only photos the studio supplied and we approved. Everything in this
+        // graph has to be something we can stand behind.
+        ...(photos.length ? { image: photos.map((p: any) => p.public_url) } : {}),
         ...(studioData.website ? { sameAs: [studioData.website] } : {}),
         ...(studioData.phone ? { telephone: studioData.phone } : {}),
         address: {
@@ -440,6 +449,8 @@ export default async function StudioPage({ params }: StudioPageProps) {
         </section>
 
         <div className="shell space-y-20 py-20">
+          <StudioGallery photos={photos} studioName={studioData.name} />
+
           {/* Classes offered / Contact / Opening hours, side by side. Each
               card stretches to the row height so the tops and bottoms line up. */}
           <div className="grid items-stretch gap-6 md:grid-cols-2 lg:grid-cols-3">

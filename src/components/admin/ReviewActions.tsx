@@ -18,7 +18,7 @@ interface PromoteOptions {
 }
 
 interface ReviewActionsProps {
-  kind: 'submission' | 'claim' | 'edit';
+  kind: 'submission' | 'claim' | 'edit' | 'photo';
   id: string;
   choices: Choice[];
   /** Present only for submissions, where approving also decides the URL. */

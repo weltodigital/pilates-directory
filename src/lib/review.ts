@@ -3,6 +3,7 @@ import { recordAction } from '@/lib/admin-auth'
 import { requestPasswordLink } from '@/lib/owner-auth'
 import { sendEmail, siteUrl } from '@/lib/email'
 import { EDITABLE_KEYS, fieldSpec, parseValue } from '@/lib/editable'
+import { BUCKET } from '@/lib/photos'
 
 /**
  * The three approval paths.
@@ -437,4 +438,75 @@ export async function rejectEdit(
   }
 
   return { ok: true, message: 'Edit rejected.' };
+}
+
+// ------------------------------------------------------------------ photos
+
+export async function approvePhoto(
+  supabase: any,
+  photoId: string,
+  note: string | null
+): Promise<Result> {
+  const now = new Date().toISOString();
+  const { data, error } = await supabase
+    .from('studio_photos')
+    .update({ status: 'approved', reviewed_at: now, review_note: note })
+    .eq('id', photoId)
+    .eq('status', 'pending')
+    .select('id, pilates_studios(name)')
+    .single();
+
+  if (error || !data) return { ok: false, error: error?.message || 'Photo not found.' };
+
+  await recordAction(supabase, 'photo.approved', 'studio_photos', photoId, null, note);
+  return { ok: true, message: `Published on ${(data as any).pilates_studios?.name}.` };
+}
+
+/**
+ * Reject a photo, and delete the file with it.
+ *
+ * A rejected photo is one we have decided not to publish. Keeping the bytes
+ * on a public bucket, at a URL anyone holding it can still open, would leave
+ * it published in every sense except the listing.
+ */
+export async function rejectPhoto(
+  supabase: any,
+  photoId: string,
+  note: string | null
+): Promise<Result> {
+  const { data: photo } = await supabase
+    .from('studio_photos')
+    .select('id, storage_path, studio_owners(email, name), pilates_studios(name)')
+    .eq('id', photoId)
+    .single();
+
+  if (!photo) return { ok: false, error: 'Photo not found.' };
+
+  const { error } = await supabase
+    .from('studio_photos')
+    .update({ status: 'rejected', reviewed_at: new Date().toISOString(), review_note: note })
+    .eq('id', photoId)
+    .eq('status', 'pending');
+  if (error) return { ok: false, error: error.message };
+
+  await supabase.storage.from(BUCKET).remove([photo.storage_path]);
+  await recordAction(supabase, 'photo.rejected', 'studio_photos', photoId, null, note);
+
+  const owner = (photo as any).studio_owners;
+  if (owner?.email) {
+    await sendEmail({
+      to: owner.email,
+      subject: `About the photo you added to ${(photo as any).pilates_studios?.name}`,
+      text: [
+        owner.name ? `Hi ${owner.name},` : 'Hi,',
+        '',
+        'We were not able to publish one of the photos you uploaded.',
+        note ? `\n${note}` : '\nReply to this email and we will sort it out.',
+        '',
+        'Pilates Classes Near',
+      ].join('\n'),
+    });
+  }
+
+  return { ok: true, message: 'Photo rejected and removed.' };
 }
