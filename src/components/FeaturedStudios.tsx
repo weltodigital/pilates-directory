@@ -17,12 +17,13 @@ interface FeaturedStudio {
 }
 
 /**
- * The paid slots at the top of a town page.
+ * The featured slots at the top of a town page.
  *
- * Set apart deliberately, and labelled as paid on every card. A promoted
- * placement that reads as an editorial pick is the thing that makes a
- * directory untrustworthy, and this one orders everything else by rating and
- * distance rather than by payment. Saying so is what lets that stay true.
+ * Every card carries a Featured badge, and the panel is visibly separate from
+ * the list below it. That separation is the point: the rest of the page is
+ * ordered by rating and distance, and a promotion that reads as an editorial
+ * pick would quietly make that claim untrue. "Featured" is the word people
+ * already read as promoted, which is what the CAP Code asks for.
  */
 export default function FeaturedStudios({
   studios, townName,
@@ -31,21 +32,21 @@ export default function FeaturedStudios({
 
   return (
     <section aria-labelledby="featured-heading">
-      <div className="overflow-hidden rounded-xl border-2 border-brand/25 bg-brand-tint">
-        <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-brand/15 px-7 py-5">
+      <div className="overflow-hidden rounded-xl border-2 border-brand shadow-[0_16px_40px_-20px_hsl(var(--brand)/0.55)]">
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-brand px-7 py-5">
           <h2
             id="featured-heading"
-            className="flex items-center gap-2 font-fraunces text-xl font-semibold text-brand-ink"
+            className="flex items-center gap-2.5 font-fraunces text-xl font-semibold text-white sm:text-2xl"
           >
-            <Sparkles className="h-4 w-4 text-brand" aria-hidden="true" />
+            <Sparkles className="h-5 w-5" aria-hidden="true" />
             Featured in {townName}
           </h2>
-          <p className="text-xs text-brand-ink/70">
-            Paid placements. Every other studio below is ordered by rating and distance.
+          <p className="text-sm text-white/80">
+            {studios.length === 1 ? 'A studio' : 'Studios'} we&apos;re highlighting this month
           </p>
         </div>
 
-        <div className="grid gap-px bg-brand/15 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-px bg-brand/20 sm:grid-cols-2 lg:grid-cols-3">
           {studios.map((studio) => {
             const blurb = studio.description
               ? studio.description.split(' ').slice(0, 22).join(' ') +
@@ -54,6 +55,11 @@ export default function FeaturedStudios({
 
             return (
               <article key={studio.id} className="flex flex-col bg-surface p-7">
+                <span className="chip mb-4 self-start border-brand/30 bg-brand-tint text-brand-ink">
+                  <Sparkles className="h-3.5 w-3.5 text-brand" aria-hidden="true" />
+                  Featured
+                </span>
+
                 <div className="flex items-start justify-between gap-3">
                   <h3 className="font-fraunces text-lg font-semibold leading-snug">
                     <Link
