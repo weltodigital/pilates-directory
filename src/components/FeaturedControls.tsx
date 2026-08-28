@@ -17,6 +17,8 @@ interface FeaturedControlsProps {
    */
   reservedUntil: string | null;
   townName: string;
+  /** Studios already listed in this town — what a featured place stands out from. */
+  townStudios: number;
   slotsFree: number;
   slotsTotal: number;
   price: string;
@@ -35,8 +37,8 @@ function formatDate(value: string | null) {
 
 export default function FeaturedControls(props: FeaturedControlsProps) {
   const {
-    studioId, feature, reservedUntil, townName, slotsFree, slotsTotal, price,
-    eligible, available,
+    studioId, feature, reservedUntil, townName, townStudios, slotsFree,
+    slotsTotal, price, eligible, available,
   } = props;
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -171,23 +173,27 @@ export default function FeaturedControls(props: FeaturedControlsProps) {
     );
   }
 
-  // The claims here are things the page actually does. A directory that
-  // promises bookings it cannot deliver is one nobody renews.
+  // Written as what the owner gets, not what the panel does. Every claim is
+  // something this site demonstrably arranges - nothing about more bookings
+  // or more customers, which no directory can promise and which is what stops
+  // people renewing when it does not happen.
   const REASONS = [
     {
       icon: ArrowUpRight,
-      title: `Above every other studio in ${townName}`,
-      body: 'Your listing sits in its own panel at the top of the town page, above the map and above the full list — the first studios anyone sees on it.',
+      title: 'Get chosen before the comparing starts',
+      body: townStudios > 1
+        ? `Someone looking for pilates in ${townName} arrives with no shortlist. You are the studio they read about first, rather than one of ${townStudios} they work through.`
+        : `Someone looking for pilates in ${townName} arrives with no shortlist. You are the studio they read about first, in a panel of your own before the rest of the page.`,
     },
     {
       icon: Sparkles,
-      title: `Only ${slotsTotal} studios can hold it`,
-      body: 'Not an auction and not an ad slot. Three places per town, and your position does not change with your rating or how recently you were reviewed.',
+      title: 'Stop waiting on reviews to be seen',
+      body: 'Studios below are ordered by rating and review count, so a newer one starts near the bottom however good it is. A featured place puts you above that from the day you take it, and keeps you there.',
     },
     {
       icon: CalendarCheck,
-      title: 'A booking button, not just a link',
-      body: 'Your rating, your classes and a Book a class button that goes straight to your own booking system, so someone ready to book does not have to hunt for it.',
+      title: 'Send them straight to your timetable',
+      body: 'Your card carries a Book a class button that opens your own booking system. Someone ready to book gets there in one step, instead of finding your listing, then your website, then your timetable.',
     },
   ];
 
@@ -204,7 +210,9 @@ export default function FeaturedControls(props: FeaturedControlsProps) {
               Be the first studio people see in {townName}
             </h3>
             <p className="mt-2 text-sm leading-relaxed text-brand-ink/80">
-              {slotsFree} of {slotsTotal} places {slotsFree === 1 ? 'is' : 'are'} available.
+              Only {slotsTotal} studios in {townName} can hold a featured place,
+              so it stays worth having. {slotsFree} of {slotsTotal}{' '}
+              {slotsFree === 1 ? 'is' : 'are'} available now.
             </p>
           </div>
         </div>

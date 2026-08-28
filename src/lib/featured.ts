@@ -55,6 +55,20 @@ export interface TownAvailability {
   slots: number[];
 }
 
+/** How many studios a town already lists, which is what a featured place is
+ *  bought to stand out from. */
+export async function townStudioCount(
+  supabase: any, county: string, city: string
+): Promise<number> {
+  const { count } = await supabase
+    .from('pilates_studios')
+    .select('*', { count: 'exact', head: true })
+    .eq('county_slug', county)
+    .eq('city_slug', city)
+    .eq('is_active', true);
+  return count || 0;
+}
+
 export async function townAvailability(
   supabase: any, county: string, city: string
 ): Promise<TownAvailability> {

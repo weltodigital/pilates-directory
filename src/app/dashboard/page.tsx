@@ -6,7 +6,7 @@ import ReviewsCta from '@/components/ReviewsCta'
 import FeaturedControls from '@/components/FeaturedControls'
 import {
   FEATURED_SLOTS_PER_TOWN, featuredConfigured, formatPrice, studioFeature,
-  townAvailability,
+  townAvailability, townStudioCount,
 } from '@/lib/featured'
 
 export const dynamic = 'force-dynamic'
@@ -35,11 +35,12 @@ async function featuredByStudio(studios: any[]) {
   if (!supabase || !studios.length) return {};
 
   const entries = await Promise.all(studios.map(async (studio: any) => {
-    const [feature, availability] = await Promise.all([
+    const [feature, availability, townStudios] = await Promise.all([
       studioFeature(supabase, studio.id),
       townAvailability(supabase, studio.county_slug, studio.city_slug),
+      townStudioCount(supabase, studio.county_slug, studio.city_slug),
     ]);
-    return [studio.id, { feature, availability }] as const;
+    return [studio.id, { feature, availability, townStudios }] as const;
   }));
 
   return Object.fromEntries(entries);
@@ -113,6 +114,7 @@ export default async function DashboardPage() {
                 price={formatPrice()}
                 slotsTotal={FEATURED_SLOTS_PER_TOWN}
                 slotsFree={featured[studio.id]?.availability?.free ?? 0}
+                townStudios={featured[studio.id]?.townStudios ?? 0}
                 {...(() => {
                   // A pending row is a held place, not a subscription. Only a
                   // slot Stripe has actually collected for counts as featured.
