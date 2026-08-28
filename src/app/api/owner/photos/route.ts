@@ -4,7 +4,8 @@ import { field, serverClient } from '@/lib/forms'
 import { getOwner, ownsStudio } from '@/lib/owner-auth'
 import { notifyAdmin, siteUrl } from '@/lib/email'
 import {
-  BUCKET, MAX_BYTES, MAX_PHOTOS, extensionFor, readDimensions, sniffImageType,
+  BUCKET, MAX_BYTES, MAX_PHOTOS, PHOTO_CACHE_SECONDS, extensionFor,
+  readDimensions, sniffImageType,
 } from '@/lib/photos'
 
 export const dynamic = 'force-dynamic'
@@ -78,9 +79,14 @@ export async function POST(request: Request) {
   // string from a stranger, and it would otherwise end up in a public URL.
   const path = `${studioId}/${randomBytes(16).toString('hex')}.${extensionFor(contentType)}`;
 
+  // A short cache, deliberately. Rejecting a photo deletes the file, but the
+  // CDN in front of storage honours whatever we set here - a year-long
+  // max-age left a rejected photo publicly retrievable at its URL for a year
+  // after it was deleted, which is the opposite of what rejecting it means.
+  // Five minutes costs a little egress and makes the deletion real.
   const { error: uploadError } = await supabase.storage
     .from(BUCKET)
-    .upload(path, bytes, { contentType, cacheControl: '31536000', upsert: false });
+    .upload(path, bytes, { contentType, cacheControl: String(PHOTO_CACHE_SECONDS), upsert: false });
 
   if (uploadError) {
     console.error('Photo upload failed:', uploadError.message);

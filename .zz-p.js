@@ -1,0 +1,5 @@
+require('dotenv').config({ path: '.env.local', quiet: true })
+const { createClient } = require('@supabase/supabase-js')
+const s = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SECRET_KEY)
+s.from('studio_photos').select('id,status,width,height,bytes,content_type,storage_path')
+  .then(({data}) => data.forEach(r => console.log(' ', r.status, `${r.width}x${r.height}`, `${(r.bytes/1024).toFixed(0)}KB`, r.content_type, '|', r.storage_path)))

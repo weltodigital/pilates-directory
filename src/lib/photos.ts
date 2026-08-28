@@ -10,6 +10,16 @@ export const MAX_PHOTOS = 8
 export const MAX_BYTES = 5 * 1024 * 1024
 export const BUCKET = 'studio-photos'
 
+/**
+ * How long the CDN may hold a photo.
+ *
+ * Short on purpose. Rejecting a photo deletes the file, but the CDN serves
+ * whatever cache-control it was stored with, so a long max-age would keep a
+ * rejected photo retrievable at its URL long after it was removed. Deleting
+ * has to actually delete.
+ */
+export const PHOTO_CACHE_SECONDS = 300
+
 export const ACCEPTED = ['image/jpeg', 'image/png', 'image/webp'] as const
 
 /** The real type, from the file's own leading bytes. Null if it is not one we take. */
