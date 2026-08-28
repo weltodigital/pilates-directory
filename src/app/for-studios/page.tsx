@@ -206,8 +206,11 @@ export default async function ForStudiosPage() {
               <div>
                 <dt className="font-semibold text-ink">Does it cost anything?</dt>
                 <dd className="mt-2 text-sm leading-relaxed text-ink-muted">
-                  No. Listing and claiming are both free, and we don&apos;t sell
-                  placement in the results.
+                  No. Listing, claiming and keeping your details current are all
+                  free, and always will be. Studios that want to can pay for a
+                  featured place at the top of their town page; those are
+                  labelled as paid and change nothing about how everything else
+                  is ordered.
                 </dd>
               </div>
               <div>
@@ -222,7 +225,10 @@ export default async function ForStudiosPage() {
                 <dt className="font-semibold text-ink">How are studios ordered?</dt>
                 <dd className="mt-2 text-sm leading-relaxed text-ink-muted">
                   By rating and review volume, or by distance when someone
-                  searches from a postcode. Never by payment.
+                  searches from a postcode. No position in that list can be
+                  bought, and paying us moves nothing within it. The featured
+                  places above a town&apos;s list sit outside the ordering
+                  entirely, and say on every card that they are paid for.
                 </dd>
               </div>
               <div>
