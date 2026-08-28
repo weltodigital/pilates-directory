@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { MapPin, Star, Navigation, Search, Loader2, ArrowRight, ShieldCheck } from 'lucide-react'
 import StudioLocationsMap from '@/components/StudioLocationsMap'
@@ -21,8 +21,8 @@ interface Result {
   is_verified: boolean | null;
 }
 
-export default function NearSearch() {
-  const [postcode, setPostcode] = useState('');
+export default function NearSearch({ initialPostcode }: { initialPostcode?: string }) {
+  const [postcode, setPostcode] = useState(initialPostcode ?? '');
   const [results, setResults] = useState<Result[] | null>(null);
   const [label, setLabel] = useState('');
   const [radiusKm, setRadiusKm] = useState<number | null>(null);
@@ -47,6 +47,17 @@ export default function NearSearch() {
       setBusy(false);
     }
   }
+
+  // A postcode arriving in the URL - from a studio's address, say - should
+  // land on results rather than on a filled-in box waiting to be submitted.
+  // The ref stops it running again on every render.
+  const ranInitial = useRef(false);
+  useEffect(() => {
+    if (ranInitial.current || !initialPostcode?.trim()) return;
+    ranInitial.current = true;
+    run(`postcode=${encodeURIComponent(initialPostcode.trim())}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialPostcode]);
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();

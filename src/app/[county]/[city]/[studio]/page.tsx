@@ -587,14 +587,18 @@ export default async function StudioPage({ params }: StudioPageProps) {
                       {studioData.address}
                       <br />
                       {studioData.city},{' '}
-                      {outwardCode ? (
+                      {studioData.postcode ? (
+                        // A distance search from the full postcode, rather
+                        // than the district page this used to reach: "what is
+                        // near here" is a question about distance, not about
+                        // which side of a postcode boundary something sits.
                         <Link
-                          href={`/${outwardCode.toLowerCase()}`}
+                          href={`/near?postcode=${encodeURIComponent(studioData.postcode)}`}
                           className="text-brand underline-offset-4 hover:underline"
                         >
                           {studioData.postcode}
                         </Link>
-                      ) : studioData.postcode}
+                      ) : null}
                     </dd>
                   </div>
                 </div>

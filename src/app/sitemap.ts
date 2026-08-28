@@ -65,13 +65,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   }
 
-  // Studios and postcode districts come from the same scan.
+  // Every active studio.
   const studios = await selectAll(
-    supabase, 'pilates_studios', 'full_url_path,outward_code,updated_at',
+    supabase, 'pilates_studios', 'full_url_path,updated_at',
     (q: any) => q.eq('is_active', true).not('full_url_path', 'is', null)
   );
-
-  const districtCounts: Record<string, number> = {};
 
   for (const studio of studios) {
     entries.push({
@@ -79,20 +77,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: studio.updated_at ? new Date(studio.updated_at) : lastModified,
       changeFrequency: 'monthly',
       priority: 0.7,
-    });
-    const code = (studio.outward_code || '').toLowerCase();
-    if (code) districtCounts[code] = (districtCounts[code] || 0) + 1;
-  }
-
-  // Matches the prerender threshold in the [county] route: districts with
-  // fewer than three studios render on demand and are too thin to submit.
-  for (const [code, count] of Object.entries(districtCounts)) {
-    if (count < 3) continue;
-    entries.push({
-      url: `${BASE_URL}/${code}`,
-      lastModified,
-      changeFrequency: 'weekly',
-      priority: 0.8,
     });
   }
 

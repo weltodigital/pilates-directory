@@ -253,17 +253,6 @@ export default async function CityPage({ params }: CityPageProps) {
   const studios = await getCityStudios(resolvedParams.county, resolvedParams.city);
   const featured = await getFeaturedStudios(resolvedParams.county, resolvedParams.city);
 
-  // Postcode districts covered by this town, so the district pages are
-  // reachable rather than orphaned.
-  const districtCounts = studios.reduce<Record<string, number>>((acc, s: any) => {
-    const code = (s.postcode || '').trim().split(/\s+/)[0];
-    if (code) acc[code.toUpperCase()] = (acc[code.toUpperCase()] || 0) + 1;
-    return acc;
-  }, {});
-  const postcodeDistricts = Object.entries(districtCounts)
-    .filter(([, count]) => count >= 1)
-    .sort((a, b) => b[1] - a[1])
-    .map(([code, count]) => ({ code, count }));
 
 
   // ItemList so a location page is machine-readable as a ranked directory
@@ -372,26 +361,6 @@ export default async function CityPage({ params }: CityPageProps) {
 
           <EquipmentStrip />
 
-          {postcodeDistricts.length > 0 && (
-            <section>
-              <span className="eyebrow">By postcode</span>
-              <h2 className="mt-3 text-display-sm">
-                Postcode districts in {location.name}
-              </h2>
-              <div className="mt-8 flex flex-wrap gap-2">
-                {postcodeDistricts.map(({ code, count }) => (
-                  <Link
-                    key={code}
-                    href={`/${code.toLowerCase()}`}
-                    className="chip hover:border-brand hover:text-brand"
-                  >
-                    {code}
-                    <span className="text-ink-faint">{count}</span>
-                  </Link>
-                ))}
-              </div>
-            </section>
-          )}
 
           <ReviewsCta locationName={location.name} />
 

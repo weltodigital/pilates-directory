@@ -2,13 +2,12 @@ import React from 'react';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { MapPin, Users, Activity, Star, ArrowRight, ShieldCheck } from 'lucide-react';
 import HeaderWithBreadcrumbs from '@/components/HeaderWithBreadcrumbs';
 import EquipmentStrip from '@/components/EquipmentStrip';
 import ReviewsCta from '@/components/ReviewsCta';
 import StudioLocationsMap from '@/components/StudioLocationsMap';
-import PostcodeDirectory from '@/components/PostcodeDirectory';
 import { isOutwardCode } from '@/lib/geo';
 
 interface CountyPageProps {
@@ -236,21 +235,6 @@ function toMapStudio(s: any) {
 export async function generateMetadata({ params }: CountyPageProps): Promise<Metadata> {
   const resolvedParams = await params;
 
-  if (isOutwardCode(resolvedParams.county)) {
-    const code = resolvedParams.county.toUpperCase();
-    const studios = await getPostcodeStudios(resolvedParams.county);
-    if (!studios.length) {
-      return { title: 'Postcode Not Found | Pilates Classes Near' };
-    }
-    const towns = Array.from(new Set(studios.map((s: any) => s.city).filter(Boolean))).slice(0, 3);
-    return {
-      title: `Pilates Studios in ${code} | ${studios.length} Studios Near You`,
-      description: `Find ${studios.length} pilates studios in the ${code} postcode district${towns.length ? ` covering ${towns.join(', ')}` : ''}. Compare ratings, opening hours and verified Google reviews.`,
-      alternates: { canonical: `/${resolvedParams.county}` },
-      robots: { index: true, follow: true },
-    };
-  }
-
   const location = await getCountyData(resolvedParams.county);
 
   if (!location) {
@@ -304,39 +288,51 @@ export async function generateMetadata({ params }: CountyPageProps): Promise<Met
   };
 }
 
+/**
+ * The town a district should hand its visitors to: the one holding most of
+ * its studios. For 84% of districts that is the only town they covered, so
+ * the redirect is exact; for the rest it is the closest real page there is.
+ */
+async function getDistrictTown(code: string): Promise<string | null> {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SECRET_KEY!
+  );
+
+  const { data } = await supabase
+    .from('pilates_studios')
+    .select('county_slug, city_slug')
+    .eq('is_active', true)
+    .ilike('outward_code', code)
+    .limit(200);
+
+  if (!data?.length) return null;
+
+  const counts: Record<string, number> = {};
+  for (const row of data) {
+    if (!row.county_slug || !row.city_slug) continue;
+    const path = `${row.county_slug}/${row.city_slug}`;
+    counts[path] = (counts[path] || 0) + 1;
+  }
+
+  const best = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
+  return best?.[0] ?? null;
+}
+
 export default async function CountyPage({ params }: CountyPageProps) {
   const resolvedParams = await params;
 
-  // Postcode district rather than a county.
+  // Postcode district pages are gone. Google crawled all 1,455 and indexed
+  // none of them: 84% duplicated a single town page, a third listed one
+  // studio, and /near answers "what is close to this postcode" properly, by
+  // distance from a full postcode rather than by a district boundary.
+  //
+  // Redirected rather than removed, so the town page inherits anyone still
+  // holding the link.
   if (isOutwardCode(resolvedParams.county)) {
-    const code = resolvedParams.county.toUpperCase();
-    const [studios, neighbours] = await Promise.all([
-      getPostcodeStudios(resolvedParams.county),
-      getNeighbouringCodes(code),
-    ]);
-    if (!studios.length) notFound();
-
-    let areaName: string | null = null;
-    try {
-      const res = await fetch(`https://api.postcodes.io/outcodes/${encodeURIComponent(code)}`, {
-        next: { revalidate: 86400 },
-      });
-      if (res.ok) {
-        const j = await res.json();
-        areaName = j.result?.admin_district?.[0] || j.result?.region || null;
-      }
-    } catch {
-      // Area name is decoration; the page stands without it.
-    }
-
-    return (
-      <PostcodeDirectory
-        code={code}
-        areaName={areaName}
-        studios={studios as any}
-        neighbours={neighbours}
-      />
-    );
+    const town = await getDistrictTown(resolvedParams.county);
+    if (!town) notFound();
+    permanentRedirect(`/${town}`);
   }
 
   const location = await getCountyData(resolvedParams.county);
@@ -620,30 +616,5 @@ export async function generateStaticParams() {
 
   const counties = (data || []).map((county) => ({ county: county.slug }));
 
-  // Prerender postcode districts carrying enough studios to be worth a page.
-  // Thinner districts still resolve, rendered on demand.
-  let studios: any[] = [];
-  for (let from = 0; ; from += 1000) {
-    const { data: page } = await supabase
-      .from('pilates_studios')
-      .select('outward_code')
-      .eq('is_active', true)
-      .not('outward_code', 'is', null)
-      .range(from, from + 999);
-    if (!page || !page.length) break;
-    studios = studios.concat(page);
-    if (page.length < 1000) break;
-  }
-
-  const counts = studios.reduce<Record<string, number>>((acc, r) => {
-    const c = (r.outward_code || '').toLowerCase();
-    if (c) acc[c] = (acc[c] || 0) + 1;
-    return acc;
-  }, {});
-
-  const postcodes = Object.entries(counts)
-    .filter(([, n]) => n >= 3)
-    .map(([code]) => ({ county: code }));
-
-  return [...counties, ...postcodes];
+  return counties;
 }

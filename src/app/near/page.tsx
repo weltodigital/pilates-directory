@@ -12,7 +12,16 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 }
 
-export default function NearPage() {
+interface NearPageProps {
+  searchParams: Promise<{ postcode?: string }>;
+}
+
+export default async function NearPage({ searchParams }: NearPageProps) {
+  // Studio pages link here with their own postcode, so the search runs on
+  // arrival rather than presenting an empty box to someone who has already
+  // said where they are.
+  const { postcode } = await searchParams;
+
   return (
     <>
       <Header breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Near me' }]} />
@@ -38,7 +47,7 @@ export default function NearPage() {
               </p>
             </div>
 
-            <NearSearch />
+            <NearSearch initialPostcode={postcode} />
           </div>
         </section>
       </main>
