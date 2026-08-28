@@ -108,22 +108,48 @@ export async function POST(request: Request) {
         const sub = event.data.object as any;
         const periodEnd = sub.items?.data?.[0]?.current_period_end ?? sub.current_period_end;
 
+        // Stripe can express "this is ending" in more than one way, and which
+        // one arrives depends on how it was cancelled and on the API version
+        // the account sends events in. Reading a single field got this wrong
+        // once already: a cancellation came through as an ordinary update and
+        // the slot stayed live. Any of these means the same thing.
+        const endingSoon = Boolean(
+          sub.cancel_at_period_end || sub.cancel_at || sub.cancellation_details?.reason
+        );
+        const ended = sub.status === 'canceled' || sub.status === 'incomplete_expired';
+
         await supabase
           .from('featured_listings')
           .update({
             // A subscription Stripe considers unpaid keeps its slot while
             // Stripe retries; anything past that releases it.
-            status: sub.status === 'active' || sub.status === 'trialing'
-              ? 'active'
+            status: ended
+              ? 'cancelled'
               : sub.status === 'past_due' || sub.status === 'unpaid'
                 ? 'past_due'
-                : 'cancelled',
-            cancel_at_period_end: Boolean(sub.cancel_at_period_end),
+                : 'active',
+            cancel_at_period_end: endingSoon,
             current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
-            ended_at: sub.status === 'canceled' ? now : null,
+            ended_at: ended ? now : null,
             updated_at: now,
           })
           .eq('stripe_subscription_id', sub.id);
+
+        // Worth knowing about, and the only signal that a slot is due back.
+        if (endingSoon && !ended) {
+          const { data: row } = await supabase
+            .from('featured_listings')
+            .select('pilates_studios(name, city)')
+            .eq('stripe_subscription_id', sub.id)
+            .single();
+          const studio = (row as any)?.pilates_studios;
+          if (studio) {
+            await notifyAdmin(
+              `Featured listing cancelled: ${studio.name}`,
+              `${studio.name} has cancelled and will stop being featured in ${studio.city} at the end of the period it has paid for.`
+            );
+          }
+        }
         break;
       }
 
