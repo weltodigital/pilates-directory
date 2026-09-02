@@ -51,3 +51,7 @@ _removed_studios_backup.json
 _import_preview.json
 dataset_google-maps-extractor_*.csv
 _enrich_preview.json
+
+# Google Places response cache (paid calls; never in the repo)
+.places-cache/
+.places-usage.json
