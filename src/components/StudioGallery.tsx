@@ -9,9 +9,13 @@ interface Photo {
 /**
  * Photos the studio uploaded and we approved.
  *
- * The first is shown large and the rest fill the grid beside and below it.
- * Every approved photo appears: an owner allowed to upload eight and shown
- * five has three that exist, were reviewed, and are nowhere.
+ * Every tile is the same 4:3 box and every photo is cropped to fill it. The
+ * uploads are whatever came off a phone - most are portrait, several times
+ * taller than they are wide - so letting each picture set its own height gave
+ * a grid of mismatched tiles with dead space under the short ones.
+ *
+ * Not linked to the full-size file: a picture of a studio is there to show
+ * the room, and opening a 3000px original in a bare tab is not a viewer.
  *
  * Plain img rather than next/image: these come from Supabase storage already
  * sized, and routing them through the optimiser would bill us per
@@ -22,45 +26,24 @@ export default function StudioGallery({
 }: { photos: Photo[]; studioName: string }) {
   if (!photos.length) return null;
 
-  const [lead, ...rest] = photos;
-
   return (
     <section aria-label={`Photos of ${studioName}`}>
-      <div className="grid gap-3 sm:grid-cols-4 sm:grid-rows-2">
-        <a
-          href={lead.public_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group block overflow-hidden rounded-xl border border-line sm:col-span-2 sm:row-span-2"
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={lead.public_url}
-            alt={lead.alt || `${studioName}`}
-            width={lead.width ?? undefined}
-            height={lead.height ?? undefined}
-            className="block aspect-[4/3] w-full bg-surface-sunken object-cover transition-transform duration-300 group-hover:scale-[1.02] sm:aspect-auto sm:h-full"
-          />
-        </a>
-
-        {rest.map((photo, i) => (
-          <a
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        {photos.map((photo, i) => (
+          <div
             key={photo.id}
-            href={photo.public_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group block overflow-hidden rounded-xl border border-line"
+            className="overflow-hidden rounded-xl border border-line bg-surface-sunken"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={photo.public_url}
-              alt={photo.alt || `${studioName}, photo ${i + 2}`}
+              alt={photo.alt || (i === 0 ? studioName : `${studioName}, photo ${i + 1}`)}
               width={photo.width ?? undefined}
               height={photo.height ?? undefined}
-              loading="lazy"
-              className="block aspect-[4/3] w-full bg-surface-sunken object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+              loading={i < 4 ? undefined : 'lazy'}
+              className="block aspect-[4/3] w-full object-cover"
             />
-          </a>
+          </div>
         ))}
       </div>
 
