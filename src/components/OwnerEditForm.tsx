@@ -8,7 +8,7 @@ import { DAYS, EditableField, FIELD_GROUPS } from '@/lib/editable'
 
 interface OwnerEditFormProps {
   studioId: string;
-  /** Current stored values, keyed by field. */
+  /** Current stored values with any pending edit applied, keyed by field. */
   values: Record<string, any>;
   /** True when an earlier edit is still waiting, so saving replaces it. */
   hasPending: boolean;
@@ -183,7 +183,8 @@ export default function OwnerEditForm({ studioId, values, hasPending }: OwnerEdi
     <form onSubmit={onSubmit} className="space-y-8">
       {hasPending && !done && (
         <p className="rounded-md border border-line-strong bg-surface-sunken px-4 py-3 text-sm">
-          You have changes waiting to be reviewed. Saving again replaces them.
+          You have changes waiting to be reviewed. They are already filled in
+          below, and saving replaces them with whatever you send next.
         </p>
       )}
 

@@ -241,10 +241,19 @@ function canonical(value: unknown): string {
   return JSON.stringify(value);
 }
 
-/** True when a stored value and a submitted one are the same edit. */
+/**
+ * True when a stored value and a submitted one are the same edit.
+ *
+ * An empty tag list counts as no value. The columns hold a mix of null and
+ * [] for "nothing selected", and treating those as different recorded a
+ * change every time an owner saved a form whose tags they had never touched
+ * - which then published as a deliberate clear.
+ */
 export function sameValue(a: unknown, b: unknown): boolean {
+  const empty = (v: unknown) =>
+    v === null || v === undefined || (Array.isArray(v) && v.length === 0);
   if (a === b) return true;
-  if ((a ?? null) === null && (b ?? null) === null) return true;
+  if (empty(a) && empty(b)) return true;
   return canonical(a ?? null) === canonical(b ?? null);
 }
 

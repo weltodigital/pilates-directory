@@ -49,10 +49,19 @@ export default async function EditStudioPage({ params }: PageProps) {
   const row = studio as any;
   const waiting = pending?.[0];
 
-  // The form starts from what is published, not from the pending edit: the
-  // owner should see the listing as visitors do, and saving replaces whatever
-  // was queued rather than stacking a second change on top of it.
-  const values = Object.fromEntries(EDITABLE_KEYS.map(key => [key, row[key] ?? null]));
+  // What is published, with anything still waiting laid over the top.
+  //
+  // Saving replaces the queued edit rather than stacking a second one on it,
+  // so the form has to open holding those queued values: an owner who came
+  // back to add a price found every tag they had just picked showing as
+  // unselected, and saving sent the whole lot as a deliberate clear.
+  const values = {
+    ...Object.fromEntries(EDITABLE_KEYS.map(key => [key, row[key] ?? null])),
+    ...Object.fromEntries(
+      Object.entries((waiting?.changes || {}) as Record<string, unknown>)
+        .filter(([key]) => EDITABLE_KEYS.includes(key))
+    ),
+  };
 
   return (
     <>
@@ -81,7 +90,8 @@ export default async function EditStudioPage({ params }: PageProps) {
           <p className="mt-1 text-sm text-ink-muted">
             Sent {new Date(waiting.created_at).toLocaleDateString('en-GB', {
               day: 'numeric', month: 'long',
-            })}. These are not on your listing yet.
+            })}. These are not on your listing yet, but the form below already
+            holds them, so you can carry on editing.
           </p>
           <ul className="mt-4 space-y-1.5 text-sm">
             {Object.entries(waiting.changes || {}).map(([key, value]) => {
