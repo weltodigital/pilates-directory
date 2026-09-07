@@ -202,6 +202,25 @@ export default async function StudioPage({ params }: StudioPageProps) {
   ];
 
   const fullAddress = `${studioData.address}, ${studioData.city}, ${studioData.postcode}`;
+
+  // What the "Classes offered" card has to show.
+  //
+  // The card carries prices and maximum class size as well as the class tags,
+  // so both halves decide whether it appears. Testing the tags alone hid a
+  // verified studio's approved prices, because they had not picked any class
+  // types and the whole card - prices included - was skipped.
+  const hasClassTags =
+    (studioData.class_types?.length ?? 0) > 0 ||
+    (studioData.equipment_available?.length ?? 0) > 0 ||
+    (studioData.specialties?.length ?? 0) > 0 ||
+    (studioData.class_levels?.length ?? 0) > 0 ||
+    (studioData.goal_tags?.length ?? 0) > 0;
+
+  const hasPrices = Boolean(
+    studioData.price_intro_offer || studioData.price_drop_in ||
+    studioData.price_class_pack || studioData.price_membership ||
+    studioData.class_size_max
+  );
   const BASE = 'https://www.pilatesclassesnear.com';
   const studioUrl = `${BASE}/${studioData.full_url_path}`;
 
@@ -456,13 +475,11 @@ export default async function StudioPage({ params }: StudioPageProps) {
           <div className="grid items-stretch gap-6 md:grid-cols-2 lg:grid-cols-3">
 
             {/* ------------------------------------------- Classes offered */}
-            {((studioData.class_types?.length ?? 0) > 0 ||
-              (studioData.equipment_available?.length ?? 0) > 0 ||
-              (studioData.specialties?.length ?? 0) > 0 ||
-              (studioData.class_levels?.length ?? 0) > 0 ||
-              (studioData.goal_tags?.length ?? 0) > 0) && (
+            {(hasClassTags || hasPrices) && (
               <section className="card-flat h-full p-7">
-                <h2 className="font-fraunces text-xl font-semibold">Classes offered</h2>
+                <h2 className="font-fraunces text-xl font-semibold">
+                  {hasClassTags ? 'Classes offered' : 'Prices'}
+                </h2>
 
                 {studioData.class_types && studioData.class_types.length > 0 && (
                   <div className="mt-5 flex flex-wrap gap-2">
@@ -501,13 +518,13 @@ export default async function StudioPage({ params }: StudioPageProps) {
                   </div>
                 )}
 
-                {(studioData.price_drop_in || studioData.price_class_pack ||
-                  studioData.price_membership || studioData.class_size_max ||
-                  studioData.price_intro_offer) && (
-                  <div className="mt-6 border-t border-line pt-5">
-                    <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-faint">
-                      Prices
-                    </h3>
+                {hasPrices && (
+                  <div className={hasClassTags ? 'mt-6 border-t border-line pt-5' : 'mt-5'}>
+                    {hasClassTags && (
+                      <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-faint">
+                        Prices
+                      </h3>
+                    )}
                     <dl className="mt-3 space-y-2.5 text-sm">
                       {studioData.price_intro_offer && (
                         <div className="flex items-baseline justify-between gap-4">
