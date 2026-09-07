@@ -66,6 +66,7 @@ interface PilatesStudio {
   price_membership?: string;
   class_size_max?: number;
   instructor_qualifications?: string[];
+  field_sources?: Record<string, { source?: string }>;
   county_slug: string;
   city_slug: string;
   full_url_path: string;
@@ -216,10 +217,21 @@ export default async function StudioPage({ params }: StudioPageProps) {
     (studioData.class_levels?.length ?? 0) > 0 ||
     (studioData.goal_tags?.length ?? 0) > 0;
 
-  const hasPrices = Boolean(
-    studioData.price_intro_offer || studioData.price_drop_in ||
-    studioData.price_class_pack || studioData.price_membership ||
-    studioData.class_size_max
+  const PRICE_KEYS = [
+    'price_intro_offer', 'price_drop_in', 'price_class_pack',
+    'price_membership', 'class_size_max',
+  ] as const;
+
+  const shownPrices = PRICE_KEYS.filter(key => studioData[key]);
+  const hasPrices = shownPrices.length > 0;
+
+  // Most prices on the site were read off a studio's website by the
+  // enrichment pass, so the note under them says where they came from and to
+  // check before booking. A price the owner typed in and we approved needs no
+  // provenance line - it came from them - but prices move, so the note keeps
+  // the part that is still worth saying.
+  const pricesFromOwner = shownPrices.every(
+    key => studioData.field_sources?.[key]?.source === 'owner'
   );
   const BASE = 'https://www.pilatesclassesnear.com';
   const studioUrl = `${BASE}/${studioData.full_url_path}`;
@@ -565,7 +577,9 @@ export default async function StudioPage({ params }: StudioPageProps) {
                       )}
                     </dl>
                     <p className="mt-3 text-xs text-ink-faint">
-                      Prices from the studio&apos;s own website. Confirm before booking.
+                      {pricesFromOwner
+                        ? 'Confirm before booking.'
+                        : 'Prices from the studio\u2019s own website. Confirm before booking.'}
                     </p>
                   </div>
                 )}
