@@ -1,3 +1,4 @@
+import { revalidatePath } from 'next/cache'
 import { lookupPostcode } from '@/lib/forms'
 import { recordAction } from '@/lib/admin-auth'
 import { requestPasswordLink } from '@/lib/owner-auth'
@@ -25,6 +26,21 @@ export function slugify(value: string): string {
 }
 
 type Result = { ok: true; message: string; path?: string } | { ok: false; error: string }
+
+/**
+ * Clear the cached pages a studio appears on.
+ *
+ * The county and town pages, the homepage and the sitemap are rendered once
+ * at build time and served from cache from then on. Without this, a studio
+ * approved today is live at its own address but missing from every list that
+ * should lead to it until the next deploy.
+ */
+export function republish(studioPath: string): void {
+  const [county, city] = studioPath.split('/');
+  for (const path of ['/', `/${county}`, `/${county}/${city}`, `/${studioPath}`, '/sitemap.xml']) {
+    try { revalidatePath(path); } catch (e) { console.error('Revalidation failed for', path, e); }
+  }
+}
 
 /**
  * Nudge a location's studio count. The column name is a leftover from the
@@ -165,6 +181,7 @@ export async function approveSubmission(
 
   await bumpLocationCount(supabase, cityId!, 1);
   await bumpLocationCount(supabase, county.id, 1);
+  republish(path);
 
   await supabase
     .from('studio_submissions')
@@ -290,6 +307,7 @@ export async function approveClaim(
   await recordAction(supabase, 'claim.approved', 'studio_claims', claim.id, {
     studio_id: claim.studio_id, owner_id: ownerId,
   }, note);
+  if (claim.pilates_studios?.full_url_path) republish(claim.pilates_studios.full_url_path);
 
   await requestPasswordLink(email, 'set_password', 'admin-approval');
 
@@ -378,6 +396,7 @@ export async function approveEdit(
   await recordAction(supabase, 'edit.approved', 'studio_edits', edit.id, {
     studio_id: edit.studio_id, fields: applied,
   }, note);
+  if (edit.pilates_studios?.full_url_path) republish(edit.pilates_studios.full_url_path);
 
   const owner = (edit as any).studio_owners;
   if (owner?.email) {
@@ -453,12 +472,13 @@ export async function approvePhoto(
     .update({ status: 'approved', reviewed_at: now, review_note: note })
     .eq('id', photoId)
     .eq('status', 'pending')
-    .select('id, pilates_studios(name)')
+    .select('id, pilates_studios(name,full_url_path)')
     .single();
 
   if (error || !data) return { ok: false, error: error?.message || 'Photo not found.' };
 
   await recordAction(supabase, 'photo.approved', 'studio_photos', photoId, null, note);
+  if ((data as any).pilates_studios?.full_url_path) republish((data as any).pilates_studios.full_url_path);
   return { ok: true, message: `Published on ${(data as any).pilates_studios?.name}.` };
 }
 

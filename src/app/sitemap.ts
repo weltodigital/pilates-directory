@@ -1,6 +1,10 @@
 import { MetadataRoute } from 'next'
 import { createClient } from '@supabase/supabase-js'
 
+// Rebuilt on approval (see republish in lib/review); this is the fallback
+// for anything changed by hand or by a script.
+export const revalidate = 86400
+
 /**
  * Generated from the database rather than hand-maintained.
  *

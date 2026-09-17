@@ -10,6 +10,10 @@ import ReviewsCta from '@/components/ReviewsCta';
 import StudioLocationsMap from '@/components/StudioLocationsMap';
 import { isOutwardCode } from '@/lib/geo';
 
+// Rebuilt on approval (see republish in lib/review); this is the fallback
+// for anything changed by hand or by a script.
+export const revalidate = 86400
+
 interface CountyPageProps {
   params: Promise<{
     county: string;
